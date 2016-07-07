@@ -21,7 +21,7 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
 # Finished setting up Nginx
 
 # Install requirements
-COPY conf/requirements.txt .
+COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 # Copy configuration files
