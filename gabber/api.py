@@ -71,14 +71,16 @@ def upload():
 
     # 3. Save image to disk and capture path
     # Image of interviewee is optional. If not provided, use default silhouette.
+    authorPath = None
     if 'author' in request.files:
         authorImage = request.files['authorImage']
-        authorPath = os.path.join(app.config['UPLOAD_FOLDER'], authorImage.filename)
+        authorPath = os.path.join(app.config['UPLOAD_FOLDER'],
+                                  authorImage.filename)
         authorImage.save(authorPath)
 
     # 4. Save all data to database.
     experienceDB = Experience(experience=expPath,
-                              authorImage=authorPath or None,
+                              authorImage=authorPath,
                               interviewerEmail=interviewerEmail,
                               intervieweeEmail=intervieweeEmail,
                               intervieweeName=intervieweeName,
