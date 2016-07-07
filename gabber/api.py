@@ -1,6 +1,7 @@
 from gabber import app, db
-from gabber.models import User
+from gabber.models import User, Experience
 from flask import jsonify, request
+import os
 
 
 # requests.post('http://0.0.0.0:8080/api/register',
@@ -40,3 +41,41 @@ def login():
             return jsonify({'success': 'We did it!'}), 200
         return jsonify({'error': 'Incorrect password provided.'}), 400
     return jsonify({'error': 'Username and password do not match.'}), 400
+
+
+# requests.post("http://0.0.0.0:8080/api/upload",
+# files={'experience': open('audio.mp3', 'rb'),
+#        'authorImage': open('gnome.svg', 'rb')},
+# data={'interviewerEmail':'jawrainey@gmail.com'})
+@app.route('/api/upload', methods=['POST'])
+def upload():
+    # TODO: return better errors for specific missing data.
+    if not request.files or not request.form:
+        return jsonify({'error': 'Required data has not been sent.'}), 400
+
+    # 1. Validate fields
+    experience = request.files['experience']
+    authorImage = request.files['authorImage']
+    interviewerEmail = request.form.get('interviewerEmail', None)
+    intervieweeEmail = request.form.get('intervieweeEmail', None)
+    intervieweeName = request.form.get('intervieweeName', None)
+    location = request.form.get('location', None)
+    promptText = request.form.get('promptText', None)
+
+    # 2. Save file to disk and capture path
+    expPath = os.path.join(app.config['UPLOAD_FOLDER'], experience.filename)
+    experience.save(expPath)
+
+    # 3. Save image to disk and capture path
+    authorPath = os.path.join(app.config['UPLOAD_FOLDER'], authorImage.filename)
+    authorImage.save(authorPath)
+
+    # 4. Save all data to database.
+    experienceDB = Experience(experience=expPath, authorImage=authorPath,
+                              interviewerEmail=interviewerEmail,
+                              intervieweeEmail=intervieweeEmail,
+                              intervieweeName=intervieweeName,
+                              location=location, promptText=promptText)
+    db.session.add(experienceDB)
+    db.session.commit()
+    return jsonify({'success': 'We did it!'}), 200
