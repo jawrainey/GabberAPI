@@ -59,23 +59,26 @@ def upload():
 
     # 1. Validate fields
     experience = request.files['experience']
-    authorImage = request.files['authorImage']
     interviewerEmail = request.form.get('interviewerEmail', None)
     intervieweeEmail = request.form.get('intervieweeEmail', None)
     intervieweeName = request.form.get('intervieweeName', None)
     location = request.form.get('location', None)
     promptText = request.form.get('promptText', None)
 
-    # 2. Save file to disk and capture path
+    # 2. Save file to disk and capture path. Required.
     expPath = os.path.join(app.config['UPLOAD_FOLDER'], experience.filename)
     experience.save(expPath)
 
     # 3. Save image to disk and capture path
-    authorPath = os.path.join(app.config['UPLOAD_FOLDER'], authorImage.filename)
-    authorImage.save(authorPath)
+    # Image of interviewee is optional. If not provided, use default silhouette.
+    if 'author' in request.files:
+        authorImage = request.files['authorImage']
+        authorPath = os.path.join(app.config['UPLOAD_FOLDER'], authorImage.filename)
+        authorImage.save(authorPath)
 
     # 4. Save all data to database.
-    experienceDB = Experience(experience=expPath, authorImage=authorPath,
+    experienceDB = Experience(experience=expPath,
+                              authorImage=authorPath or None,
                               interviewerEmail=interviewerEmail,
                               intervieweeEmail=intervieweeEmail,
                               intervieweeName=intervieweeName,
