@@ -1,0 +1,7 @@
+/venv
+dev.db
+*.pyc
+*.swp
+*.swo
+.ropeproject/
+.idea/
