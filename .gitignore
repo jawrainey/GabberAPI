@@ -1,7 +1,8 @@
 /venv
-dev.db
+dati.db
 *.pyc
 *.swp
 *.swo
 .ropeproject/
 .idea/
+/experiences
