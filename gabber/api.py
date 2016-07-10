@@ -79,12 +79,14 @@ def upload():
         authorImage.save(authorPath)
 
     # 4. Save all data to database.
-    experienceDB = Experience(experience=expPath,
-                              authorImage=authorPath,
+    experienceDB = Experience(experience=experience.filename,
+                              authorImage=authorImage.filename,
                               interviewerEmail=interviewerEmail,
                               intervieweeEmail=intervieweeEmail,
                               intervieweeName=intervieweeName,
-                              location=location, promptText=promptText)
+                              location=location,
+                              promptText=promptText)
     db.session.add(experienceDB)
     db.session.commit()
+
     return jsonify({'success': 'We did it!'}), 200
