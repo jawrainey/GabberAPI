@@ -30,3 +30,5 @@ class Experience(db.Model):
     intervieweeName = db.Column(db.String(64))
     location = db.Column(db.String(10))
     promptText = db.Column(db.String(64))
+    # Take the values: ALL, AUD, ANON, NONE.
+    consent = db.Column(db.String(4))

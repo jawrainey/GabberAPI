@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Approve consent to publically share your data</title>
+  <link href="{{ url_for('static', filename='css/custom.css', _external=True) }}" rel="stylesheet">
+</head>
+<body>
+  <div id="wrapper">
+    <h2>Your consent to share</h2>
+    <p>Hello: {{ data['name'].split(" ")[0].title() }}</p>{% if data['image'] %}
+    <img width="50" height="50" src="{{ url_for('protected', filename=data['image']) }}" /> {% endif %}
+    <audio preload="metadata" controls src="{{ data['audio'] }}"></audio>
+    <form method="post">{% if data['image'] %}
+      <input type="checkbox" name="consent" value="ALL" checked />Image and audio<br /> {% endif %}
+      <input type="checkbox" name="consent" value="AUD" {% if not data['image'] %} Checked {% endif %} />Audio experience<br />
+      <input type="checkbox" name="consent" value="ANON" />An anonymized transcription of the audio<br />
+      <input type="checkbox" name="consent" value="NONE" />None of the above<br />
+      <button type="submit" name="submit">Submit consent</button>
+    </form>
+  </div>
+ </body>
+</html>

@@ -1,0 +1,9 @@
+#wrapper {
+  font: .6em/1.618 serif;
+  max-width: 40em;
+  margin: 0 auto;
+}
+ul { list-style: none; }
+h2 {text-align: center; }
+img, audio { display: inline;}
+audio { width: 85%; }

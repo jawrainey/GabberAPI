@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Experiences of DEN Summer school</title>
+  <link href="{{ url_for('static', filename='css/custom.css', _external=True) }}" rel="stylesheet">
+</head>
+<body>
+  <div id="wrapper"> {% with messages = get_flashed_messages() %} {% if messages %}
+    {{ messages[0]}} {% endif %} {% endwith %}
+    <h2>GABBER: ALL EXPERIENCES</h2>
+    <ul>{% for experience in experiences %}
+      <li>
+        <img width="50" height="50" src="{{ experience['image'] }}" />
+        <audio type="audio/3gpp" preload="metadata" controls src="{{ experience['audio'] }}"></audio>
+      </li>{% endfor %}
+    </ul>
+  </div>
+ </body>
+</html>

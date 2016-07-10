@@ -15,10 +15,11 @@ dbp = os.path.join(xp, 'dati.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + dbp
 app.config['SECRET_KEY'] = 'supersecretpasswordfromtheotherside'
 app.config['UPLOAD_FOLDER'] = xp
+app.config['SALT'] = 'supersecretsaltfromtheotherside'
 
 db = SQLAlchemy(app)
 
-from gabber import models, api
+from gabber import models, api, views
 
 # Create the database afterwards as models meta-data required to populate it.
 if not os.path.exists(dbp):
