@@ -1,4 +1,4 @@
-from gabber import app, db
+from gabber import app, db, helper
 from gabber.models import User, Experience
 from flask import jsonify, request
 import os
@@ -84,5 +84,6 @@ def upload():
                               promptText=promptText)
     db.session.add(experienceDB)
     db.session.commit()
-
+    # Now we have saved it, ask the interviewee for permission to share it.
+    helper.email_consent(experienceDB)
     return jsonify({'success': 'We did it!'}), 200
