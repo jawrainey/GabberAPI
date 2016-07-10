@@ -14,7 +14,6 @@ def index():
     """
     # All of the experiences that have been consented for public display.
     experiences = Experience.query.filter(Experience.consent != "NONE").all()
-    print _generate_consent_url(experiences[1])
     # Pass information we want to display to simplify view logic.
     filtered_experiences = []
     # TODO: transcriptions as "subtitles below audios" for non-natives?
