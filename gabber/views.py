@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from gabber import app, db
 from gabber.models import Experience
 from helper import confirm_consent
