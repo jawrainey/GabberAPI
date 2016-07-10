@@ -30,7 +30,7 @@ app.config['MAIL_USE_SSL'] = True
 db = SQLAlchemy(app)
 mail = Mail(app)
 
-from gabber import models, api, views
+from gabber import models, api, views, helper
 
 # Create the database afterwards as models meta-data required to populate it.
 if not os.path.exists(dbp):

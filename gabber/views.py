@@ -1,6 +1,5 @@
-from gabber import app, db
+from gabber import app, db, helper
 from gabber.models import Experience
-from helper import confirm_consent
 from flask import render_template, send_from_directory, \
     Markup, flash, url_for, request, redirect
 
@@ -31,7 +30,7 @@ def index():
 def consent(token):
     # Get the audio-experience (AX) associated with this consent.
     # The interviewees name and path to the recorded audio is encoded in URI.
-    consent = confirm_consent(token)
+    consent = helper.confirm_consent(token)
     # The consent URI exists for a period of time to prevent hacks.
     if not consent:
         return "Approval for this experience has expired."
