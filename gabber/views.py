@@ -2,7 +2,7 @@
 
 from gabber import app, db
 from gabber.models import Experience
-from itsdangerous import URLSafeTimedSerializer
+from helper import confirm_consent
 from flask import render_template, send_from_directory, \
     Markup, flash, url_for, request, redirect
 
@@ -33,7 +33,7 @@ def index():
 def consent(token):
     # Get the audio-experience (AX) associated with this consent.
     # The interviewees name and path to the recorded audio is encoded in URI.
-    consent = _confirm_consent(token)
+    consent = confirm_consent(token)
     # The consent URI exists for a period of time to prevent hacks.
     if not consent:
         return "Approval for this experience has expired."
@@ -69,27 +69,3 @@ def protected(filename):
     # TODO: however, if the filename is known, then anyone can download.
     path = os.path.join(app.root_path, 'protected')
     return send_from_directory(path, filename)
-
-
-def _email_consent(email, experience):
-    # TODO: this will be invoked in upload()
-    # Sends an email to a user to approve their audio experience, which
-    # calls _generate_consent_url(who, what) below.
-    return 0
-
-
-def _generate_consent_url(experience):
-    ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
-    properties = [experience.intervieweeName, experience.experience,
-                  experience.authorImage]
-    token = ts.dumps(properties, app.config['SALT'])
-    return url_for('consent', token=token)
-
-
-def _confirm_consent(token, exp=3600):
-    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
-    try:
-        consent = serializer.loads(token, salt=app.config['SALT'], max_age=exp)
-    except:
-        return False  # URI expired or invalid token created.
-    return consent
