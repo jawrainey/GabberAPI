@@ -4,10 +4,6 @@ from flask import jsonify, request
 import os
 
 
-@app.route('/', methods=['POST', 'GET'])
-def index():
-    return 'Hello you.'
-
 # requests.post('http://0.0.0.0:8080/api/register',
 # data = {'email': 'jawrainey@gmail.com',
 # 'password': 'apassword', 'fullname': 'Jay Rainey'})
