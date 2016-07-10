@@ -1,21 +1,19 @@
-from gabber import app
-from flask import url_for
+from gabber import app, mail
+from flask import url_for, render_template, request
 from itsdangerous import URLSafeTimedSerializer
 
 
-def email_consent(email, experience):
+def email_consent(experience):
     # TODO: this will be invoked in upload()
     # Sends an email to a user to approve their audio experience, which
     # calls _generate_consent_url(who, what) below.
-    return 0
-
-
-def generate_consent_url(experience):
-    ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
-    properties = [experience.intervieweeName, experience.experience,
-                  experience.authorImage]
-    token = ts.dumps(properties, app.config['SALT'])
-    return url_for('consent', token=token)
+    from flask_mail import Message
+    message = Message('Gabber: consent to share your experience with the world',
+                      recipients=[experience.intervieweeEmail])
+    content = {'name': experience.intervieweeName,
+               'uri': request.url_root[:-1] + __consent_url(experience)}
+    message.html = render_template('email.html', data=content)
+    mail.send(message)
 
 
 def confirm_consent(token, exp=3600):
@@ -25,3 +23,11 @@ def confirm_consent(token, exp=3600):
     except:
         return False  # URI expired or invalid token created.
     return consent
+
+
+def __consent_url(experience):
+    ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+    properties = [experience.intervieweeName, experience.experience,
+                  experience.authorImage]
+    token = ts.dumps(properties, app.config['SALT'])
+    return url_for('consent', token=token)
