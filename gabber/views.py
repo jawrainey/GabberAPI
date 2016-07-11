@@ -18,7 +18,7 @@ def index():
         # An audio experience is required
         audio = url_for('protected', filename=experience.experience)
         # Taking a picture of interviewee is optional. Only show if allowed.
-        if experience.authorImage and experience.consent == 'all':
+        if experience.authorImage and experience.consent == 'ALL':
             image = url_for('protected', filename=experience.authorImage)
         else:
             image = url_for('protected', filename='default.png')
