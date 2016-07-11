@@ -28,35 +28,37 @@ def index():
     return render_template('home.html', experiences=filtered_experiences)
 
 
-@main.route('consent/<token>', methods=['GET', 'POST'])
-def consent(token):
+@main.route('consent/<token>', methods=['POST'])
+def validate_consent(token):
+    # TODO: user can re-approve their experience until expiration time met.
+    experience_path = helper.confirm_consent(token)[1]
+    experience = Experience.query.filter_by(experience=experience_path).first()
+    # TODO: validate input -- those haxzors may modify the name property
+    # for malicious intent, but for now. Let's make it work.
+    experience.consent = request.form['consent']
+    db.session.commit()
+    # Display a message upon submitting their consent on the home page.
+    # That way, if they do approve, they can see their experience too.
+    flash(Markup('<h3>Thank you for approving your experience. If you \
+                    would like to gather your friends experiences, consider \
+                    downloading <a href="/download">gabber</a>.</h3>'))
+    return redirect(url_for('main.index'))
+
+
+@main.route('consent/<token>', methods=['GET'])
+def display_consent(token):
     # Get the audio-experience (AX) associated with this consent.
     # The interviewees name and path to the recorded audio is encoded in URI.
     consent = helper.confirm_consent(token)
     # The consent URI exists for a period of time to prevent hacks.
     if not consent:
         return "Approval for this experience has expired."
-
+    # The contents of the experience to display to the user.
     experience_to_approve = {
         'name': consent[0],
         'audio': url_for('main.protected', filename=consent[1]),
         'image': consent[2]
     }
-
-    # TODO: move this post operation to individual method.
-    if request.method == "POST":
-        # TODO: user can re-approve their experience until expiration time met.
-        experience = Experience.query.filter_by(experience=consent[1]).first()
-        # TODO: validate input -- those haxzors may modify the name property
-        # for malicious intent, but for now. Let's make it work.
-        experience.consent = request.form['consent']
-        db.session.commit()
-        # Display a message upon submitting their consent on the home page.
-        # That way, if they do approve, they can see their experience too.
-        flash(Markup('<h3>Thank you for approving your experience. If you \
-                     would like to gather your friends experiences, consider \
-                     downloading <a href="/download">gabber</a>.</h3>'))
-        return redirect(url_for('main.index'))
     # Display the experience that the user needs to approve.
     return render_template('consent.html', data=experience_to_approve)
 
