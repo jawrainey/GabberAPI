@@ -1,13 +1,14 @@
 from gabber import app, db, helper
 from gabber.models import User, Experience
-from flask import jsonify, request
+from flask import jsonify, request, Blueprint
 import os
 
+api = Blueprint('api', __name__)
 
 # requests.post('http://0.0.0.0:8080/api/register',
 # data = {'email': 'jawrainey@gmail.com',
 # 'password': 'apassword', 'fullname': 'Jay Rainey'})
-@app.route('/api/register', methods=['POST'])
+@api.route('register', methods=['POST'])
 def register():
     username = request.form.get('email', None)
     password = request.form.get('password', None)
@@ -26,7 +27,7 @@ def register():
 
 # requests.post('http://0.0.0.0:8080/api/auth',
 # data = {'username': 'jawrainey@gmail.com', 'password' : 'apassword'})
-@app.route('/api/auth', methods=['POST'])
+@api.route('auth', methods=['POST'])
 def login():
     username = request.form.get('username', None)
     password = request.form.get('password', None)
@@ -47,7 +48,7 @@ def login():
 # files={'experience': open('audio.mp3', 'rb'),
 #        'authorImage': open('gnome.svg', 'rb')},
 # data={'interviewerEmail':'jawrainey@gmail.com'})
-@app.route('/api/upload', methods=['POST'])
+@api.route('upload', methods=['POST'])
 def upload():
     # TODO: return better errors for specific missing data.
     if not request.files or not request.form:

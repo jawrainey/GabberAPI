@@ -30,4 +30,4 @@ def __consent_url(experience):
     properties = [experience.intervieweeName, experience.experience,
                   experience.authorImage]
     token = ts.dumps(properties, app.config['SALT'])
-    return url_for('consent', token=token)
+    return url_for('main.consent', token=token)

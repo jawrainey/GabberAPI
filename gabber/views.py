@@ -1,10 +1,12 @@
-from gabber import app, db, helper
+from gabber import db, helper
 from gabber.models import Experience
 from flask import render_template, send_from_directory, \
-    Markup, flash, url_for, request, redirect
+    Markup, flash, url_for, request, redirect, Blueprint
+
+main = Blueprint('main', __name__)
 
 
-@app.route('/', methods=['GET'])
+@main.route('/', methods=['GET'])
 def index():
     """
     Displays chronologically all experiences that have been made public.
@@ -16,17 +18,17 @@ def index():
     # TODO: transcriptions as "subtitles below audios" for non-natives?
     for experience in experiences:
         # An audio experience is required
-        audio = url_for('protected', filename=experience.experience)
+        audio = url_for('main.protected', filename=experience.experience)
         # Taking a picture of interviewee is optional. Only show if allowed.
         if experience.authorImage and experience.consent == 'ALL':
-            image = url_for('protected', filename=experience.authorImage)
+            image = url_for('main.protected', filename=experience.authorImage)
         else:
-            image = url_for('protected', filename='default.png')
+            image = url_for('main.protected', filename='default.png')
         filtered_experiences.append({'audio': audio, 'image': image})
     return render_template('home.html', experiences=filtered_experiences)
 
 
-@app.route('/consent/<token>', methods=['GET', 'POST'])
+@main.route('consent/<token>', methods=['GET', 'POST'])
 def consent(token):
     # Get the audio-experience (AX) associated with this consent.
     # The interviewees name and path to the recorded audio is encoded in URI.
@@ -37,7 +39,7 @@ def consent(token):
 
     experience_to_approve = {
         'name': consent[0],
-        'audio': url_for('protected', filename=consent[1]),
+        'audio': url_for('main.protected', filename=consent[1]),
         'image': consent[2]
     }
 
@@ -54,15 +56,13 @@ def consent(token):
         flash(Markup('<h3>Thank you for approving your experience. If you \
                      would like to gather your friends experiences, consider \
                      downloading <a href="/download">gabber</a>.</h3>'))
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     # Display the experience that the user needs to approve.
     return render_template('consent.html', data=experience_to_approve)
 
 
-@app.route('/protected/<filename>')
+@main.route('protected/<filename>')
 def protected(filename):
-    import os
     # Store on root with nginx config to prevent anyone viewing audios
     # TODO: however, if the filename is known, then anyone can download.
-    path = os.path.join(app.root_path, 'protected')
-    return send_from_directory(path, filename)
+    return send_from_directory('protected', filename)
