@@ -29,7 +29,7 @@ RUN apt-get update && apt-get install -y supervisor \
 COPY conf/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Declare volumes to persist
-VOLUME /experiences
+VOLUME /app/gabber/protected
 
 # Copy rest of app environment
 COPY . /app
