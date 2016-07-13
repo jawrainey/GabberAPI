@@ -77,7 +77,8 @@ def upload():
 
     # 4. Save all data to database.
     experienceDB = Experience(experience=experience.filename,
-                              authorImage=authorImage.filename,
+                              authorImage=(authorImage.filename
+                                           if authorPath else authorPath),
                               interviewerEmail=interviewerEmail,
                               intervieweeEmail=intervieweeEmail,
                               intervieweeName=intervieweeName,
