@@ -69,7 +69,7 @@ def display_consent(token):
     # The contents of the experience to display to the user.
     experience_to_approve = [{
         'file': url_for('main.protected', filename=consent[1]),
-        'thumb': (consent[2] if consent[2]
+        'thumb': (url_for('main.protected', filename=consent[2]) if consent[2]
                   else url_for('main.protected', filename='default.jpg'))
     }]
     # Display the experience that the user needs to approve.
