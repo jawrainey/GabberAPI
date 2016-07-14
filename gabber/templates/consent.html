@@ -1,24 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Approve consent to publically share your data</title>
-  <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+  <title>Gabber: approve consent to publically share your data</title>
+  <link href="{{ url_for('static', filename='css/materialize.min.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="{{ url_for('static', filename='css/style.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="{{ url_for('static', filename='css/main.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <style>
+    .jAudio--playlist-meta-text { display: none; }
+    .jAudio--player .jAudio--playlist { height: 100%; }
+    .jAudio--playlist, .jAudio--player .jAudio--progress-bar, .jAudio--player .jAudio--controls { vertical-align: middle; display: inline-block; }
+    .jAudio--player .jAudio--playlist { overflow-y: hidden; }
+    .jAudio--player .jAudio--controls { width: 15%; }
+    .jAudio--player .jAudio--controls li { width: 100%; }
+    .jAudio--player .jAudio--progress-bar { width: 70%; padding: 0 .5rem; display: table-cell; }
+    .jAudio--player .jAudio--playlist .jAudio--playlist-item { width: 0; padding: .25rem; }
+    .jAudio--player .jAudio--playlist .jAudio--playlist-thumb { margin-right: 0; }
+    .jAudio--player .jAudio--playlist .jAudio--playlist-thumb img { width: 4.4rem; height: 4.4rem; margin-right: 0; }
+    .jAudio--player .jAudio--progress-bar .jAudio--progress-bar-wrapper { background: WhiteSmoke; }
+    .jAudio--player .jAudio--playlist .jAudio--playlist-item.active { background: none; }
+    .jAudio--player .jAudio--progress-bar .jAudio--progress-bar-played { background: #26a69a; }
+    .btn-large { margin-top: 1rem; }
+    form { padding: 1rem 0; }
+    .container { width: 32em; }
+    @media (max-width:641px) {
+      .jAudio--player, .container { width: 96%; padding: 0 2.5%; }
+      .jAudio--player .jAudio--controls { width: 20%; }
+      .jAudio--player .jAudio--progress-bar { width: 54%; }
+    }
+  </style>
 </head>
 <body>
-  <div id="wrapper">
-    <h2>Your consent to share</h2>
-    <p>Hello: {{ data['name'].split(" ")[0].title() }}</p>{% if data['image'] %}
-    <img width="50" height="50" src="{{ url_for('main.protected', filename=data['image']) }}" /> {% endif %}
-    <audio preload="metadata" controls src="{{ data['audio'] }}"></audio>
-    <form method="post">{% if data['image'] %}
-      <input type="checkbox" name="consent" value="ALL" checked />Image and audio<br /> {% endif %}
-      <input type="checkbox" name="consent" value="AUD" {% if not data['image'] %} Checked {% endif %} />Audio experience<br />
-      <input type="checkbox" name="consent" value="ANON" />An anonymized transcription of the audio<br />
-      <input type="checkbox" name="consent" value="NONE" />None of the above<br />
-      <button type="submit" name="submit">Submit consent</button>
+  <h2>Share your gabbering</h2>
+  <div class='jAudio--player'>
+    <audio></audio>
+    <div class='jAudio--playlist'></div>
+    <div class='jAudio--controls'>
+      <ul>
+        <li><button class='btn' data-action='play' id='btn-play'><span></span></button></li>
+      </ul>
+    </div>
+    <div class='jAudio--progress-bar'>
+      <div class='jAudio--progress-bar-wrapper'>
+        <div class='jAudio--progress-bar-played'>
+          <span class='jAudio--progress-bar-pointer'></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <p>Do you want the world to hear your experience? If you are unhappy
+      with either the image or audio then then consider creating an anonymized
+      transcription of the audio so the world can still learn from your data. </p>
+    <form method="post">
+      <p>
+        <input checked name="consent" type="radio" id="ALL" value="ALL" />
+        <label for="ALL">Image and audio</label>
+      </p>
+      <p>
+        <input name="consent" type="radio" id="AUD" value="AUD" />
+        <label for="AUD">Audio experience</label>
+      </p>
+      <p>
+        <input name="consent" type="radio" id="ANON" value="ANON"  />
+        <label for="ANON">An anonymized transcription of the audio</label>
+      </p>
+      <p>
+        <input name="consent" type="radio" id="NONE" value="NONE"  />
+        <label for="NONE">None of the above</label>
+      </p>
+      <button class="right waves-effect waves-light btn-large" type="submit" name="action">Submit consent</button>
     </form>
   </div>
- </body>
+  <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+  <script src='{{ url_for('static', filename='js/jaudio.min.js') }}'></script>
+  <script> $(".jAudio--player").jAudio( { playlist: {{ experiences | safe }} }); </script>
+  </script>
+</body>
 </html>

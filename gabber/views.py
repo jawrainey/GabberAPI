@@ -2,12 +2,18 @@ from gabber import db, helper
 from gabber.models import Experience
 from flask import render_template, send_from_directory, \
     Markup, flash, url_for, request, redirect, Blueprint
+import json
 
 main = Blueprint('main', __name__)
 
 
 @main.route('/', methods=['GET'])
 def index():
+    return render_template('index.html')
+
+
+@main.route('explore', methods=['GET'])
+def explore():
     """
     Displays chronologically all experiences that have been made public.
     """
@@ -24,8 +30,9 @@ def index():
             image = url_for('main.protected', filename=experience.authorImage)
         else:
             image = url_for('main.protected', filename='default.png')
-        filtered_experiences.append({'audio': audio, 'image': image})
-    return render_template('home.html', experiences=filtered_experiences)
+        filtered_experiences.append({'file': audio, 'thumb': image})
+    return render_template('explore.html',
+                           experiences=json.dumps(filtered_experiences))
 
 
 @main.route('consent/<token>', methods=['POST'])
@@ -42,7 +49,7 @@ def validate_consent(token):
     flash(Markup('<h3>Thank you for approving your experience. If you \
                     would like to gather your friends experiences, consider \
                     downloading <a href="/download">gabber</a>.</h3>'))
-    return redirect(url_for('main.index'))
+    return redirect(url_for('main.explore'))
 
 
 @main.route('consent/<token>', methods=['GET'])
@@ -54,13 +61,14 @@ def display_consent(token):
     if not consent:
         return "Approval for this experience has expired."
     # The contents of the experience to display to the user.
-    experience_to_approve = {
-        'name': consent[0],
-        'audio': url_for('main.protected', filename=consent[1]),
-        'image': consent[2]
-    }
+    experience_to_approve = [{
+        'file': url_for('main.protected', filename=consent[1]),
+        'thumb': (consent[2] if consent[2]
+                  else url_for('main.protected', filename='default.jpg'))
+    }]
     # Display the experience that the user needs to approve.
-    return render_template('consent.html', data=experience_to_approve)
+    return render_template('consent.html',
+                           experiences=json.dumps(experience_to_approve))
 
 
 @main.route('protected/<filename>')

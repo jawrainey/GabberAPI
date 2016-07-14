@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+  <title>Gabber: experienes being in a Digital Economy CDT</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/materialize.min.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="{{ url_for('static', filename='css/style.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+<body>
+  <nav class="white" role="navigation">
+    <div class="nav-wrapper container">
+      <a id="logo-container" href="#" class="brand-logo">gabber</a>
+      <ul class="right hide-on-med-and-down">
+        <li><a href="/explore">Explore</a></li>
+        <li><a href="/download">Download</a></li>
+      </ul>
+      <ul id="nav-mobile" class="side-nav">
+        <li><a href="/explore">Explore</a></li>
+        <li><a href="/download">Download</a></li>
+      </ul>
+      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+    </div>
+  </nav>
+  <div id="index-banner" class="parallax-container valign-wrapper">
+    <div class="section no-pad-bot">
+      <div class="container">
+        <h2 class="header center lighten-1">Conversations <u>shared</u> to be <b>heard</b></h2>
+        <h5 class="center lighten-3" style="padding-bottom: 1em;">
+          <i>Know a friend whose perspectives the world should hear?</i>
+        </h5>
+        <div class="row center">
+          <a href="/download" id="download-button" class="btn-large
+          waves-effect waves-light teal lighten-1">Download gabber</a>
+        </div>
+      </div>
+    </div>
+    <div class="parallax"><img src="{{ url_for('static', filename='img/background.jpg') }}"" alt=""></div>
+  </div>
+  <div class="container">
+    <div class="section no-pad-bot">
+      <div class="row">
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center teal-text"><i class="material-icons">group</i></h2>
+            <h5 class="center">1. Gather details</h5>
+            <p class="light">Take the name, email and (optionally) a photo of
+            the individual who you are gabbering with.</p>
+          </div>
+        </div>
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center teal-text"><i class="material-icons">chat_bubble_outline</i></h2>
+            <h5 class="center">2. Select a topic</h5>
+            <p class="light">Select an image to guide the discussion. What
+            discussion topic does your friend relate to most?</p>
+          </div>
+        </div>
+        <div class="col s12 m4">
+          <div class="icon-block">
+            <h2 class="center teal-text"><i class="material-icons">mic</i></h2>
+            <h5 class="center">3. Record opinions</h5>
+            <p class="light">Record a gabbering with your friend to share
+            with others to relate to, learn and be inspired from.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+   <footer>
+     <p class="center"><i>Crafted by <a class="brown-text text-lighten-3" href="http://jawrainey.me">@jawrainey</a>
+     using <a class="brown-text text-lighten-3" href="http://materializecss.com">Materialize</a>.</i></p>
+  </footer>
+  <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/materialize.min.js') }}"></script>
+  </body>
+</html>
