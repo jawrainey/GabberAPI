@@ -11,7 +11,7 @@
 <body>
   <nav class="white" role="navigation">
     <div class="nav-wrapper container">
-      <a id="logo-container" href="#" class="brand-logo">gabber</a>
+      <a id="logo-container" href="{{ url_for('main.index') }}" class="brand-logo">gabber</a>
       <ul class="right hide-on-med-and-down">
         <li><a href="{{ url_for('main.explore') }}">Explore</a></li>
         <li><a href="{{ url_for('main.download') }}">Download</a></li>
