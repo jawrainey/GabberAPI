@@ -3,6 +3,13 @@ from flask import url_for, render_template, request
 from itsdangerous import URLSafeTimedSerializer
 
 
+def register_response(fullname, email):
+    from flask_mail import Message
+    message = Message('Gabber registration', recipients=[email])
+    message.html = render_template('reg_email.html', data={'name': fullname})
+    mail.send(message)
+
+
 def email_consent(experience):
     # TODO: this will be invoked in upload()
     # Sends an email to a user to approve their audio experience, which

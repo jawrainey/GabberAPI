@@ -5,6 +5,7 @@ import os
 
 api = Blueprint('api', __name__)
 
+
 # requests.post('http://0.0.0.0:8080/api/register',
 # data = {'email': 'jawrainey@gmail.com',
 # 'password': 'apassword', 'fullname': 'Jay Rainey'})
@@ -22,6 +23,7 @@ def register():
 
     db.session.add(User(username, password, fullname))
     db.session.commit()
+    helper.register_response(fullname, username)
     return jsonify({'success': 'We did it!'}), 200
 
 
