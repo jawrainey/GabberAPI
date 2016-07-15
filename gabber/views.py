@@ -55,6 +55,7 @@ def validate_consent(token):
     flash(Markup('<h3>Thank you for approving your experience. If you \
                     would like to gather your friends experiences, consider \
                     downloading <a href="/download">gabber</a>.</h3>'))
+    helper.snowball(experience.intervieweeEmail)
     return redirect(url_for('main.explore'))
 
 

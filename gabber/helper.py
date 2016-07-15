@@ -10,6 +10,16 @@ def register_response(fullname, email):
     mail.send(message)
 
 
+def snowball(experience):
+    from flask_mail import Message
+    message = Message('Download gabber and share your friends perspectives',
+                      recipients=[experience.intervieweeEmail])
+    content = {'name': experience.intervieweeName,
+               'uri': url_for('main.download')}
+    message.html = render_template('snowball_email.html', data=content)
+    mail.send(message)
+
+
 def email_consent(experience):
     # TODO: this will be invoked in upload()
     # Sends an email to a user to approve their audio experience, which
@@ -19,7 +29,7 @@ def email_consent(experience):
                       recipients=[experience.intervieweeEmail])
     content = {'name': experience.intervieweeName,
                'uri': request.url_root[:-1] + __consent_url(experience)}
-    message.html = render_template('email.html', data=content)
+    message.html = render_template('consent_email.html', data=content)
     mail.send(message)
 
 
