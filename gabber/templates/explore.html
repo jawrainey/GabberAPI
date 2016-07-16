@@ -6,9 +6,19 @@
   <title>Gabber: experienes being in a Digital Economy CDT</title>
   <link href="{{ url_for('static', filename='css/main.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
 </head>
+  <style>
+    /* Increases the size of the photo whilst reducing padding. */
+    .jAudio--player .jAudio--playlist .jAudio--playlist-thumb img { width: 4.4rem; height: 4.4rem; margin-right: 0; }
+    /* The image in this row has changed size, so we want to align-center promptText */
+    .jAudio--player .jAudio--playlist-meta-text { margin-left: 5.5rem; margin-top: 1.5rem; }
+    /* Makes each item smaller in scale */
+    .jAudio--player .jAudio--playlist .jAudio--playlist-item { padding: .75rem; }
+    /* Makes the media-player & all contents responsive. */
+    @media (max-width:641px) { .jAudio--player { width: 96%; margin: 0 2.5%; } }
+  </style>
 <body> {% with messages = get_flashed_messages() %} {% if messages %}
   <p class="center">{{ messages[0] }}</p>{% endif %} {% endwith %}
-  <h2>Experiences as a DEN student</h2>
+  <h2>What’s it like to be a researcher in the DEN?</h2>
   <div class='jAudio--player'>
     <audio></audio>
     <div class='jAudio--ui'>

@@ -33,10 +33,23 @@ def explore():
         audio = url_for('main.protected', filename=experience.experience)
         # Taking a picture of interviewee is optional. Only show if allowed.
         if experience.authorImage and experience.consent == 'ALL':
+            # TODO: returns a 404... it would be better if a request was not
+            # made, e.g. we can ask the database if there is an authorImage,
+            # if there is, then no worries...
             image = url_for('main.protected', filename=experience.authorImage)
         else:
             image = url_for('main.protected', filename='default.png')
-        filtered_experiences.append({'file': audio, 'thumb': image})
+        # TODO: need to re-write jaudio such that the correct names are relevant
+        # to my own use. Used it for speed, but now it's blah...
+        mapPrompts = {"Prompt One": url_for('static', filename='img/prompts/1.jpg'),
+                      "Prompt Two": url_for('static', filename='img/prompts/2.jpg'),
+                      "Prompt Three": url_for('static', filename='img/prompts/3.jpg')}
+
+        promptImage = mapPrompts.get(experience.promptText, None)
+        filtered_experiences.append({'file': audio,
+                                     'thumb': promptImage,
+                                     'trackAlbum': image,
+                                     'trackName': experience.promptText})
     return render_template('explore.html',
                            experiences=json.dumps(filtered_experiences))
 
