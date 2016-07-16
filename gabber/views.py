@@ -41,9 +41,17 @@ def explore():
             image = url_for('main.protected', filename='default.png')
         # TODO: need to re-write jaudio such that the correct names are relevant
         # to my own use. Used it for speed, but now it's blah...
-        mapPrompts = {"Prompt One": url_for('static', filename='img/prompts/1.jpg'),
-                      "Prompt Two": url_for('static', filename='img/prompts/2.jpg'),
-                      "Prompt Three": url_for('static', filename='img/prompts/3.jpg')}
+
+        mapPrompts = {"Life in a CDT": url_for('static', filename='img/prompts/1.jpg'),
+                      "Why a PhD in the digital economy?": url_for('static', filename='img/prompts/2.jpg'),
+                      "CDT vs “normal” PhDs": url_for('static', filename='img/prompts/3.jpg'),
+                      "A highlight of your CDT experience": url_for('static', filename='img/prompts/4.jpg'),
+                      "What your family and friends think about what you do": url_for('static', filename='img/prompts/5.jpg'),
+                      "What inspires you to do what you do": url_for('static', filename='img/prompts/6.jpg'),
+                      "The best part of the summer school": url_for('static', filename='img/prompts/7.jpg'),
+                      "Advice you’d give your past self": url_for('static', filename='img/prompts/8.jpg'),
+                      "The essentials for a digital economy student": url_for('static', filename='img/prompts/9.jpg'),
+                      "Your most challenging experience so far": url_for('static', filename='img/prompts/10.jpg') }
 
         promptImage = mapPrompts.get(experience.promptText, None)
         filtered_experiences.append({'file': audio,
