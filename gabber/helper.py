@@ -7,9 +7,7 @@ def snowball(experience):
     from flask_mail import Message
     message = Message('Get gabbering with your friends',
                       recipients=[experience.intervieweeEmail])
-    content = {'name': experience.intervieweeName,
-               'uri': url_for('main.download')}
-    message.html = render_template('snowball_email.html', data=content)
+    message.html = render_template('snowball_email.html')
     mail.send(message)
 
 
