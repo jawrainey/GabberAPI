@@ -13,11 +13,11 @@
     <div class="nav-wrapper container">
       <a id="logo-container" href="{{ url_for('main.index') }}" class="brand-logo">gabber</a>
       <ul class="right hide-on-med-and-down">
-        <!-- <li><a href="{{ url_for('main.explore') }}">Explore</a></li> -->
+        <li><a href="{{ url_for('main.listen') }}">Listen</a></li>
         <li><a href="{{ url_for('main.download') }}">Download</a></li>
       </ul>
       <ul id="nav-mobile" class="side-nav">
-        <!-- <li><a href="{{ url_for('main.explore') }}">Explore</a></li> -->
+        <li><a href="{{ url_for('main.listen') }}">Listen</a></li>
         <li><a href="{{ url_for('main.download') }}">Download</a></li>
       </ul>
       <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
@@ -67,9 +67,28 @@
       </div>
     </div>
   </div>
-   <footer>
-     <p class="center"><i>Crafted by <a class="brown-text text-lighten-3" href="http://jawrainey.me">@jawrainey</a>
-     using <a class="brown-text text-lighten-3" href="http://materializecss.com">Materialize</a>.</i></p>
+
+  <footer class="page-footer teal">
+    <div class="container">
+      <div class="row">
+        <div class="col l8 s12">
+          <h5 class="white-text">About Gabber</h5>
+          <p class="grey-text text-lighten-4">Gabber was created as an
+          exploratory application to capture and share conversations between
+          communities. Data produced through gabber is fed back into the community
+          for analysis and use.</p>
+        </div>
+        <div class="col l3 s12 right">
+          <h5 class="white-text">Contact details</h5>
+          <p class="white-text">Jay Rainey</br>
+          Doctoral Trainee,</br>
+          <a class="brown-text text-lighten-3"
+            href="mailto:j.rainey2@ncl.ac.uk?subject=Gabber">j.rainey2@ncl.ac.uk</a></br>
+          Open Lab, Newcastle University</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer-copyright"></div>
   </footer>
   <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
   <script src="{{ url_for('static', filename='js/materialize.min.js') }}"></script>

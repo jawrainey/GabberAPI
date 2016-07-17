@@ -20,8 +20,8 @@ def download():
     return send_from_directory('protected', 'gabber.apk', as_attachment=True)
 
 
-@main.route('explore', methods=['GET'])
-def explore():
+@main.route('listen', methods=['GET'])
+def listen():
     """
     Displays chronologically all experiences that have been made public.
     """
@@ -78,7 +78,7 @@ def validate_consent(token):
     experience.consent = request.form['consent']
     db.session.commit()
     helper.snowball(experience)
-    return redirect(url_for('main.explore'))
+    return redirect(url_for('main.listen'))
 
 
 @main.route('consent/<token>', methods=['GET'])
