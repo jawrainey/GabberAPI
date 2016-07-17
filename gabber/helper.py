@@ -3,16 +3,9 @@ from flask import url_for, render_template, request
 from itsdangerous import URLSafeTimedSerializer
 
 
-def register_response(fullname, email):
-    from flask_mail import Message
-    message = Message('Gabber registration', recipients=[email])
-    message.html = render_template('reg_email.html', data={'name': fullname})
-    mail.send(message)
-
-
 def snowball(experience):
     from flask_mail import Message
-    message = Message('Download gabber and share your friends perspectives',
+    message = Message('Get gabbering with your friends',
                       recipients=[experience.intervieweeEmail])
     content = {'name': experience.intervieweeName,
                'uri': url_for('main.download')}
@@ -25,10 +18,9 @@ def email_consent(experience):
     # Sends an email to a user to approve their audio experience, which
     # calls _generate_consent_url(who, what) below.
     from flask_mail import Message
-    message = Message('Gabber: consent to share your experience with the world',
+    message = Message('Share your gabberings with the world',
                       recipients=[experience.intervieweeEmail])
-    content = {'name': experience.intervieweeName,
-               'uri': request.url_root[:-1] + __consent_url(experience)}
+    content = {'uri': request.url_root[:-1] + __consent_url(experience)}
     message.html = render_template('consent_email.html', data=content)
     mail.send(message)
 

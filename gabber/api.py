@@ -23,7 +23,6 @@ def register():
 
     db.session.add(User(username, password, fullname))
     db.session.commit()
-    helper.register_response(fullname, username)
     return jsonify({'success': 'We did it!'}), 200
 
 

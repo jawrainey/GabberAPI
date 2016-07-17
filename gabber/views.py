@@ -77,11 +77,6 @@ def validate_consent(token):
     # for malicious intent, but for now. Let's make it work.
     experience.consent = request.form['consent']
     db.session.commit()
-    # Display a message upon submitting their consent on the home page.
-    # That way, if they do approve, they can see their experience too.
-    flash(Markup('<h3>Thank you for approving your experience. If you \
-                    would like to gather your friends experiences, consider \
-                    downloading <a href="/download">gabber</a>.</h3>'))
     helper.snowball(experience)
     return redirect(url_for('main.explore'))
 
