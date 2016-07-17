@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from gabber import db, helper
 from gabber.models import Experience
 from flask import render_template, send_from_directory, \
@@ -41,17 +43,16 @@ def explore():
             image = url_for('main.protected', filename='default.png')
         # TODO: need to re-write jaudio such that the correct names are relevant
         # to my own use. Used it for speed, but now it's blah...
-
-        mapPrompts = {"Life in a CDT": url_for('static', filename='img/prompts/1.jpg'),
-                      "Why a PhD in the digital economy?": url_for('static', filename='img/prompts/2.jpg'),
-                      "CDT vs “normal” PhDs": url_for('static', filename='img/prompts/3.jpg'),
-                      "A highlight of your CDT experience": url_for('static', filename='img/prompts/4.jpg'),
-                      "What your family and friends think about what you do": url_for('static', filename='img/prompts/5.jpg'),
-                      "What inspires you to do what you do": url_for('static', filename='img/prompts/6.jpg'),
-                      "The best part of the summer school": url_for('static', filename='img/prompts/7.jpg'),
-                      "Advice you’d give your past self": url_for('static', filename='img/prompts/8.jpg'),
-                      "The essentials for a digital economy student": url_for('static', filename='img/prompts/9.jpg'),
-                      "Your most challenging experience so far": url_for('static', filename='img/prompts/10.jpg') }
+        mapPrompts = {"How is life in a CDT?": p(1),
+                      "Why a digital economy PhD?": p(2),
+                      "CDT vs “normal” PhDs?": p(3),
+                      "A highlight of your CDT experience": p(4),
+                      "What do your family think of your research?": p(5),
+                      "What inspires your research?": p(6),
+                      "Best part of the summer school?": p(7),
+                      "What advice would you give to new CDTs?": p(8),
+                      "What's essential for a DEN student?": p(9),
+                      "Challenging research experience you've had?": p(10)}
 
         promptImage = mapPrompts.get(experience.promptText, None)
         filtered_experiences.append({'file': audio,
@@ -60,6 +61,11 @@ def explore():
                                      'trackName': experience.promptText})
     return render_template('explore.html',
                            experiences=json.dumps(filtered_experiences))
+
+
+def p(f):
+    # Returns the URL to the prompt by filename...
+    return url_for('static', filename='img/prompts/' + str(f) + '.jpg')
 
 
 @main.route('consent/<token>', methods=['POST'])
