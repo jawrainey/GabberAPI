@@ -23,10 +23,10 @@ def email_consent(experience):
     mail.send(message)
 
 
-def confirm_consent(token, exp=3600):
+def confirm_consent(token):
     serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
     try:
-        consent = serializer.loads(token, salt=app.config['SALT'], max_age=exp)
+        consent = serializer.loads(token, salt=app.config['SALT'])
     except:
         return False  # URI expired or invalid token created.
     return consent
