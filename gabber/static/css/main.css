@@ -67,7 +67,6 @@ html { background: WhiteSmoke; }
   clear: both;
 }
 .jAudio--player .jAudio--controls {
-  position: absolute;
   bottom: 0;
   width: 100%;
   display: table;
@@ -170,7 +169,7 @@ html { background: WhiteSmoke; }
 }
 .jAudio--player .jAudio--playlist {
   background: #fff;
-  height: 50vh;
+  height: 40vh;
   overflow-y: scroll;
 }
 
