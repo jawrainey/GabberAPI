@@ -81,7 +81,7 @@ def validate_consent(token):
         experience.consentInterviewer = request.form['consent']
     else:
         experience.consentInterviewee = request.form['consent']
-        helper.snowball(experience.consentInterviewee)
+        helper.snowball(str(experience.consentInterviewee))
     db.session.commit()
     return redirect(url_for('main.listen'))
 
