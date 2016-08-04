@@ -3,10 +3,9 @@ from flask import url_for, render_template, request
 from itsdangerous import URLSafeTimedSerializer
 
 
-def snowball(experience):
+def snowball(email):
     from flask_mail import Message
-    message = Message('Get gabbering with your friends',
-                      recipients=[experience.intervieweeEmail])
+    message = Message('Get gabbering with your friends', recipients=[email])
     message.html = render_template('snowball_email.html')
     mail.send(message)
 
