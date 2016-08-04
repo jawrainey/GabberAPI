@@ -26,9 +26,10 @@ def listen():
     Displays chronologically all experiences that have been made public.
     """
     # All of the experiences that have been consented for public display.
-    experiences = Experience.query.filter(
-        Experience.consentInterviewer != "NONE" and
-        Experience.consentInterviewee != "NONE").all()
+    from sqlalchemy import and_
+    experiences = Experience.query.filter(and_(
+        Experience.consentInterviewer != "NONE",
+        Experience.consentInterviewee != "NONE")).all()
     # Pass information we want to display to simplify view logic.
     filtered_experiences = []
     # TODO: transcriptions as "subtitles below audios" for non-natives?
