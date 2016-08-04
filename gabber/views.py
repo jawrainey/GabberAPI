@@ -2,8 +2,8 @@
 
 from gabber import db, helper
 from gabber.models import Experience
-from flask import render_template, send_from_directory, \
-    Markup, flash, url_for, request, redirect, Blueprint
+from flask import Blueprint, redirect, request, \
+    render_template, send_from_directory, url_for
 import json
 
 main = Blueprint('main', __name__)
