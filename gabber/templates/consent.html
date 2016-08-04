@@ -76,5 +76,6 @@
   <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
   <script src='{{ url_for('static', filename='js/jaudio.min.js') }}'></script>
   <script> $(".jAudio--player").jAudio( { playlist: {{ experiences | safe }} }); </script>
+  {% include 'analytics' %}
 </body>
 </html>
