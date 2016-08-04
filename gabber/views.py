@@ -26,7 +26,9 @@ def listen():
     Displays chronologically all experiences that have been made public.
     """
     # All of the experiences that have been consented for public display.
-    experiences = Experience.query.filter(Experience.consent != "NONE").all()
+    experiences = Experience.query.filter(
+        Experience.consentInterviewer != "NONE" and
+        Experience.consentInterviewee != "NONE").all()
     # Pass information we want to display to simplify view logic.
     filtered_experiences = []
     # TODO: transcriptions as "subtitles below audios" for non-natives?
@@ -34,7 +36,9 @@ def listen():
         # An audio experience is required
         audio = url_for('main.protected', filename=experience.experience)
         # Taking a picture of interviewee is optional. Only show if allowed.
-        if experience.authorImage and experience.consent == 'ALL':
+        if (experience.authorImage and
+            experience.consentInterviewer == 'ALL' and
+            experience.consentInterviewee == 'ALL'):
             # TODO: returns a 404... it would be better if a request was not
             # made, e.g. we can ask the database if there is an authorImage,
             # if there is, then no worries...
@@ -71,11 +75,12 @@ def p(f):
 @main.route('consent/<token>', methods=['POST'])
 def validate_consent(token):
     # TODO: user can re-approve their experience until expiration time met.
-    experience_path = helper.confirm_consent(token)[1]
-    experience = Experience.query.filter_by(experience=experience_path).first()
-    # TODO: validate input -- those haxzors may modify the name property
-    # for malicious intent, but for now. Let's make it work.
-    experience.consent = request.form['consent']
+    token = helper.confirm_consent(token)
+    experience = Experience.query.filter_by(experience=token[1]).first()
+    if token[0] == experience.interviewerEmail:
+        experience.consentInterviewer = request.form['consent']
+    else:
+        experience.consentInterviewee = request.form['consent']
     db.session.commit()
     helper.snowball(experience)
     return redirect(url_for('main.listen'))

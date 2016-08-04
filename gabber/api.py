@@ -87,6 +87,7 @@ def upload():
                               promptText=promptText)
     db.session.add(experienceDB)
     db.session.commit()
-    # Now we have saved it, ask the interviewee for permission to share it.
-    helper.email_consent(experienceDB)
+    # Now we have saved it, ask both for their joint permission to share it.
+    helper.email_consent(experienceDB, experienceDB.interviewerEmail)
+    helper.email_consent(experienceDB, experienceDB.intervieweeEmail)
     return jsonify({'success': 'We did it!'}), 200

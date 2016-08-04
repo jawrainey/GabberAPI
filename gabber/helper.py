@@ -11,14 +11,13 @@ def snowball(experience):
     mail.send(message)
 
 
-def email_consent(experience):
+def email_consent(experience, email):
     # TODO: this will be invoked in upload()
     # Sends an email to a user to approve their audio experience, which
     # calls _generate_consent_url(who, what) below.
     from flask_mail import Message
-    message = Message('Share your gabberings with the world',
-                      recipients=[experience.intervieweeEmail])
-    content = {'uri': request.url_root[:-1] + __consent_url(experience)}
+    message = Message('Share your gabberings with the world', recipients=[email])
+    content = {'uri': request.url_root[:-1] + __consent_url(experience, email)}
     message.html = render_template('consent_email.html', data=content)
     mail.send(message)
 
@@ -32,9 +31,8 @@ def confirm_consent(token):
     return consent
 
 
-def __consent_url(experience):
+def __consent_url(experience, email):
     ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
-    properties = [experience.intervieweeName, experience.experience,
-                  experience.authorImage]
+    properties = [email, experience.experience, experience.authorImage]
     token = ts.dumps(properties, app.config['SALT'])
     return url_for('main.display_consent', token=token)
