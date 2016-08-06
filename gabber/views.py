@@ -48,16 +48,13 @@ def listen():
             image = url_for('main.protected', filename='default.png')
         # TODO: need to re-write jaudio such that the correct names are relevant
         # to my own use. Used it for speed, but now it's blah...
-        mapPrompts = {"How is life in a CDT?": p(1),
-                      "Why a digital economy PhD?": p(2),
-                      "CDT vs “normal” PhDs?": p(3),
-                      "A highlight of your CDT experience": p(4),
-                      "What do your family think of your research?": p(5),
-                      "What inspires your research?": p(6),
-                      "Best part of the summer school?": p(7),
-                      "What advice would you give to new CDTs?": p(8),
-                      "What's essential for a DEN student?": p(9),
-                      "Challenging research experience you've had?": p(10)}
+        mapPrompts = {"Getting involved in volunteering": p(1),
+                      "Benefits of volunteering": p(2),
+                      "Bad things about volunteering": p(3),
+                      "Are volunteers appreciated enough?": p(4),
+                      "Do volunteers have much freedom and flexibility?": p(5),
+                      "Is it always clear what is expected of volunteers?": p(6),
+                      "Do volunteers have much say in what they do?": p(7)}
 
         promptImage = mapPrompts.get(experience.promptText, None)
         filtered_experiences.append({'file': audio,
