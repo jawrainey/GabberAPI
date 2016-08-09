@@ -14,12 +14,6 @@ def index():
     return render_template('index.html')
 
 
-@main.route('download', methods=['GET'])
-def download():
-    # TODO: add the APK to the server, ovvio!
-    return send_from_directory('protected', 'gabber.apk', as_attachment=True)
-
-
 @main.route('listen', methods=['GET'])
 def listen():
     """
