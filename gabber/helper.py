@@ -15,7 +15,7 @@ def email_consent(experience, email):
     # Sends an email to a user to approve their audio experience, which
     # calls _generate_consent_url(who, what) below.
     from flask_mail import Message
-    message = Message('Share your gabberings with the world', recipients=[email])
+    message = Message('Share your Gabber with the world', recipients=[email])
     content = {'uri': request.url_root[:-1] + __consent_url(experience, email)}
     message.html = render_template('consent_email.html', data=content)
     mail.send(message)
