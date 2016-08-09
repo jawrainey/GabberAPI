@@ -7,7 +7,12 @@
   <link href="{{ url_for('static', filename='css/main.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
   <style>
     /* Increases the size of the photo whilst reducing padding. */
-    .jAudio--player .jAudio--playlist .jAudio--playlist-thumb img { width: 4.4rem; height: 4.4rem; margin-right: 0; }
+    .jAudio--player .jAudio--playlist .jAudio--playlist-thumb img { width:
+      4.4rem; height: 4.4rem; margin-right: 0;    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg); }
     /* The image in this row has changed size, so we want to align-center promptText */
     .jAudio--player .jAudio--playlist-meta-text { margin-left: 5.5rem; margin-top: 1rem; }
     /* Makes each item smaller in scale */
