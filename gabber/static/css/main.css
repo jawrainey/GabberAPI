@@ -14,7 +14,7 @@ h2 {
   font-size: 1.6em;
   text-align: center;
   padding: .8em;
-  color: #000000;
+  color: rgba(0,0,0,0.87);
   font-weight: bold;
 }
 

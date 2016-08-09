@@ -7,6 +7,9 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/materialize.min.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
   <link href="{{ url_for('static', filename='css/style.css') }}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <style>
+  h2, h5 { color: rgba(0,0,0,0.87); }
+  </style>
 </head>
 <body>
   <nav class="white" role="navigation">
@@ -26,9 +29,9 @@
   <div id="index-banner" class="parallax-container valign-wrapper">
     <div class="section no-pad-bot">
       <div class="container">
-        <h2 class="header center lighten-1">Conversations <u>shared</u> to be <b>heard</b></h2>
+        <h2 class="header center ">Conversations <u>shared</u> to be <b>heard</b></h2>
         <h5 class="center lighten-3" style="padding-bottom: 1em;">
-          <i>Do you know a friend whose gabberings you should share?</i>
+          <i>Do you know a friend whose gabberings you could share?</i>
         </h5>
         <div class="row center">
           <a href="{{ url_for('main.download') }}" id="download-button" class="btn-large
