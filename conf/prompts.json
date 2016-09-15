@@ -1,0 +1,32 @@
+{
+   "VOL":[
+      {
+         "prompt":"Getting involved in volunteering",
+         "imageName":"1.jpg"
+      },
+      {
+         "prompt":"Benefits of volunteering",
+         "imageName":"2.jpg"
+      },
+      {
+         "prompt":"Bad things about volunteering",
+         "imageName":"3jpg"
+      },
+      {
+         "prompt":"Are volunteers appreciated enough?",
+         "imageName":"4.jpg"
+      },
+      {
+         "prompt":"Do volunteers have much freedom and flexibility?",
+         "imageName":"5.jpg"
+      },
+      {
+         "prompt":"Is it always clear what is expected of volunteers?",
+         "imageName":"6.jpg"
+      },
+      {
+         "prompt":"Do volunteers have much say in what they do?",
+         "imageName":"7.jpg"
+      }
+   ]
+}
