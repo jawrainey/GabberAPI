@@ -26,7 +26,7 @@ def listen():
         ((Experience.consentInterviewer == "AUD") & (Experience.consentInterviewee == "ALL")) |
         ((Experience.consentInterviewer == "AUD") & (Experience.consentInterviewee == "AUD"))).all()
     # Pass information we want to display to simplify view logic.
-    filtered_experiences = []
+    filtered = []
     # TODO: transcriptions as "subtitles below audios" for non-natives?
     for experience in experiences:
         # An audio experience is required
@@ -41,28 +41,22 @@ def listen():
             image = url_for('main.protected', filename=experience.authorImage)
         else:
             image = url_for('main.protected', filename='default.png')
-        # TODO: need to re-write jaudio such that the correct names are relevant
-        # to my own use. Used it for speed, but now it's blah...
-        mapPrompts = {"Getting involved in volunteering": p(1),
-                      "Benefits of volunteering": p(2),
-                      "Bad things about volunteering": p(3),
-                      "Are volunteers appreciated enough?": p(4),
-                      "Do volunteers have much freedom and flexibility?": p(5),
-                      "Is it always clear what is expected of volunteers?": p(6),
-                      "Do volunteers have much say in what they do?": p(7)}
-
-        promptImage = mapPrompts.get(experience.promptText, None)
-        filtered_experiences.append({'file': audio,
-                                     'thumb': promptImage,
-                                     'trackAlbum': image,
-                                     'trackName': experience.promptText})
-    return render_template('explore.html',
-                           experiences=json.dumps(filtered_experiences))
-
-
-def p(f):
-    # Returns the URL to the prompt by filename...
-    return url_for('static', filename='img/prompts/' + str(f) + '.jpg')
+        # All the prompts
+        with open("conf/prompts.json", 'r') as p:
+            ps = json.load(p)
+        # Assign the promptImage a filepath.
+        # TODO: should this be done when a user creates one instead?
+        for theme, prompts in ps.items():
+            for prompt in prompts:
+                prompt['imageName'] = url_for('static', filename='img/prompts/' + prompt['imageName'])
+        # TODO: prompts were abstracted to a theme; have hard-coded VOL for now.
+        prompt = [i for i in ps['VOL'] if i['prompt'] == experience.promptText]
+        # These are the experiences that have been consented to be made public.
+        filtered.append({'file': audio,
+                         'thumb': prompt[0]['imageName'],
+                         'trackAlbum': image,
+                         'trackName': experience.promptText})
+    return render_template('explore.html', experiences=json.dumps(filtered))
 
 
 @main.route('consent/<token>', methods=['POST'])
