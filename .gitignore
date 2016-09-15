@@ -3,6 +3,7 @@ dati.db
 *.pyc
 *.swp
 *.swo
+*.DS_Store
 .ropeproject/
 .idea/
 /experiences
