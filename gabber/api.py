@@ -1,9 +1,21 @@
 from gabber import app, db, helper
 from gabber.models import User, Experience
 from flask import jsonify, request, Blueprint
-import os
+import json, os
 
 api = Blueprint('api', __name__)
+
+
+@api.route('projects', methods=['GET'])
+def projects():
+    # TODO: filter based on user credentials.
+    # Some projects may not be related or private.
+    # Workaround: only return those relevant to that user?
+    # Therefore, themes becomes username, and a lookup, then filter performed.
+
+    with open("conf/prompts.json", 'r') as p:
+        prompts = json.load(p)
+    return jsonify(prompts), 200
 
 
 # requests.post('http://0.0.0.0:8080/api/register',
