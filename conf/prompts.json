@@ -1,32 +1,37 @@
 {
-   "VOL":[
-      {
-         "prompt":"Getting involved in volunteering",
-         "imageName":"1.jpg"
-      },
-      {
-         "prompt":"Benefits of volunteering",
-         "imageName":"2.jpg"
-      },
-      {
-         "prompt":"Bad things about volunteering",
-         "imageName":"3jpg"
-      },
-      {
-         "prompt":"Are volunteers appreciated enough?",
-         "imageName":"4.jpg"
-      },
-      {
-         "prompt":"Do volunteers have much freedom and flexibility?",
-         "imageName":"5.jpg"
-      },
-      {
-         "prompt":"Is it always clear what is expected of volunteers?",
-         "imageName":"6.jpg"
-      },
-      {
-         "prompt":"Do volunteers have much say in what they do?",
-         "imageName":"7.jpg"
-      }
-   ]
+	"projects": [
+		{
+			"theme": "VOL",
+			"prompts": [
+				{
+					"prompt": "Getting involved in volunteering",
+					"imageName": "https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/1.jpg"
+				},
+				{
+					"prompt": "Benefits of volunteering",
+					"imageName": "https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/2.jpg"
+				},
+				{
+					"prompt": "Bad things about volunteering",
+					"imageName": "https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/3.jpg"
+				},
+				{
+					"prompt": "Are volunteers appreciated enough?",
+					"imageName": "https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/4.jpg"
+				},
+				{
+					"prompt": "Do volunteers have much freedom and flexibility?",
+					"imageName": "https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/5.jpg"
+				},
+				{
+					"prompt": "Is it always clear what is expected of volunteers?",
+					"imageName": "https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/6.jpg"
+				},
+				{
+					"prompt": "Do volunteers have much say in what they do?",
+					"imageName": "https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/7.jpg"
+				}
+			]
+		}
+	]
 }
