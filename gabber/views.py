@@ -27,6 +27,11 @@ def listen():
         ((Experience.consentInterviewer == "AUD") & (Experience.consentInterviewee == "AUD"))).all()
     # Pass information we want to display to simplify view logic.
     filtered = []
+
+    # All the prompts. Should only be loaded once.
+    with open("conf/prompts.json", 'r') as p:
+        ps = json.load(p)
+
     # TODO: transcriptions as "subtitles below audios" for non-natives?
     for experience in experiences:
         # An audio experience is required
@@ -41,19 +46,14 @@ def listen():
             image = url_for('main.protected', filename=experience.authorImage)
         else:
             image = url_for('main.protected', filename='default.png')
-        # All the prompts
-        with open("conf/prompts.json", 'r') as p:
-            ps = json.load(p)
-        # Assign the promptImage a filepath.
-        # TODO: should this be done when a user creates one instead?
-        for theme, prompts in ps.items():
-            for prompt in prompts:
-                prompt['imageName'] = url_for('static', filename='img/prompts/' + prompt['imageName'])
-        # TODO: prompts were abstracted to a theme; have hard-coded VOL for now.
-        prompt = [i for i in ps['VOL'] if i['prompt'] == experience.promptText]
+
+        # TODO: hard-coded VOL for now.
+        promptImage = [i['imageName'] for i in ps['projects'][0]['prompts']
+                       if i['prompt'] == experience.promptText]
+
         # These are the experiences that have been consented to be made public.
         filtered.append({'file': audio,
-                         'thumb': prompt[0]['imageName'],
+                         'thumb': promptImage,
                          'trackAlbum': image,
                          'trackName': experience.promptText})
     return render_template('explore.html', experiences=json.dumps(filtered))
