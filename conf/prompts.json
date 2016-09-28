@@ -1,63 +1,61 @@
-{
-   "projects":[
-      {
-         "theme":"VOL",
-         "prompts":[
-            {
-               "prompt":"Getting involved in volunteering",
-               "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/1.jpg"
-            },
-            {
-               "prompt":"Benefits of volunteering",
-               "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/2.jpg"
-            },
-            {
-               "prompt":"Bad things about volunteering",
-               "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/3.jpg"
-            },
-            {
-               "prompt":"Are volunteers appreciated enough?",
-               "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/4.jpg"
-            },
-            {
-               "prompt":"Do volunteers have much freedom and flexibility?",
-               "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/5.jpg"
-            },
-            {
-               "prompt":"Is it always clear what is expected of volunteers?",
-               "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/6.jpg"
-            },
-            {
-               "prompt":"Do volunteers have much say in what they do?",
-               "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/7.jpg"
-            }
-         ]
-      },
-      {
-         "theme":"JV",
-         "prompts":[
-            {
-               "prompt":"Making the press",
-               "imageName":"http://i4.thejournal.co.uk/incoming/article7314133.ece/ALTERNATES/s615/JS34792295.jpg"
-            },
-            {
-               "prompt":"Ageism in the modern world",
-               "imageName":"http://www.trans-techresearch.net/wp-content/uploads/2015/04/ageingfutures1.jpg"
-            }
-         ]
-      },
-      {
-         "theme":"Nexus",
-         "prompts":[
-            {
-               "prompt":"How to improve the Metro?",
-               "imageName":"http://www.datadisplayuk.com/file/images/news/Haymarket-TFT%20PIDs.jpg"
-            },
-            {
-               "prompt":"Safety and the metro",
-               "imageName":"https://c2.staticflickr.com/6/5289/5687972639_cafd79cfab_b.jpg"
-            }
-         ]
-      }
-   ]
-}
+[
+    {
+       "theme":"VOL",
+       "prompts":[
+          {
+             "prompt":"Getting involved in volunteering",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/1.jpg"
+          },
+          {
+             "prompt":"Benefits of volunteering",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/2.jpg"
+          },
+          {
+             "prompt":"Bad things about volunteering",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/3.jpg"
+          },
+          {
+             "prompt":"Are volunteers appreciated enough?",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/4.jpg"
+          },
+          {
+             "prompt":"Do volunteers have much freedom and flexibility?",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/5.jpg"
+          },
+          {
+             "prompt":"Is it always clear what is expected of volunteers?",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/6.jpg"
+          },
+          {
+             "prompt":"Do volunteers have much say in what they do?",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/7.jpg"
+          }
+       ]
+    },
+    {
+       "theme":"JV",
+       "prompts":[
+          {
+             "prompt":"Making the press",
+             "imageName":"http://i4.thejournal.co.uk/incoming/article7314133.ece/ALTERNATES/s615/JS34792295.jpg"
+          },
+          {
+             "prompt":"Ageism in the modern world",
+             "imageName":"http://www.trans-techresearch.net/wp-content/uploads/2015/04/ageingfutures1.jpg"
+          }
+       ]
+    },
+    {
+       "theme":"Nexus",
+       "prompts":[
+          {
+             "prompt":"How to improve the Metro?",
+             "imageName":"http://www.datadisplayuk.com/file/images/news/Haymarket-TFT%20PIDs.jpg"
+          },
+          {
+             "prompt":"Safety and the metro",
+             "imageName":"https://c2.staticflickr.com/6/5289/5687972639_cafd79cfab_b.jpg"
+          }
+       ]
+    }
+ ]
