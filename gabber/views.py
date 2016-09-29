@@ -48,7 +48,7 @@ def listen():
             image = url_for('main.protected', filename='default.png')
 
         # TODO: hard-coded VOL for now.
-        promptImage = [i['imageName'] for i in ps['projects'][0]['prompts']
+        promptImage = [i['imageName'] for i in ps[0]['prompts']
                        if i['prompt'] == experience.promptText]
 
         # These are the experiences that have been consented to be made public.
