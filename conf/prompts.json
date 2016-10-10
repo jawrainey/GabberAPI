@@ -1,6 +1,6 @@
 [
     {
-       "theme":"VOL",
+       "theme":"experiences of volunteering",
        "prompts":[
           {
              "prompt":"Getting involved in volunteering",
@@ -33,7 +33,7 @@
        ]
     },
     {
-       "theme":"JV",
+       "theme":"HCI for Digital Civics",
        "prompts":[
           {
              "prompt":"Making the press",
@@ -45,17 +45,4 @@
           }
        ]
     },
-    {
-       "theme":"Nexus",
-       "prompts":[
-          {
-             "prompt":"How to improve the Metro?",
-             "imageName":"http://www.datadisplayuk.com/file/images/news/Haymarket-TFT%20PIDs.jpg"
-          },
-          {
-             "prompt":"Safety and the metro",
-             "imageName":"https://c2.staticflickr.com/6/5289/5687972639_cafd79cfab_b.jpg"
-          }
-       ]
-    }
  ]
