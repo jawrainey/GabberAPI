@@ -1,47 +1,34 @@
 [
     {
-       "theme":"experiences of volunteering",
+       "theme":"hci for digital civics",
        "prompts":[
           {
-             "prompt":"Getting involved in volunteering",
-             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/1.jpg"
+             "prompt":"something you’ve found out about this week that surprised you.",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-one/1.jpg"
           },
           {
-             "prompt":"Benefits of volunteering",
-             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/2.jpg"
+             "prompt":"what you’d tell a crowd of newbies about the field of HCI",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-one/2.jpg"
           },
           {
-             "prompt":"Bad things about volunteering",
-             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/3.jpg"
+             "prompt":"something you’d like to find out more about.",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-one/3.jpg"
           },
           {
-             "prompt":"Are volunteers appreciated enough?",
-             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/4.jpg"
+             "prompt":"something that has confused you.",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-one/4.jpg"
           },
           {
-             "prompt":"Do volunteers have much freedom and flexibility?",
-             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/5.jpg"
+             "prompt":"how you feel about your first blog post.",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-one/5.jpg"
           },
           {
-             "prompt":"Is it always clear what is expected of volunteers?",
-             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/6.jpg"
+             "prompt":"something you now think differently about.",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-one/6.jpg"
           },
           {
-             "prompt":"Do volunteers have much say in what they do?",
-             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/prompts/7.jpg"
-          }
-       ]
-    },
-    {
-       "theme":"HCI for Digital Civics",
-       "prompts":[
-          {
-             "prompt":"Making the press",
-             "imageName":"http://i4.thejournal.co.uk/incoming/article7314133.ece/ALTERNATES/s615/JS34792295.jpg"
-          },
-          {
-             "prompt":"Ageism in the modern world",
-             "imageName":"http://www.trans-techresearch.net/wp-content/uploads/2015/04/ageingfutures1.jpg"
+             "prompt":"anything you want (related to the module!)",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-one/7.jpg"
           }
        ]
     }
