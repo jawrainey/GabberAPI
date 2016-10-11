@@ -59,7 +59,7 @@ def validate_consent(token):
         experience.consentInterviewee = request.form['consent']
         helper.snowball(experience.intervieweeEmail)
     db.session.commit()
-    return redirect(url_for('main.listen'))
+    return redirect(url_for('main.projects'))
 
 
 @main.route('consent/<token>', methods=['GET'])
