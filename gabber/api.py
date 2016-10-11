@@ -96,7 +96,8 @@ def upload():
                               intervieweeEmail=intervieweeEmail,
                               intervieweeName=intervieweeName,
                               location=location,
-                              promptText=promptText)
+                              promptText=promptText,
+                              theme=helper.theme_by_prompt(promptText))
     db.session.add(experienceDB)
     db.session.commit()
     # Now we have saved it, ask both for their joint permission to share it.

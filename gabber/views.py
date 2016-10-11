@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from gabber import db, helper
 from gabber.models import Experience
 from flask import Blueprint, redirect, request, \
@@ -14,49 +12,40 @@ def index():
     return render_template('index.html')
 
 
-@main.route('listen', methods=['GET'])
-def listen():
-    """
-    Displays chronologically all experiences that have been made public.
-    """
-    # All of the experiences that have been consented for public display.
-    experiences = Experience.query.filter(
-        ((Experience.consentInterviewer == "ALL") & (Experience.consentInterviewee == "ALL")) |
-        ((Experience.consentInterviewer == "ALL") & (Experience.consentInterviewee == "AUD")) |
-        ((Experience.consentInterviewer == "AUD") & (Experience.consentInterviewee == "ALL")) |
-        ((Experience.consentInterviewer == "AUD") & (Experience.consentInterviewee == "AUD"))).all()
-    # Pass information we want to display to simplify view logic.
-    filtered = []
+@main.route('projects/', methods=['GET'])
+@main.route('projects/<path:project>', methods=['GET'])
+def projects(project=None):
+    all_projects = helper.commissioned_projects()
+    existing = [i['theme'].replace(" ", "-").lower() for i in all_projects]
 
-    # All the prompts. Should only be loaded once.
-    with open("conf/prompts.json", 'r') as p:
-        ps = json.load(p)
+    if not project:
+        return str(existing)
+    elif project not in existing:
+        return str(404)
+    else:
+        # All experiences that have been consented for public display.
+        experiences = Experience.query.filter(
+            (Experience.theme == project.replace("-", " ")) &
+            ((Experience.consentInterviewer == "ALL") | (Experience.consentInterviewer == "AUD")) &
+            ((Experience.consentInterviewee == "ALL") | (Experience.consentInterviewee == "AUD"))).all()
 
-    # TODO: transcriptions as "subtitles below audios" for non-natives?
-    for experience in experiences:
-        # An audio experience is required
-        audio = url_for('main.protected', filename=experience.experience)
-        # Taking a picture of interviewee is optional. Only show if allowed.
-        if (experience.authorImage and
-            experience.consentInterviewer == 'ALL' and
-            experience.consentInterviewee == 'ALL'):
-            # TODO: returns a 404... it would be better if a request was not
-            # made, e.g. we can ask the database if there is an authorImage,
-            # if there is, then no worries...
-            image = url_for('main.protected', filename=experience.authorImage)
-        else:
-            image = url_for('main.protected', filename='default.png')
+        filtered = []
 
-        # TODO: hard-coded VOL for now.
-        promptImage = [i['imageName'] for i in ps[0]['prompts']
-                       if i['prompt'] == experience.promptText]
+        for exp in experiences:
+            audio = url_for('main.protected', filename=exp.experience)
+            # Taking a picture of interviewee is optional. Only show if allowed.
+            if (exp.authorImage and exp.consentInterviewer == 'ALL' and exp.consentInterviewee == 'ALL'):
+                image = url_for('main.protected', filename=exp.authorImage)
+            else:
+                image = url_for('main.protected', filename='default.png')
 
-        # These are the experiences that have been consented to be made public.
-        filtered.append({'file': audio,
-                         'thumb': promptImage,
-                         'trackAlbum': image,
-                         'trackName': experience.promptText})
-    return render_template('explore.html', experiences=json.dumps(filtered))
+            promptImage = [i['imageName'] for d in all_projects for i in d['prompts'] if i['prompt'] == exp.promptText]
+
+            # The experiences that have been consented to be made public.
+            filtered.append({'file': audio, 'thumb': promptImage,
+                             'trackAlbum': image, 'trackName': exp.promptText})
+
+        return render_template('explore.html', experiences=json.dumps(filtered))
 
 
 @main.route('consent/<token>', methods=['POST'])

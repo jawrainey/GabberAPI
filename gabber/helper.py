@@ -21,6 +21,30 @@ def email_consent(experience, email):
     mail.send(message)
 
 
+def commissioned_projects():
+    """
+    The JSON configured through the commissioning of a project.
+    """
+    import json
+    with open("conf/prompts.json", 'r') as projects:
+        return json.load(projects)
+
+
+def theme_by_prompt(prompt_text):
+    """
+    Obtains the theme of a project based on a child element (prompt text).
+
+    Args:
+        prompt_text (str): the element to search for in the JSON of projects.
+
+    Note: As a prompt-text is associated with each Gabber uploaded, we use this,
+    rather than create/send another variable as a look-up for the parent theme.
+    """
+    for pj in commissioned_projects():
+        if (len([p for p in pj['prompts'] if prompt_text == p['prompt']]) > 0):
+            return pj['theme']
+
+
 def confirm_consent(token):
     serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
     try:
