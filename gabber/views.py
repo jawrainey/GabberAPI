@@ -19,9 +19,9 @@ def projects(project=None):
     existing = [i['theme'].replace(" ", "-").lower() for i in all_projects]
 
     if not project:
-        return str(existing)
+        return redirect(url_for('main.projects') + existing[0])
     elif project not in existing:
-        return str(404)
+        return redirect(url_for('main.index'))
     else:
         # All experiences that have been consented for public display.
         experiences = Experience.query.filter(
