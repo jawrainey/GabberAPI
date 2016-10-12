@@ -45,7 +45,9 @@ def projects(project=None):
             filtered.append({'file': audio, 'thumb': promptImage,
                              'trackAlbum': image, 'trackName': exp.promptText})
 
-        return render_template('explore.html', experiences=json.dumps(filtered))
+        return render_template('explore.html',
+                               project_title=project.replace("-", " "),
+                               experiences=json.dumps(filtered))
 
 
 @main.route('consent/<token>', methods=['POST'])
