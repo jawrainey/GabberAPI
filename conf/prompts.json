@@ -1,6 +1,39 @@
 [
+      {
+       "theme":"hci for digital civics week two",
+       "prompts":[
+          {
+             "prompt":"something useful you have taken away from this week",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-two/1.jpg"
+          },
+          {
+             "prompt":"when does participation become meaningful?",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-two/2.jpg"
+          },
+          {
+             "prompt":"the abuse of 'participation'",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-two/3.jpg"
+          },
+          {
+             "prompt":"the relationship between participatory design and digital civics",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-two/4.jpg"
+          },
+          {
+             "prompt":"finding new papers each week",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-two/5.jpg"
+          },
+          {
+             "prompt":"the workload",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-two/6.jpg"
+          },
+          {
+             "prompt":"anything you want (related to the module!)",
+             "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-two/7.jpg"
+          }
+       ]
+    },
     {
-       "theme":"hci for digital civics",
+       "theme":"hci for digital civics week one",
        "prompts":[
           {
              "prompt":"something you’ve found out about this week that surprised you.",
