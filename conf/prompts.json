@@ -1,5 +1,38 @@
 [
       {
+         "theme":"hci for digital civics week three",
+         "prompts":[
+            {
+               "prompt":"a day in the life of “Sal",
+               "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-three/1.jpg"
+            },
+            {
+               "prompt":"being inspired by the opportunities of ubicomp",
+               "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-three/2.jpg"
+            },
+            {
+               "prompt":"being weary of the dangers of ubicomp",
+               "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-three/3.jpg"
+            },
+            {
+               "prompt":"debating with evidence or rhetoric",
+               "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-three/4.jpg"
+            },
+            {
+               "prompt":"talking and presenting in the sessions",
+               "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-three/5.jpg"
+            },
+            {
+               "prompt":"feedback on your first two blog posts",
+               "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-three/6.jpg"
+            },
+            {
+               "prompt":"anything you want (related to the module!)",
+               "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-three/7.jpg"
+            }
+         ]
+      },
+      {
        "theme":"hci for digital civics week two",
        "prompts":[
           {
