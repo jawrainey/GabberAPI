@@ -54,6 +54,18 @@ def confirm_consent(token):
     return consent
 
 
+def consented(filename):
+    from gabber.models import Experience
+    if Experience.query.filter(
+        (Experience.experience == filename) &
+        ((Experience.consentInterviewer == "ALL") |
+         (Experience.consentInterviewer == "AUD")) &
+        ((Experience.consentInterviewee == "ALL") |
+         (Experience.consentInterviewee == "AUD"))).all():
+        return True
+    return False
+
+
 def __consent_url(experience, email):
     ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
     properties = [email, experience.experience, experience.authorImage]

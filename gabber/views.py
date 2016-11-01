@@ -1,7 +1,7 @@
 from gabber import db, helper
 from gabber.models import Experience
 from flask import Blueprint, redirect, request, \
-    render_template, send_from_directory, url_for
+    render_template, send_from_directory, session, url_for
 import json
 
 main = Blueprint('main', __name__)
@@ -72,6 +72,8 @@ def display_consent(token):
     # The consent URI exists for a period of time to prevent hacks.
     if not consent:
         return "Approval for this experience has expired."
+    # TODO: how could this be done server-side and without sessions?
+    session['consenting'] = consent[1]
     # The contents of the experience to display to the user.
     experience_to_approve = [{
         'file': url_for('main.protected', filename=consent[1]),
@@ -85,6 +87,7 @@ def display_consent(token):
 
 @main.route('protected/<filename>')
 def protected(filename):
-    # Store on root with nginx config to prevent anyone viewing audios
-    # TODO: however, if the filename is known, then anyone can download.
-    return send_from_directory('protected', filename)
+    if helper.consented(filename) or session.get('consenting', None) == filename or 'default' in filename:
+        return send_from_directory('protected', filename)
+    # TODO: should return a 403 error
+    return redirect(url_for('main.index'))
