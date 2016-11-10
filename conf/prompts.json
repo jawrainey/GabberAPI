@@ -1,5 +1,22 @@
 [
     {
+     "theme":"hci for digital civics week six",
+     "prompts":[
+       {
+         "prompt":"an issue you consider important for digital civics",
+         "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-six/1.jpg"
+       },
+       {
+         "prompt":"an issue you consider important for digital civics",
+         "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-six/2.jpg"
+       },
+       {
+         "prompt":"an issue you consider important for digital civics",
+         "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-six/3.jpg"
+       }
+     ]
+    },
+    {
          "theme":"metro futures",
          "prompts":[
             {
