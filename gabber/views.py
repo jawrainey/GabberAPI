@@ -19,7 +19,7 @@ def projects(project=None):
     existing = [i['theme'].replace(" ", "-").lower() for i in all_projects]
 
     if not project:
-        return redirect(url_for('main.projects') + existing[1])
+        return redirect(url_for('main.projects') + existing[0])
     elif project not in existing:
         return redirect(url_for('main.index'))
     else:
