@@ -14,7 +14,7 @@ def projects():
     # Therefore, themes becomes username, and a lookup, then filter performed.
 
     with open("conf/prompts.json", 'r') as p:
-        prompts = json.load(p)
+        prompts = json.load(p)[0:2]
     return jsonify(prompts), 200
 
 
