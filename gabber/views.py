@@ -9,7 +9,12 @@ main = Blueprint('main', __name__)
 
 @main.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    return render_template('views/index.html')
+
+
+@main.route('about', methods=['GET'])
+def about():
+    return render_template('views/about.html')
 
 
 @main.route('projects/', methods=['GET'])
@@ -19,7 +24,9 @@ def projects(project=None):
     existing = [i['theme'].replace(" ", "-").lower() for i in all_projects]
 
     if not project:
-        return redirect(url_for('main.projects') + existing[0])
+        # Only show the HCI project and metro futures project.
+        # Obvious flaw: the related file must be named as the project, urgh.
+        return render_template('views/projects.html', projects=existing[0:2])
     elif project not in existing:
         return redirect(url_for('main.index'))
     else:
@@ -45,7 +52,7 @@ def projects(project=None):
             filtered.append({'file': audio, 'thumb': promptImage,
                              'trackAlbum': image, 'trackName': exp.promptText})
 
-        return render_template('explore.html',
+        return render_template('views/project.html',
                                project_title=project.replace("-", " "),
                                experiences=json.dumps(filtered))
 
