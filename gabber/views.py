@@ -26,7 +26,7 @@ def projects(project=None):
     if not project:
         # Only show the HCI project and metro futures project.
         # Obvious flaw: the related file must be named as the project, urgh.
-        return render_template('views/projects.html', projects=existing[0:2])
+        return render_template('views/projects.html', projects=[existing[0]])
     elif project not in existing:
         return redirect(url_for('main.index'))
     else:
