@@ -21,7 +21,7 @@ def email_consent(experience, email):
     from flask_mail import Message
     message = Message('Provide consent for your Gabber',
                       recipients=[email],
-                      sender=("Gabber", "g@xyz.com"),
+                      sender=("Gabber", app.config['MAIL_USERNAME']),
                       html=render_template("emails/layout.html", data=content))
     mail.send(message)
 
