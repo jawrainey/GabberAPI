@@ -4,20 +4,23 @@ from itsdangerous import URLSafeTimedSerializer
 
 
 def snowball(email):
+    # Do not snowball if already in known users?
     from flask_mail import Message
-    message = Message('Get gabbering with your friends', recipients=[email])
+    message = Message('Gabber with your friends', recipients=[email])
     message.html = render_template('snowball_email.html')
     mail.send(message)
 
 
 def email_consent(experience, email):
-    # TODO: this will be invoked in upload()
     # Sends an email to a user to approve their audio experience, which
     # calls _generate_consent_url(who, what) below.
     from flask_mail import Message
-    message = Message('Share your Gabber with the world', recipients=[email])
-    content = {'uri': request.url_root[:-1] + __consent_url(experience, email)}
-    message.html = render_template('consent_email.html', data=content)
+    message = Message('Provide consent for your Gabber', recipients=[email])
+    import json
+    content = json.load(open('gabber/templates/emails/consent.json', 'r'))
+    content['button-url'] = {'uri': request.url_root[:-1] + __consent_url(experience, email)}
+
+    message.html = render_template("emails/layout.html", data=content)
     mail.send(message)
 
 
@@ -25,6 +28,7 @@ def commissioned_projects():
     """
     The JSON configured through the commissioning of a project.
     """
+    # TODO: this would be stored in database and updated in design process.
     import json
     with open("conf/prompts.json", 'r') as projects:
         return json.load(projects)
