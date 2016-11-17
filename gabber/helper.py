@@ -20,6 +20,7 @@ def email_consent(experience, email):
     content = json.load(open('gabber/templates/emails/consent.json', 'r'))
     content['button-url'] = request.url_root[:-1] + __consent_url(experience, email)
 
+    message.sender = 'Gabber'
     message.html = render_template("emails/layout.html", data=content)
     mail.send(message)
 
