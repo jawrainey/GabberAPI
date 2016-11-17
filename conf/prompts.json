@@ -1,5 +1,38 @@
 [
     {
+     "theme":"hci for digital civics",
+     "prompts":[
+       {
+         "prompt":"giving feedback to others",
+         "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-seven/1.jpg"
+       },
+       {
+         "prompt":"something useful gained from your feedback",
+         "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-seven/2.jpg"
+       },
+       {
+         "prompt":"are we researchers, or are we activists?",
+         "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-seven/3.jpg"
+       },
+       {
+         "prompt":"when is a TUI, not a TUI?",
+         "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-seven/4.jpg"
+       },
+       {
+         "prompt":"being a conference chair",
+         "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-seven/5.jpg"
+       },
+       {
+         "prompt":"ideas for your end of module blog post",
+         "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-seven/6.jpg"
+       },
+       {
+         "prompt":"anything you want (related to the module!)",
+         "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-seven/7.jpg"
+       }
+     ]
+    },
+    {
      "theme":"hci for digital civics week six",
      "prompts":[
        {
