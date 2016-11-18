@@ -19,7 +19,7 @@ def email_consent(experience, email):
     content['button-url'] = request.url_root[:-1] + __consent_url(experience, email)
 
     from flask_mail import Message
-    message = Message('Provide consent for your Gabber',
+    message = Message('Consent for your Gabber -- ' + experience.promptText,
                       recipients=[email],
                       sender=("Gabber", app.config['MAIL_USERNAME']),
                       html=render_template("emails/layout.html", data=content))
