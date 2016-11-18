@@ -8,6 +8,7 @@
   <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet" />
   <link href="{{ url_for('static', filename='css/audiopp.css') }}" rel="stylesheet" />
   <style>
+    .main { width: 37em; }
     .jAudio--playlist-meta-text { display: none; }
     .jAudio--player .jAudio--playlist { height: 100%; }
     .jAudio--playlist, .jAudio--player .jAudio--progress-bar, .jAudio--player .jAudio--controls { vertical-align: middle; display: inline-block; }
@@ -68,7 +69,7 @@
           </div>
         </div>
       </div>
-      <div class="container">
+      <div>
         <p>Select an option below to make this gabbering publically available. All
         approved gabberings are transcribed to be made searchable.</p>
         <form method="post">
@@ -82,8 +83,7 @@
           </p>
           <p>
             <input name="consent" type="radio" id="ANON" value="ANON"  />
-            <label for="ANON">An anonymized transcription of the audio. The
-              transcription will be emailed to you to verify before publishing.</label>
+            <label for="ANON">An anonymized transcription of the audio.</label>
           </p>
           <p>
             <input name="consent" type="radio" id="NONE" value="NONE"  />
