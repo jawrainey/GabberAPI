@@ -159,8 +159,8 @@
   clear: both;
 }
 .jAudio--player .jAudio--playlist .jAudio--playlist-item.active {
-  background: #f55c5c;
-  border-bottom-color: #f55c5c;
+  background: #4696BB;
+  border-bottom-color: #4696BB;
 }
 .jAudio--player .jAudio--playlist .jAudio--playlist-item.active * {
   color: #fff;

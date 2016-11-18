@@ -76,6 +76,7 @@ def display_consent(token):
     # Get the audio-experience (AX) associated with this consent.
     # The interviewees name and path to the recorded audio is encoded in URI.
     consent = helper.confirm_consent(token)
+    experience = Experience.query.filter_by(experience=consent[1]).first()
     # The consent URI exists for a period of time to prevent hacks.
     if not consent:
         return "Approval for this experience has expired."
@@ -89,7 +90,8 @@ def display_consent(token):
     }]
     # Display the experience that the user needs to approve.
     return render_template('consent.html',
-                           experiences=json.dumps(experience_to_approve))
+                           experiences=json.dumps(experience_to_approve),
+                           prompt=experience.promptText)
 
 
 @main.route('protected/<filename>')
