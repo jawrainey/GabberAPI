@@ -35,7 +35,7 @@ def register():
 
     db.session.add(User(username, password, fullname))
     db.session.commit()
-    return jsonify({'success': 'We did it!'}), 200
+    return jsonify({'success': 'A user has been created successfully'}), 200
 
 
 # requests.post('http://0.0.0.0:8080/api/auth',
@@ -63,6 +63,7 @@ def login():
 # data={'interviewerEmail':'jawrainey@gmail.com'})
 @api.route('upload', methods=['POST'])
 def upload():
+
     # TODO: return better errors for specific missing data.
     if not request.files or not request.form:
         return jsonify({'error': 'Required data has not been sent.'}), 400
@@ -76,6 +77,8 @@ def upload():
     promptText = request.form.get('promptText', None)
 
     # 2. Save file to disk and capture path. Required.
+    # TODO: CHECK THE FUCKING MIME TYPE
+    # Never trust user:: see magic_python
     expPath = os.path.join(app.config['UPLOAD_FOLDER'], experience.filename)
     experience.save(expPath)
 
