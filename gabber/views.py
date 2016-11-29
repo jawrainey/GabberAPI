@@ -89,7 +89,7 @@ def display_consent(token):
                   else url_for('main.protected', filename='default.png'))
     }]
     # Display the experience that the user needs to approve.
-    return render_template('consent.html',
+    return render_template('views/consent.html',
                            experiences=json.dumps(experience_to_approve),
                            prompt=experience.promptText)
 

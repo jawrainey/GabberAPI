@@ -6,8 +6,13 @@ from itsdangerous import URLSafeTimedSerializer
 def snowball(email):
     # Do not snowball if already in known users?
     from flask_mail import Message
-    message = Message('Gabber with your friends', recipients=[email])
-    message.html = render_template('snowball_email.html')
+    content={'title': '', 'name': '', 'main-content': '', 'sub-content' : ''}
+    message = Message('Gabber with your friends: ',
+                      recipients=[email],
+                      sender=("Gabber", app.config['MAIL_USERNAME']),
+                      html=render_template("emails/layout.html", data=content))
+
+    message.html = render_template('views/snowball_email.html')
     mail.send(message)
 
 
