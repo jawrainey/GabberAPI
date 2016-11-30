@@ -1,4 +1,46 @@
 [
+  {
+    "theme":"Experience in design",
+    "prompts": [
+      {
+        "prompt":"what makes a good framework for understanding human experience?",
+        "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-ten/1.jpg"
+      },
+      {
+        "prompt":"an emotional encounter you had with a piece of technology.",
+        "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-ten/2.jpg"
+      },
+      {
+        "prompt":"could retelling an experience change the feeling of that experience",
+        "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-ten/3.jpg"
+      },
+      {
+        "prompt": "anything you want (related to the module)!",
+        "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-two/7.jpg"
+      }
+    ]
+  },
+  {
+    "theme":"Engaging with data",
+    "prompts": [
+      {
+        "prompt":"your impressions of the personal informatics app you downloaded",
+        "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-nine/1.jpg"
+      },
+      {
+        "prompt":"what do you think a future challenge is for human-data interaction or personal informatics?",
+        "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-nine/2.jpg"
+      },
+      {
+        "prompt":"what does engaging with data mean in relation to your research interests?",
+        "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-nine/3.jpg"
+      },
+      {
+        "prompt": "anything you want (related to the module)!",
+        "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/hci-week-two/7.jpg"
+      }
+    ]
+  },
     {
      "theme":"hci for digital civics",
      "prompts":[
