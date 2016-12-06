@@ -30,9 +30,10 @@ def projects(project=None):
     elif project not in existing:
         return redirect(url_for('main.index'))
     else:
+        from sqlalchemy import func
         # All experiences that have been consented for public display.
         experiences = Experience.query.filter(
-            (Experience.theme == project.replace("-", " ")) &
+            (func.lower(Experience.theme) == project.replace("-", " ")) &
             ((Experience.consentInterviewer == "ALL") | (Experience.consentInterviewer == "AUD")) &
             ((Experience.consentInterviewee == "ALL") | (Experience.consentInterviewee == "AUD"))).all()
 
