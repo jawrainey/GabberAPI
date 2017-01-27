@@ -1,5 +1,65 @@
 [
   {
+    "theme":"Fulfilling lives",
+    "prompts": [
+      {
+        "title": "Your direction",
+        "prompt":"How would you like life to be better in your future?",
+        "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/FL/fl.jpg"
+      },
+      {
+        "title": "Getting sidetracked",
+        "prompt":"Do you sometimes get ‘sidetracked’ on your journey through life?",
+        "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/FL/fl.jpg"
+      },
+      {
+        "title": "Getting stuck",
+        "prompt": "Do you sometimes get stuck in any unhelpful habits on your journey?",
+        "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/FL/fl.jpg"
+      },
+      {
+        "title": "Motivation",
+        "prompt": "Why do you want life to get better in this way?",
+        "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/FL/fl.jpg"
+      },
+      {
+        "title": "Sizing up a problem",
+        "prompt": "Describe a problem that is in your way to get to where you would like to be.",
+        "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/FL/fl.jpg"
+      },
+      {
+        "title": "Handling emotions",
+        "prompt":"How do you feel about this problem, and how do you handle this feeling?",
+        "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/FL/fl.jpg"
+      },
+      {
+        "title": "Conflict",
+        "prompt":"Is there any CONFLICT around solving this problem?",
+        "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/FL/fl.jpg"
+      },
+      {
+        "title": "Getting HELP",
+        "prompt":"What would help you solve this, and how can you get this HELP?",
+        "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/FL/fl.jpg"
+      },
+      {
+        "title": "Planning",
+        "prompt": "What is your PLAN to solve this problem?",
+        "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/FL/fl.jpg"
+      },
+      {
+        "title": "Action",
+        "prompt": "What progress, if any, have you made already, on putting this plan into ACTION?",
+        "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/FL/fl.jpg"
+      },
+      {
+        "title": "Reflection",
+        "prompt": "What is one thing you would change about the ways you journey through life?",
+        "imageName":"https://openlab.ncl.ac.uk/dokku/gabber/static/img/FL/fl.jpg"
+      }
+    ]
+  },
+  {
     "theme":"Experience in design",
     "prompts": [
       {
