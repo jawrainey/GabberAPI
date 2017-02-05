@@ -29,7 +29,7 @@ class Interview(db.Model):
     image = db.Column(db.String(260))
     location = db.Column(db.String(10))
 
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    prompt_id = db.Column(db.Integer, db.ForeignKey('projectprompt.id'))
     participants = db.relationship('Participant', secondary=participants,
                                    backref=db.backref('participants', lazy='dynamic'))
     # Each of which provide individual consent for the audio recording.
@@ -57,12 +57,15 @@ class Project(db.Model):
 
     creator = db.Column(db.Integer, db.ForeignKey('user.username'))
     prompts = db.relationship('ProjectPrompt', backref='prompts', lazy='dynamic')
-    interviews = db.relationship('Interview', backref='interviews', lazy='dynamic')
+
 
 class ProjectPrompt(db.Model):
+    __tablename__ = 'projectprompt'
+
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     creator = db.Column(db.Integer, db.ForeignKey('user.username'))
+    interviews = db.relationship('Interview', backref='interviews', lazy='dynamic')
     text_prompt = db.Column(db.String(64))
     image_path = db.Column(db.String(64))
     audio_path = db.Column(db.String(64))

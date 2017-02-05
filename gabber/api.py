@@ -92,7 +92,7 @@ def upload():
         audio = interview.filename,
         image = None,
         location = location,
-        project_id = ProjectPrompt.query.filter_by(text_prompt=prompt_text).first().project_id
+        prompt_id = ProjectPrompt.query.filter_by(text_prompt=prompt_text).first().id
     )
 
     # Populating relationship fields outside constructor due to extending lists.

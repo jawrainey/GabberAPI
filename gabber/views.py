@@ -27,11 +27,14 @@ def projects(project=None):
     elif project not in existing:
         return redirect(url_for('main.index'))
     else:
-        # All interviews where existing project is the same as the current url
-        sp = Project.query.filter_by(title=project).first()
+        # TODO: challenge -- can the below be encapsulated into one query?
+        # Select all interviews that for this project (based on prompt_id) that
+        # have been fully consented by all participants for the audio interview.
+        selected_project = Project.query.filter_by(title=project).first()
+        prompt_ids = [i.id for i in selected_project.prompts.all()]
+        interviews = db.session.query(Interview) \
+            .filter(Interview.prompt_id.in_(prompt_ids)).all()
 
-        # TODO: can we achieve this in one query instead?
-        interviews = db.session.query(Interview).filter_by(project_id=sp.id).all()
         consented_interviews = [interview for interview in interviews
                                 if 'NONE' not in
                                 [cons.type for cons in interview.consents.all()]]
@@ -40,7 +43,7 @@ def projects(project=None):
         interviews_to_display = []
         for interview in consented_interviews:
             # TODO: how to determine the prompt for this interview?
-            prompt = ProjectPrompt.query.filter_by(id=interview.project_id).first()
+            prompt = ProjectPrompt.query.filter_by(id=interview.prompt_id).first()
             # The interviews that have been consented to be made public.
             interviews_to_display.append({
                 'file': url_for('main.protected', filename=interview.audio),
