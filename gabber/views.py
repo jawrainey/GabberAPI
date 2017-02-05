@@ -1,5 +1,5 @@
 from gabber import db, helper
-from gabber.models import Experience
+from gabber.models import Interview, Participant, InterviewConsent, Project, ProjectPrompt
 from flask import Blueprint, redirect, request, \
     render_template, send_from_directory, session, url_for
 import json
@@ -20,84 +20,85 @@ def about():
 @main.route('projects/', methods=['GET'])
 @main.route('projects/<path:project>', methods=['GET'])
 def projects(project=None):
-    all_projects = helper.commissioned_projects()
-    existing = [i['theme'].replace(" ", "-").lower() for i in all_projects]
-
+    all_projects = db.session.query(Project).all()
+    existing = [i.title.replace(" ", "-").lower() for i in all_projects]
     if not project:
-        # Only show the HCI project and metro futures project.
-        # Obvious flaw: the related file must be named as the project, urgh.
-        return render_template('views/projects.html', projects=existing[0:1])
+        return render_template('views/projects.html', projects=all_projects)
     elif project not in existing:
         return redirect(url_for('main.index'))
     else:
-        from sqlalchemy import func
-        # All experiences that have been consented for public display.
-        experiences = Experience.query.filter(
-            (func.lower(Experience.theme) == project.replace("-", " ")) &
-            ((Experience.consentInterviewer == "ALL") | (Experience.consentInterviewer == "AUD")) &
-            ((Experience.consentInterviewee == "ALL") | (Experience.consentInterviewee == "AUD"))).all()
+        # All interviews where existing project is the same as the current url
+        sp = Project.query.filter_by(title=project).first()
 
-        filtered = []
+        # TODO: can we achieve this in one query instead?
+        interviews = db.session.query(Interview).filter_by(project_id=sp.id).all()
+        consented_interviews = [interview for interview in interviews
+                                if 'NONE' not in
+                                [cons.type for cons in interview.consents.all()]]
 
-        for exp in experiences:
-            audio = url_for('main.protected', filename=exp.experience)
-            # Taking a picture of interviewee is optional. Only show if allowed.
-            if (exp.authorImage and exp.consentInterviewer == 'ALL' and exp.consentInterviewee == 'ALL'):
-                image = url_for('main.protected', filename=exp.authorImage)
-            else:
-                image = url_for('main.protected', filename='default.png')
-
-            promptImage = [i['imageName'] for d in all_projects for i in d['prompts'] if i['prompt'] == exp.promptText]
-
-            # The experiences that have been consented to be made public.
-            filtered.append({'file': audio, 'thumb': promptImage,
-                             'trackAlbum': image, 'trackName': exp.promptText})
+        # Display limited interview information to the viewer.
+        interviews_to_display = []
+        for interview in consented_interviews:
+            # TODO: how to determine the prompt for this interview?
+            prompt = ProjectPrompt.query.filter_by(id=interview.project_id).first()
+            # The interviews that have been consented to be made public.
+            interviews_to_display.append({
+                'file': url_for('main.protected', filename=interview.audio),
+                'thumb': prompt.image_path,
+                'trackAlbum': 'default.png',
+                'trackName': prompt.text_prompt})
 
         return render_template('views/project.html',
                                project_title=project.replace("-", " "),
-                               experiences=json.dumps(filtered))
+                               interviews=json.dumps(interviews_to_display))
 
 
 @main.route('consent/<token>', methods=['POST'])
 def validate_consent(token):
-    # TODO: user can re-approve their experience until expiration time met.
+    # TODO: user can re-approve their interview until expiration time met.
     token = helper.confirm_consent(token)
-    experience = Experience.query.filter_by(experience=token[1]).first()
-    if token[0] == experience.interviewerEmail:
-        experience.consentInterviewer = request.form['consent']
-    else:
-        experience.consentInterviewee = request.form['consent']
-        # helper.snowball(experience.intervieweeEmail)
+    # The participant who is associated with this particular interview
+    interviewConsent = InterviewConsent.query.join(Participant)\
+        .filter(InterviewConsent.interview_id == \
+                Interview.query.filter_by(audio = token['audio']).first().id,
+                Participant.email == token['email']).first()
+    interviewConsent.type = request.form['consent']
     db.session.commit()
+    # TODO: snowball && inform user of change?
     return redirect(url_for('main.projects'))
 
 
 @main.route('consent/<token>', methods=['GET'])
 def display_consent(token):
-    # Get the audio-experience (AX) associated with this consent.
-    # The interviewees name and path to the recorded audio is encoded in URI.
     consent = helper.confirm_consent(token)
-    experience = Experience.query.filter_by(experience=consent[1]).first()
-    # The consent URI exists for a period of time to prevent hacks.
+
     if not consent:
-        return "Approval for this experience has expired."
-    # TODO: how could this be done server-side and without sessions?
-    session['consenting'] = consent[1]
-    # The contents of the experience to display to the user.
-    experience_to_approve = [{
-        'file': url_for('main.protected', filename=consent[1]),
-        'trackAlbum': (url_for('main.protected', filename=consent[2]) if consent[2]
+        return "Approval for this interview has expired."
+
+    # Used to provide temporary access to audio file, which may not be public.
+    session['consenting'] = consent['audio']
+
+    # The contents of the interview to display to the user.
+    interview_to_approve = [{
+        'file': url_for('main.protected', filename=consent['audio']),
+        'trackAlbum': (url_for('main.protected', filename=consent['image']) if consent['image']
                   else url_for('main.protected', filename='default.png'))
     }]
-    # Display the experience that the user needs to approve.
+
+    prompt = ProjectPrompt.query.join(Project).join(Interview)\
+        .filter(InterviewConsent.interview_id == \
+                Interview.query.filter_by(audio = consent['audio']).first().id,
+                Participant.email == consent['email']).first()
+
     return render_template('views/consent.html',
-                           experiences=json.dumps(experience_to_approve),
-                           prompt=experience.promptText)
+                           interview=json.dumps(interview_to_approve),
+                           prompt=prompt.text_prompt)
 
 
 @main.route('protected/<filename>')
 def protected(filename):
-    if helper.consented(filename) or session.get('consenting', None) == filename or 'default' in filename:
+    # Allow only fully consented files to be made public,
+    # or those consenting to view protected files temporary access
+    if helper.consented(filename) or session.get('consenting', None) == filename:
         return send_from_directory('protected', filename)
-    # TODO: should return a 403 error
     return redirect(url_for('main.index'))

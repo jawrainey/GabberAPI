@@ -11,7 +11,7 @@ PROXY_PATH = os.getenv('PROXY_PATH', '/')
 app = Flask(__name__, static_url_path=os.path.join(PROXY_PATH, 'static'))
 bcrypt = Bcrypt(app)
 app.debug = True
-# This is where all the audio experiences will be stored -- root directory.
+# This is where all the audio interviews will be stored -- root directory.
 xp = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'protected')
 if not os.path.exists(xp):
     os.makedirs(xp)

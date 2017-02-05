@@ -1,5 +1,5 @@
 from gabber import app, db, helper
-from gabber.models import User, Experience
+from gabber.models import User, Interview, Project, ProjectPrompt, Participant, InterviewConsent
 from flask import jsonify, request, Blueprint
 import json, os
 
@@ -9,13 +9,15 @@ api = Blueprint('api', __name__)
 @api.route('projects', methods=['GET'])
 def projects():
     # TODO: filter based on user credentials.
-    # Some projects may not be related or private.
-    # Workaround: only return those relevant to that user?
-    # Therefore, themes becomes username, and a lookup, then filter performed.
-
-    with open("conf/prompts.json", 'r') as p:
-        prompts = json.load(p)[0:2]
-    return jsonify(prompts), 200
+    # TODO: use built-in __dict__ and filter to simplify accessing from models.
+    res = []
+    for project in Project.query.join(ProjectPrompt).all():
+        res.append({
+            'theme': project.title,
+            'prompts': [
+                {'image_name': p.image_path,'prompt' : p.text_prompt}
+                for p in project.prompts]})
+    return jsonify(res), 200
 
 
 # requests.post('http://0.0.0.0:8080/api/register',
@@ -63,47 +65,42 @@ def login():
 # data={'interviewerEmail':'jawrainey@gmail.com'})
 @api.route('upload', methods=['POST'])
 def upload():
-
+    """
+    Allows a client to upload an audio interview with associated meta-data,
+    including details of participants in a JSON encoded file.
+    """
     # TODO: return better errors for specific missing data.
     if not request.files or not request.form:
         return jsonify({'error': 'Required data has not been sent.'}), 400
 
-    # 1. Validate fields
-    experience = request.files['experience']
-    interviewerEmail = request.form.get('interviewerEmail', None)
-    intervieweeEmail = request.form.get('intervieweeEmail', None)
-    intervieweeName = request.form.get('intervieweeName', None)
+    # TODO: validate fields
+    interview = request.files['interview']
+    participants = request.files['participants']
     location = request.form.get('location', None)
-    promptText = request.form.get('promptText', None)
+    prompt_text = request.form.get('promptText', None)
 
-    # 2. Save file to disk and capture path. Required.
-    # TODO: CHECK THE FUCKING MIME TYPE
-    # Never trust user:: see magic_python
-    expPath = os.path.join(app.config['UPLOAD_FOLDER'], experience.filename)
-    experience.save(expPath)
+    # Save file to disk and capture path.
+    # TODO: validate: check mime type, use magic_python.
+    expPath = os.path.join(app.config['UPLOAD_FOLDER'], interview.filename)
+    interview.save(expPath)
 
-    # 3. Save image to disk and capture path
-    # Image of interviewee is optional. If not provided, use default silhouette.
-    authorPath = None
-    if 'authorImage' in request.files:
-        authorImage = request.files['authorImage']
-        authorPath = os.path.join(app.config['UPLOAD_FOLDER'],
-                                  authorImage.filename)
-        authorImage.save(authorPath)
+    parts = [Participant(name=i['name'], email=i['email'],
+                         consent=[InterviewConsent(type='None')])
+             for i in json.loads(participants.read())]
 
-    # 4. Save all data to database.
-    experienceDB = Experience(experience=experience.filename,
-                              authorImage=(authorImage.filename
-                                           if authorPath else authorPath),
-                              interviewerEmail=interviewerEmail,
-                              intervieweeEmail=intervieweeEmail,
-                              intervieweeName=intervieweeName,
-                              location=location,
-                              promptText=promptText,
-                              theme=helper.theme_by_prompt(promptText))
-    db.session.add(experienceDB)
+    interview = Interview(
+        audio = interview.filename,
+        image = None,
+        location = location,
+        project_id = ProjectPrompt.query.filter_by(text_prompt=prompt_text).first().project_id
+    )
+
+    # Populating relationship fields outside constructor due to extending lists.
+    interview.consents.extend([i.consent.first() for i in parts])
+    interview.participants.extend(parts)
+
+    db.session.add(interview)
     db.session.commit()
-    # Now we have saved it, ask both for their joint permission to share it.
-    helper.email_consent(experienceDB, experienceDB.interviewerEmail)
-    helper.email_consent(experienceDB, experienceDB.intervieweeEmail)
+
+    # TODO: email all participants for consent
     return jsonify({'success': 'We did it!'}), 200

@@ -4,9 +4,9 @@
       <h1>Gabber projects</h1>
       <hr>{% for project in projects %}
       <div class="project">
-        <a class="project-ref" href="{{ project }}">
-          <img src="{{ url_for('static', filename='img/' + project + '.png') }}" alt="">
-          <h4 class="project-title">{{ project.replace("-", " ") }}</h4>
+        <a class="project-ref" href="{{ project.title }}">
+          <img src="{{ url_for('static', filename='img/' + project.banner) }}" alt="">
+          <h4 class="project-title">{{ project.title.replace("-", " ") }}</h4>
         </a>
       </div>{% endfor %}
 {%- endblock %}

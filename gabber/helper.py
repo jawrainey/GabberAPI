@@ -20,6 +20,8 @@ def email_consent(experience, email):
     # Sends an email to a user to approve their audio experience, which
     # calls _generate_consent_url(who, what) below.
     import json
+    # TODO: abstract this per project basis?
+    # do this based on details of the experience, e.g. project by extension?
     content = json.load(open('gabber/templates/emails/consent.json', 'r'))
     content['button-url'] = request.url_root[:-1] + __consent_url(experience, email)
 
@@ -31,54 +33,33 @@ def email_consent(experience, email):
     mail.send(message)
 
 
-def commissioned_projects():
-    """
-    The JSON configured through the commissioning of a project.
-    """
-    # TODO: this would be stored in database and updated in design process.
-    import json
-    with open("conf/prompts.json", 'r') as projects:
-        return json.load(projects)
-
-
-def theme_by_prompt(prompt_text):
-    """
-    Obtains the theme of a project based on a child element (prompt text).
-
-    Args:
-        prompt_text (str): the element to search for in the JSON of projects.
-
-    Note: As a prompt-text is associated with each Gabber uploaded, we use this,
-    rather than create/send another variable as a look-up for the parent theme.
-    """
-    for pj in commissioned_projects():
-        if (len([p for p in pj['prompts'] if prompt_text == p['prompt']]) > 0):
-            return pj['theme']
-
-
 def confirm_consent(token):
     serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
     try:
         consent = serializer.loads(token, salt=app.config['SALT'])
+        # Improves readability when accessing within views.
+        consent = {'email': consent[0], 'audio': consent[1], 'image': consent[2]}
     except:
         return False  # URI expired or invalid token created.
     return consent
 
 
 def consented(filename):
-    from gabber.models import Experience
-    if Experience.query.filter(
-        (Experience.experience == filename) &
-        ((Experience.consentInterviewer == "ALL") |
-         (Experience.consentInterviewer == "AUD")) &
-        ((Experience.consentInterviewee == "ALL") |
-         (Experience.consentInterviewee == "AUD"))).all():
+    """
+    Checks if participants have provided consent for an interview to be public.
+
+    Returns:
+        bool: True if all participants provided full consent, otherwise False.
+    """
+    from gabber.models import Interview
+    interview = Interview.query.filter(Interview.audio == filename).first()
+    if interview and 'NONE' not in [c.type for c in interview.consents.all()]:
         return True
     return False
 
 
-def __consent_url(experience, email):
+def __consent_url(interview, email):
     ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
-    properties = [email, experience.experience, experience.authorImage]
+    properties = [email, interview.audio, interview.image]
     token = ts.dumps(properties, app.config['SALT'])
     return url_for('main.display_consent', token=token)
