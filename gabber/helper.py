@@ -16,17 +16,17 @@ def snowball(email):
     mail.send(message)
 
 
-def email_consent(experience, email):
-    # Sends an email to a user to approve their audio experience, which
-    # calls _generate_consent_url(who, what) below.
+def email_consent(interview, email):
     import json
     # TODO: abstract this per project basis?
-    # do this based on details of the experience, e.g. project by extension?
     content = json.load(open('gabber/templates/emails/consent.json', 'r'))
-    content['button-url'] = request.url_root[:-1] + __consent_url(experience, email)
+    content['button-url'] = request.url_root[:-1] + __consent_url(interview, email)
 
     from flask_mail import Message
-    message = Message('Gabber consent: ' + experience.promptText,
+    from models import ProjectPrompt
+    prompt_text = ProjectPrompt.query.filter_by(
+        id=interview.prompt_id).first().text_prompt
+    message = Message('Gabber consent: ' + prompt_text,
                       recipients=[email],
                       sender=("Gabber", app.config['MAIL_USERNAME']),
                       html=render_template("emails/layout.html", data=content))
