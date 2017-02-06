@@ -84,16 +84,16 @@ def upload():
                  for i in json.loads(participants.read())]
 
     else:
-        name = request.form.get('intervieweeName', None)
-        fname = User.query.filter_by(fullname=name).first()
+        email = request.form.get('interviewerEmail', None)
+        fname = User.query.filter_by(username=email).first()
         participants = [
             {
-                'name': request.form.get('interviewerEmail', None),
+                'name': request.form.get('intervieweeName', None),
                 'email': request.form.get('intervieweeEmail', None)
             },
             {
-                'name': name,
-                'email': fname if fname else None
+                'name': fname.fullname if fname else None,
+                'email': email
                 }
         ]
         parts = [Participant(name=i['name'], email=i['email'],
