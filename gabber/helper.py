@@ -23,7 +23,7 @@ def email_consent(interview, email):
     content['button-url'] = request.url_root[:-1] + __consent_url(interview, email)
 
     from flask_mail import Message
-    from models import ProjectPrompt
+    from gabber.models import ProjectPrompt
     prompt_text = ProjectPrompt.query.filter_by(
         id=interview.prompt_id).first().text_prompt
     message = Message('Gabber consent: ' + prompt_text,
