@@ -75,7 +75,31 @@ def upload():
 
     # TODO: validate fields
     interview = request.files['interview']
-    participants = request.files['participants']
+
+    if 'participants' in request.files:
+        participants = request.files['participants']
+
+        parts = [Participant(name=i['name'], email=i['email'],
+                             consent=[InterviewConsent(type='None')])
+                 for i in json.loads(participants.read())]
+
+    else:
+        name = request.form.get('intervieweeName', None)
+        fname = User.query.filter_by(fullname=name).first()
+        participants = [
+            {
+                'name': request.form.get('interviewerEmail', None),
+                'email': request.form.get('intervieweeEmail', None)
+            },
+            {
+                'name': name,
+                'email': fname if fname else None
+                }
+        ]
+        parts = [Participant(name=i['name'], email=i['email'],
+                             consent=[InterviewConsent(type='None')])
+                 for i in participants]
+
     location = request.form.get('location', None)
     prompt_text = request.form.get('promptText', None)
 
@@ -84,9 +108,6 @@ def upload():
     expPath = os.path.join(app.config['UPLOAD_FOLDER'], interview.filename)
     interview.save(expPath)
 
-    parts = [Participant(name=i['name'], email=i['email'],
-                         consent=[InterviewConsent(type='None')])
-             for i in json.loads(participants.read())]
 
     interview = Interview(
         audio = interview.filename,
