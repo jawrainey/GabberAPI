@@ -124,6 +124,7 @@ def upload():
     db.session.commit()
 
     for participant in participants:
-        helper.email_consent(interview, participant['email'])
+        if participant['email']:
+            helper.email_consent(interview, participant['email'])
 
     return jsonify({'success': 'We did it!'}), 200
