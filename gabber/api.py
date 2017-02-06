@@ -80,7 +80,7 @@ def upload():
         participants = request.files['participants']
 
         parts = [Participant(name=i['name'], email=i['email'],
-                             consent=[InterviewConsent(type='None')])
+                             consent=[InterviewConsent(type='NONE')])
                  for i in json.loads(participants.read())]
 
     else:
@@ -97,7 +97,7 @@ def upload():
                 }
         ]
         parts = [Participant(name=i['name'], email=i['email'],
-                             consent=[InterviewConsent(type='None')])
+                             consent=[InterviewConsent(type='NONE')])
                  for i in participants]
 
     location = request.form.get('location', None)
