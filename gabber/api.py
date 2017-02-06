@@ -74,7 +74,7 @@ def upload():
         return jsonify({'error': 'Required data has not been sent.'}), 400
 
     # TODO: validate fields
-    interview = request.files['interview']
+    interview = request.files['experience']
 
     if 'participants' in request.files:
         participants = request.files['participants']
