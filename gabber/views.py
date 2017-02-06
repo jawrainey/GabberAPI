@@ -88,10 +88,9 @@ def display_consent(token):
                   else url_for('main.protected', filename='default.png'))
     }]
 
-    prompt = ProjectPrompt.query.join(Project).join(Interview)\
-        .filter(InterviewConsent.interview_id == \
-                Interview.query.filter_by(audio = consent['audio']).first().id,
-                Participant.email == consent['email']).first()
+    prompt_id = Interview.query.filter_by(
+        audio=consent['audio']).first().prompt_id
+    prompt = ProjectPrompt.query.filter_by(id=prompt_id).first()
 
     return render_template('views/consent.html',
                            interview=json.dumps(interview_to_approve),
