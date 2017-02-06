@@ -15,7 +15,7 @@ def projects():
         res.append({
             'theme': project.title,
             'prompts': [
-                {'image_name': p.image_path,'prompt' : p.text_prompt}
+                {'imageName': p.image_path,'prompt' : p.text_prompt}
                 for p in project.prompts]})
     return jsonify(res), 200
 
