@@ -90,6 +90,6 @@ You can play-back the audio you created and provide consent using the form below
   </footer>
   <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
   <script src='{{ url_for('static', filename='js/jaudio.min.js') }}'></script>
-  <script> $(".jAudio--player").jAudio( { playlist: {{ experiences | safe }} }); </script>
+  <script> $(".jAudio--player").jAudio( { playlist: {{ interview | safe }} }); </script>
   </body>
 </html>
