@@ -6,6 +6,9 @@ class User(db.Model):
     password = db.Column(db.String(192))
     fullname = db.Column(db.String(64))
 
+    created_on = db.Column(db.DateTime, default=db.func.now())
+    updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+
     def __init__(self, username, password, fullname):
         self.username = username
         self.set_password(password)
@@ -29,6 +32,8 @@ class Interview(db.Model):
     image = db.Column(db.String(260))
     location = db.Column(db.String(10))
 
+    created_on = db.Column(db.DateTime, default=db.func.now())
+
     prompt_id = db.Column(db.Integer, db.ForeignKey('projectprompt.id'))
     participants = db.relationship('Participant', secondary=participants,
                                    backref=db.backref('participants', lazy='dynamic'))
@@ -49,6 +54,9 @@ class InterviewConsent(db.Model):
     participant_id = db.Column(db.Integer, db.ForeignKey('participant.id'))
     type = db.Column(db.String(50))
 
+    created_on = db.Column(db.DateTime, default=db.func.now())
+    updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+
 
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -58,14 +66,20 @@ class Project(db.Model):
     creator = db.Column(db.Integer, db.ForeignKey('user.username'))
     prompts = db.relationship('ProjectPrompt', backref='prompts', lazy='dynamic')
 
+    created_on = db.Column(db.DateTime, default=db.func.now())
+    updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+
 
 class ProjectPrompt(db.Model):
     __tablename__ = 'projectprompt'
 
     id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     creator = db.Column(db.Integer, db.ForeignKey('user.username'))
-    interviews = db.relationship('Interview', backref='interviews', lazy='dynamic')
     text_prompt = db.Column(db.String(64))
     image_path = db.Column(db.String(64))
-    audio_path = db.Column(db.String(64))
+
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    interviews = db.relationship('Interview', backref='interviews', lazy='dynamic')
+
+    created_on = db.Column(db.DateTime, default=db.func.now())
+    updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
