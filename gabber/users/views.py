@@ -1,0 +1,44 @@
+from flask import Blueprint, render_template, request, redirect, url_for
+from flask.ext.login import current_user, login_user, login_required, logout_user
+from gabber.users.forms import LoginForm
+from gabber.users.models import User
+from gabber import login_manager
+
+users = Blueprint('users', __name__)
+
+
+@login_manager.user_loader
+def load_user(email):
+    return User.query.get(email)
+
+
+@users.route('login/', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+
+    if current_user.is_authenticated:
+        return redirect(url_for('users.dashboard'))
+
+    if form.validate_on_submit():
+        login_user(User.query.filter_by(username=form.email.data).first())
+        return redirect(url_for('users.dashboard'))
+    return render_template('views/login.html', form=form)
+
+
+@users.route('logout/', methods=['GET', 'POST'])
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('main.index'))
+
+
+@users.route('dashboard/', methods=['GET', 'POST'])
+@login_required
+def dashboard():
+    pass
+
+
+@users.route('dashboard/edit/<project>/', methods=['GET', 'POST'])
+@login_required
+def edit_project(project=None):
+    pass

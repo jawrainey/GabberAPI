@@ -7,6 +7,8 @@
   {%- block scripts %}
   <!--[if lte IE 8]><script src="{{ url_for('static', filename='js/ie/html5shiv.js') }}"></script><![endif]-->
   {%- endblock %}
+  <link
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" />
   <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet" />
 </head>
@@ -17,7 +19,7 @@
         <li><a href="{{ url_for('main.index') }}">Home</a></li>
         <li><a href="{{ url_for('main.about') }}">About</a></li>
         <li><a href="{{ url_for('main.projects') }}">Projects</a></li>
-        <li class="active register"><a href="#">Sign in</a></li>
+        <li class="active register"><a href="{{ url_for('users.login') }}">Sign in</a></li>
       </ul>
     </nav>
     <section class="main">

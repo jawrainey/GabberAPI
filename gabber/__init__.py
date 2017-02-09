@@ -1,4 +1,5 @@
 from flask import Flask
+from flask.ext.login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail
@@ -10,6 +11,9 @@ PROXY_PATH = os.getenv('PROXY_PATH', '/')
 # Set static path as it will remain the same throughout blueprints.
 app = Flask(__name__, static_url_path=os.path.join(PROXY_PATH, 'static'))
 bcrypt = Bcrypt(app)
+
+login_manager = LoginManager(app)
+
 app.debug = True
 # This is where all the audio interviews will be stored -- root directory.
 xp = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'protected')
@@ -40,6 +44,8 @@ from gabber.views import main
 app.register_blueprint(main, url_prefix=PROXY_PATH)
 from gabber.api import api
 app.register_blueprint(api, url_prefix=os.path.join(PROXY_PATH, 'api/'))
+from gabber.users.views import users
+app.register_blueprint(users, url_prefix=PROXY_PATH)
 
 # Create the database afterwards as models meta-data required to populate it.
 if not os.path.exists(dbp):
