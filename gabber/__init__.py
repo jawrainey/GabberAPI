@@ -49,8 +49,8 @@ from gabber.api import api
 app.register_blueprint(api, url_prefix=os.path.join(PROXY_PATH, 'api/'))
 from gabber.users.views import users
 app.register_blueprint(users, url_prefix=PROXY_PATH)
-from gabber.users.views import users
-app.register_blueprint(users, url_prefix=PROXY_PATH)
+from gabber.projects.views import project
+app.register_blueprint(project, url_prefix=PROXY_PATH)
 
 # Create the database afterwards as models meta-data required to populate it.
 if not os.path.exists(dbp):
