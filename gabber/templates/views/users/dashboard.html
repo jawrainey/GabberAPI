@@ -1,0 +1,12 @@
+{% extends "views/layout.html" %}
+{% block content %}
+<ul>
+{% for project in projects %}
+  <li>
+    <a href="{{ url_for('main.projects', project=project.title) }}">{{ project.title }}</a>
+    |
+    <a href="{{ url_for('users.edit_project', project=project.title) }}">Edit</a>
+  </li>
+{% endfor %}
+</ul>
+{% endblock %}

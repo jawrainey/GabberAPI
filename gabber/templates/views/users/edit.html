@@ -1,0 +1,34 @@
+{% extends "views/layout.html" %}
+{% block scripts %}
+  <script>
+  function readURL(event) {
+    var tgt = event.target || window.event.srcElement, files = tgt.files;
+    // No fallback for now: assume modern device.
+    if (FileReader && files && files.length) {
+      var fr = new FileReader();
+        fr.onload = function () {
+            document.getElementById("promptImg-" + event.id.split("-")[1]).src = fr.result;
+        }
+        fr.readAsDataURL(files[0]);
+    }
+  }
+  </script>
+{% endblock %}
+{% block content %}
+      <form method="POST" enctype=multipart/form-data>
+        <div class="form-group">
+          <input type="text" class="form-control" name="title" value="{{ project.title }}">
+        </div>
+{%- for prompt in project.prompts %}
+        <div class="project">
+            <input type="file" name="upload-{{ prompt.id }}" id="upload-{{ prompt.id }}" onchange="readURL(this)" style="display:none">
+            <label for="upload-{{ prompt.id }}">
+              <img id="promptImg-{{ prompt.id }}" src="{{ url_for('static',
+              filename='img/' + project.id|string + "/" + prompt.image_path) }}" />
+            </label>
+            <textarea type="text" class="form-control" name="promptText-{{ prompt.id }}" style="font-size: .8em; width: 100%;">{{ prompt.text_prompt.lower() }}</textarea>
+        </div>
+{%- endfor %}
+        <button class="btn btn-primary btn-block" type="submit">Update</button>
+      </form>
+{%- endblock %}
