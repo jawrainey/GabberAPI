@@ -23,9 +23,6 @@ def projects():
     return jsonify(res), 200
 
 
-# requests.post('http://0.0.0.0:8080/api/register',
-# data = {'email': 'jawrainey@gmail.com',
-# 'password': 'apassword', 'fullname': 'Jay Rainey'})
 @api.route('register', methods=['POST'])
 def register():
     username = request.form.get('email', None)
@@ -43,8 +40,6 @@ def register():
     return jsonify({'success': 'A user has been created successfully'}), 200
 
 
-# requests.post('http://0.0.0.0:8080/api/auth',
-# data = {'username': 'jawrainey@gmail.com', 'password' : 'apassword'})
 @api.route('auth', methods=['POST'])
 def login():
     username = request.form.get('username', None)
@@ -62,10 +57,6 @@ def login():
     return jsonify({'error': 'Username and password do not match.'}), 400
 
 
-# requests.post("http://0.0.0.0:8080/api/upload",
-# files={'experience': open('audio.mp3', 'rb'),
-#        'authorImage': open('gnome.svg', 'rb')},
-# data={'interviewerEmail':'jawrainey@gmail.com'})
 @api.route('upload', methods=['POST'])
 def upload():
     """
