@@ -1,7 +1,7 @@
 from gabber import app, db, helper
 from gabber.users.models import User
 from gabber.projects.models import Interview, Project, ProjectPrompt, Participant, InterviewConsent
-from flask import jsonify, request, Blueprint
+from flask import jsonify, request, Blueprint, url_for
 import json, os
 
 api = Blueprint('api', __name__)
@@ -13,10 +13,12 @@ def projects():
     # TODO: use built-in __dict__ and filter to simplify accessing from models.
     res = []
     for project in Project.query.join(ProjectPrompt).all():
+        uri = request.url_root + 'static/img/' + str(project.id) + '/'
         res.append({
             'theme': project.title,
             'prompts': [
-                {'imageName': p.image_path,'prompt' : p.text_prompt}
+                {'imageName': uri + p.image_path,
+                 'prompt' : p.text_prompt}
                 for p in project.prompts]})
     return jsonify(res), 200
 
