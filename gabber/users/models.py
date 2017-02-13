@@ -1,6 +1,6 @@
 from gabber import db, bcrypt
 from gabber.users import constants as const
-from flask.ext.login import UserMixin
+from flask_login import UserMixin
 
 
 class User(UserMixin, db.Model):

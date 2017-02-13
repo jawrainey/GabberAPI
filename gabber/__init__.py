@@ -1,23 +1,18 @@
 from flask import Flask
-from flask.ext.login import LoginManager
+from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail
 import os
 
-# Required when deploying to dokku. This would be
+# Required when deploying to dokku @OpenLab
 PROXY_PATH = os.getenv('PROXY_PATH', '/')
-# Set the static path here as ...
-# Set static path as it will remain the same throughout blueprints.
+# Share static path behind proxy across all blueprints
 app = Flask(__name__, static_url_path=os.path.join(PROXY_PATH, 'static'))
 bcrypt = Bcrypt(app)
-
 login_manager = LoginManager(app)
 
-app.debug = True
-# This is where all the audio interviews will be stored -- root directory.
 root = os.path.dirname(os.path.abspath(__file__))
-
 xp = os.path.join(root, 'protected')
 if not os.path.exists(xp):
     os.makedirs(xp)
@@ -30,8 +25,6 @@ app.config['SALT'] = 'supersecretsaltfromtheotherside'
 app.config['PROXY_PATH'] = PROXY_PATH
 app.config['IMG_FOLDER'] = os.path.join(root, 'static/img/')
 
-
-# Gmail for simplicity of initial deployment.
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', '')
@@ -54,6 +47,6 @@ app.register_blueprint(project, url_prefix=PROXY_PATH)
 from gabber.consent.views import consent
 app.register_blueprint(consent, url_prefix=PROXY_PATH)
 
-# Create the database afterwards as models meta-data required to populate it.
+# Model meta-data required to create db correctly
 if not os.path.exists(dbp):
     db.create_all()
