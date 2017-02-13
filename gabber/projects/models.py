@@ -1,6 +1,33 @@
 from gabber import db
 
 
+class Project(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(64))
+    banner = db.Column(db.String(64))
+
+    creator = db.Column(db.Integer, db.ForeignKey('user.username'))
+    prompts = db.relationship('ProjectPrompt', backref='prompts', lazy='dynamic')
+
+    created_on = db.Column(db.DateTime, default=db.func.now())
+    updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+
+
+class ProjectPrompt(db.Model):
+    __tablename__ = 'projectprompt'
+
+    id = db.Column(db.Integer, primary_key=True)
+    creator = db.Column(db.Integer, db.ForeignKey('user.username'))
+    text_prompt = db.Column(db.String(64))
+    image_path = db.Column(db.String(64))
+
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    interviews = db.relationship('Interview', backref='interviews', lazy='dynamic')
+
+    created_on = db.Column(db.DateTime, default=db.func.now())
+    updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+
+
 participants = db.Table('participants',
     db.Column('participant_id', db.Integer, db.ForeignKey('participant.id')),
     db.Column('interview_id', db.Integer, db.ForeignKey('interview.id')))
@@ -33,33 +60,6 @@ class InterviewConsent(db.Model):
     interview_id = db.Column(db.Integer, db.ForeignKey('interview.id'))
     participant_id = db.Column(db.Integer, db.ForeignKey('participant.id'))
     type = db.Column(db.String(50))
-
-    created_on = db.Column(db.DateTime, default=db.func.now())
-    updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
-
-
-class Project(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(64))
-    banner = db.Column(db.String(64))
-
-    creator = db.Column(db.Integer, db.ForeignKey('user.username'))
-    prompts = db.relationship('ProjectPrompt', backref='prompts', lazy='dynamic')
-
-    created_on = db.Column(db.DateTime, default=db.func.now())
-    updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
-
-
-class ProjectPrompt(db.Model):
-    __tablename__ = 'projectprompt'
-
-    id = db.Column(db.Integer, primary_key=True)
-    creator = db.Column(db.Integer, db.ForeignKey('user.username'))
-    text_prompt = db.Column(db.String(64))
-    image_path = db.Column(db.String(64))
-
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
-    interviews = db.relationship('Interview', backref='interviews', lazy='dynamic')
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())

@@ -1,5 +1,5 @@
 from gabber import db, helper
-from gabber.models import Interview, Participant, InterviewConsent, Project, ProjectPrompt
+from gabber.projects.models import Interview, Participant, InterviewConsent, Project, ProjectPrompt
 from flask import Blueprint, redirect, request, \
     render_template, send_from_directory, session, url_for
 import json
