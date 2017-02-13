@@ -1,6 +1,8 @@
-from gabber import app, db, helper
+from gabber import app, db
+from gabber.consent import helper
 from gabber.users.models import User
-from gabber.projects.models import Interview, Project, ProjectPrompt, Participant, InterviewConsent
+from gabber.projects.models import Interview, Project, ProjectPrompt, Participant
+from gabber.consent.models import InterviewConsent
 from flask import jsonify, request, Blueprint, url_for
 import json, os
 

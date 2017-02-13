@@ -53,7 +53,7 @@ def consented(filename):
     """
     from gabber.projects.models import Interview
     interview = Interview.query.filter(Interview.audio == filename).first()
-    if interview and 'NONE' not in [c.type for c in interview.consents.all()]:
+    if interview and 'none' not in [c.type.lower() for c in interview.consents.all()]:
         return True
     return False
 
@@ -62,4 +62,4 @@ def __consent_url(interview, email):
     ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
     properties = [email, interview.audio, interview.image]
     token = ts.dumps(properties, app.config['SALT'])
-    return url_for('main.display_consent', token=token)
+    return url_for('consent.display_consent', token=token)
