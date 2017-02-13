@@ -14,18 +14,7 @@
 </head>
 <body>
   <div class="wrapper">
-    <nav>
-      <ul>
-        <li><a href="{{ url_for('main.index') }}">Home</a></li>
-        <li><a href="{{ url_for('main.about') }}">About</a></li>
-        <li><a href="{{ url_for('main.projects') }}">Projects</a></li>
-        {% if current_user.is_authenticated %}
-        <li class="active register"><a href="{{ url_for('users.dashboard') }}">Dashboard</a></li>
-        {% else %}
-        <li class="active register"><a href="{{ url_for('users.login') }}">Sign in</a></li>
-        {% endif %}
-      </ul>
-    </nav>
+{% include 'views/nav.html' %}
     <section class="main">
   {%- with messages = get_flashed_messages() -%}
   {% if messages %}
@@ -39,17 +28,7 @@
 {%- endblock %}
     </section>
   </div>
-  <footer id="footer">
-    <ul>
-      <li>&copy; 2016 Gabber</li>
-      <li><a href="{{ url_for('main.about') }}">About</a></li>
-      <li><a href="#">Contact</a></li>
-      <li><a href="#">Privacy</a></li>
-      {%- if current_user.is_authenticated %}
-      <li><a href="{{ url_for('users.logout') }}">Logout</a></li>
-      {%- endif %}
-    </ul>
-  </footer>
+  {% include 'views/footer.html' %}
   <!--[if lte IE 8]><script src="{{ url_for('static', filename='js/ie/respond.min.js') }}"></script><![endif]-->
   {%- block fscripts %}
   {%- endblock %}

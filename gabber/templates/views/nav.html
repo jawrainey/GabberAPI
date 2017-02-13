@@ -1,0 +1,12 @@
+    <nav>
+      <ul>
+        <li><a href="{{ url_for('main.index') }}">Home</a></li>
+        <li><a href="{{ url_for('main.about') }}">About</a></li>
+        <li><a href="{{ url_for('main.projects') }}">Projects</a></li>
+        {% if current_user.is_authenticated -%}
+        <li class="active register"><a href="{{ url_for('users.dashboard') }}">Dashboard</a></li>
+        {%- else %}
+        <li class="active register"><a href="{{ url_for('users.login') }}">Sign in</a></li>
+        {% endif %}
+      </ul>
+    </nav>

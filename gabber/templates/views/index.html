@@ -12,14 +12,7 @@
   <!--[if lte IE 9]><link rel="stylesheet" href="{{ url_for('static', filename='css/ie9.css') }}" /><![endif]-->
 </head>
 <body>
-  <nav>
-    <ul>
-      <li><a href="{{ url_for('main.index') }}">Home</a></li>
-      <li><a href="{{ url_for('main.about') }}">About</a></li>
-      <li><a href="{{ url_for('main.projects') }}">Projects</a></li>
-      <li class="active register"><a href="{{ url_for('users.login') }}">Sign in</a></li>
-    </ul>
-  </nav>
+  {% include 'views/nav.html' %}
   <header id="header">
     <div class="content">
       <h1>Your voice matters</h1>
@@ -37,14 +30,7 @@
       </div>
     </div>
   </header>
-  <footer id="footer">
-    <ul>
-      <li>&copy; 2016 Gabber</li>
-      <li><a href="{{ url_for('main.about') }}">About</a></li>
-      <li><a href="#">Contact</a></li>
-      <li><a href="#">Privacy</a></li>
-    </ul>
-  </footer>
+  {% include 'views/footer.html' %}
   <!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
   <script>
     window.onload = function(e) {

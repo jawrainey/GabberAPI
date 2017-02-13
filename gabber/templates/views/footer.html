@@ -1,0 +1,11 @@
+<footer id="footer">
+    <ul>
+      <li>&copy; 2016 Gabber</li>
+      <li><a href="{{ url_for('main.about') }}">About</a></li>
+      <li><a href="#">Contact</a></li>
+      <li><a href="#">Privacy</a></li>
+      {%- if current_user.is_authenticated %}
+      <li><a href="{{ url_for('users.logout') }}">Logout</a></li>
+      {%- endif %}
+    </ul>
+  </footer>
