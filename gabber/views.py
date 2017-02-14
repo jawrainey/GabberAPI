@@ -11,7 +11,7 @@ def index():
     return render_template('views/main/index.html')
 
 
-@main.route('about', methods=['GET'])
+@main.route('about/', methods=['GET'])
 def about():
     return render_template('views/main/about.html')
 
