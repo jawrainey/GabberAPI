@@ -43,7 +43,7 @@ app.register_blueprint(api, url_prefix=os.path.join(PROXY_PATH, 'api/'))
 from gabber.users.views import users
 app.register_blueprint(users, url_prefix=PROXY_PATH)
 from gabber.projects.views import project
-app.register_blueprint(project, url_prefix=PROXY_PATH)
+app.register_blueprint(project, url_prefix=os.path.join(PROXY_PATH, 'project/'))
 from gabber.consent.views import consent
 app.register_blueprint(consent, url_prefix=PROXY_PATH)
 
