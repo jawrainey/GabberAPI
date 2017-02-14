@@ -12,11 +12,8 @@ class User(UserMixin, db.Model):
 
     def __init__(self, username, password, fullname):
         self.username = username
-        self.set_password(password)
+        self.password = bcrypt.generate_password_hash(password)
         self.fullname = fullname
-
-    def set_password(self, plaintext):
-        self.password = bcrypt.generate_password_hash(plaintext)
 
     def is_correct_password(self, plaintext):
         return bcrypt.check_password_hash(self.password, plaintext)
