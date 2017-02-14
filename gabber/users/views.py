@@ -34,7 +34,7 @@ def logout():
     return redirect(url_for('main.index'))
 
 
-@users.route('dashboard/', methods=['GET', 'POST'])
+@users.route('dashboard/', methods=['GET'])
 @login_required
 def dashboard():
     projects = Project.query.filter_by(creator=current_user.username).all()
