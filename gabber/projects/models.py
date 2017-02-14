@@ -1,5 +1,4 @@
 from gabber import db
-from gabber.users.models import User
 
 
 class Project(db.Model):

@@ -1,5 +1,4 @@
 from gabber import db, bcrypt
-from gabber.users import constants as const
 from flask_login import UserMixin
 
 
