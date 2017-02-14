@@ -14,7 +14,7 @@
 </head>
 <body>
   <div class="wrapper">
-{% include 'views/nav.html' %}
+{% include 'views/shared/nav.html' %}
     <section class="main">
   {%- with messages = get_flashed_messages() -%}
   {% if messages %}
@@ -28,7 +28,7 @@
 {%- endblock %}
     </section>
   </div>
-  {% include 'views/footer.html' %}
+  {% include 'views/shared/footer.html' %}
   <!--[if lte IE 8]><script src="{{ url_for('static', filename='js/ie/respond.min.js') }}"></script><![endif]-->
   {%- block fscripts %}
   {%- endblock %}

@@ -12,7 +12,7 @@
   <!--[if lte IE 9]><link rel="stylesheet" href="{{ url_for('static', filename='css/ie9.css') }}" /><![endif]-->
 </head>
 <body>
-  {% include 'views/nav.html' %}
+  {% include 'views/shared/nav.html' %}
   <header id="header">
     <div class="content">
       <h1>Your voice matters</h1>
@@ -30,7 +30,7 @@
       </div>
     </div>
   </header>
-  {% include 'views/footer.html' %}
+  {% include 'views/shared/footer.html' %}
   <!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
   <script>
     window.onload = function(e) {

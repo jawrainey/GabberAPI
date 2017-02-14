@@ -27,7 +27,7 @@
 </head>
 <body>
   <div class="wrapper">
-  {% include 'views/nav.html' %}
+  {% include 'views/shared/nav.html' %}
     <section class="main">
       <h1>Sharing your Gabber</h1>
       <hr>
@@ -73,7 +73,7 @@ You can play-back the audio you created and provide consent using the form below
       </div>
     </section>
   </div>
-  {% include 'views/footer.html' %}
+  {% include 'views/shared/footer.html' %}
   <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
   <script src='{{ url_for('static', filename='js/jaudio.min.js') }}'></script>
   <script> $(".jAudio--player").jAudio( { playlist: {{ interview | safe }} }); </script>

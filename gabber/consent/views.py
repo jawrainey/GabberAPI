@@ -45,7 +45,7 @@ def display_consent(token):
         audio=consent['audio']).first().prompt_id
     prompt = ProjectPrompt.query.filter_by(id=prompt_id).first()
 
-    return render_template('views/consent.html',
+    return render_template('views/consent/consent.html',
                            interview=json.dumps(interview_to_approve),
                            prompt=prompt.text_prompt)
 

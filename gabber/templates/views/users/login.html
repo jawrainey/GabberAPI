@@ -1,8 +1,8 @@
-{% extends "views/layout.html" %}
+{% extends "views/shared/layout.html" %}
 {% block content %}
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
-        <h1 class="text-center">Gabber login</h1>{% from "views/macros.html" import render_field %}
+        <h1 class="text-center">Gabber login</h1>{% from "views/shared/macros.html" import render_field %}
           <form method="POST">
             {{ form.csrf_token }}
             <input type="hidden" name="next" value="{{ next }}"/>

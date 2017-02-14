@@ -24,7 +24,7 @@ def login():
     if form.validate_on_submit():
         login_user(User.query.filter_by(username=form.email.data).first())
         return redirect(url_for('users.dashboard'))
-    return render_template('views/login.html', form=form)
+    return render_template('views/users/login.html', form=form)
 
 
 @users.route('logout/', methods=['GET', 'POST'])
