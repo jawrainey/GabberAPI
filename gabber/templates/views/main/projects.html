@@ -1,7 +1,7 @@
 {% extends "views/shared/layout.html" %}
 {% block title %}Projects{% endblock %}
 {% block content %}
-      <h1>Gabber projects</h1>
+      <h1>Gabber Projects</h1>
       <hr>{% for project in projects %}
       <div class="project">
         <a class="project-ref" href="{{ url_for('project.display',
