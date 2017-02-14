@@ -16,7 +16,7 @@
   </style>
   {%- endblock %}
 {% block content %}
-      <h1>{{ project_title }}</h1>
+      <h1>{{ project_title.lower().title().replace("-", " ") }}</h1>
       <hr>
       <div class='jAudio--player'>
         <audio></audio>

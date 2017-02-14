@@ -19,7 +19,8 @@ def display(project=None):
         # TODO: challenge -- can the below be encapsulated into one query?
         # Select all interviews that for this project (based on prompt_id) that
         # have been fully consented by all participants for the audio interview.
-        selected_project = Project.query.filter_by(title=project).first()
+        selected_project = Project.query.filter_by(
+            title=project.replace("-", " ").lower()).first()
         prompt_ids = [i.id for i in selected_project.prompts.all()]
         interviews = db.session.query(Interview) \
             .filter(Interview.prompt_id.in_(prompt_ids)).all()
@@ -41,20 +42,20 @@ def display(project=None):
                 'trackName': prompt.text_prompt})
 
         return render_template('views/projects/display.html',
-                               project_title=project.replace("-", " "),
+                               project_title=project,
                                interviews=json.dumps(interviews_to_display))
 
 
 @project.route('edit/<path:project>/', methods=['GET', 'POST'])
 @login_required
 def edit(project=None):
-    project = Project.query.filter_by(title=project).first()
+    project = Project.query.filter_by(title=project.replace("-", " ").lower()).first()
 
     # TODO: use WTForms to process and validate form. Tricky with dynamic form.
     if request.method == 'POST':
         # Allows title removal to create a 'prompt only' dictionary for parsing
         _form = request.form.copy()
-        project.title = _form.get('title', None)
+        project.title = _form.get('title', '').lower()
         _form.pop('title')
 
         prompts = project.prompts.all()

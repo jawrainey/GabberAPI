@@ -3,9 +3,9 @@
 <ul>
 {% for project in projects %}
   <li>
-    <a href="{{ url_for('project.display', project=project.title) }}">{{ project.title }}</a>
+    <a href="{{ url_for('project.display', project=project.title.replace(" ", "-")).lower() }}">{{ project.title }}</a>
     |
-    <a href="{{ url_for('project.edit', project=project.title) }}">Edit</a>
+    <a href="{{ url_for('project.edit', project=project.title.replace(" ", "-").lower()) }}">Edit</a>
   </li>
 {% endfor %}
 </ul>
