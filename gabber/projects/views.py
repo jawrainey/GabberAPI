@@ -1,5 +1,7 @@
 from gabber.projects.models import User, Interview,  Project, ProjectPrompt
-from flask import Blueprint, render_template, url_for, redirect
+from flask import Blueprint, render_template, url_for, redirect, request, flash
+from flask_login import login_required
+
 from gabber import db
 import json
 
@@ -38,6 +40,47 @@ def display(project=None):
                 'trackAlbum': 'default.png',
                 'trackName': prompt.text_prompt})
 
-        return render_template('views/project.html',
+        return render_template('views/projects/display.html',
                                project_title=project.replace("-", " "),
                                interviews=json.dumps(interviews_to_display))
+
+
+@project.route('edit/<path:project>/', methods=['GET', 'POST'])
+@login_required
+def edit(project=None):
+    project = Project.query.filter_by(title=project).first()
+
+    # TODO: use WTForms to process and validate form. Tricky with dynamic form.
+    if request.method == 'POST':
+        # Allows title removal to create a 'prompt only' dictionary for parsing
+        _form = request.form.copy()
+        project.title = _form.get('title', None)
+        _form.pop('title')
+
+        prompts = project.prompts.all()
+
+        for fieldname, prompt_text in _form.iteritems():
+            __update_prompt(prompts, fieldname.split("-")[-1], text=prompt_text)
+
+        for fieldname, uploaded_file in request.files.iteritems():
+            if uploaded_file.filename:
+                folder = os.path.join(app.config['IMG_FOLDER'] + str(project.id))
+                if not os.path.exists(folder):
+                    os.makedirs(folder)
+                fname = fieldname.split("-")[-1] + '.jpg'
+                uploaded_file.save(os.path.join(folder, fname))
+                __update_prompt(prompts, fname.split('.')[0], image=fname)
+
+        db.session.commit()
+        flash('The prompts for your project have been updated if any changes were made.')
+        return redirect(url_for('users.dashboard'))
+    return render_template('views/projects/edit.html', project=project)
+
+
+def __update_prompt(prompts, prompt_id, text=None, image=None):
+    for prompt in prompts:
+        if int(prompt_id) == prompt.id:
+            if text:
+                prompt.text_prompt = text
+            if image:
+                prompt.image_path = image
