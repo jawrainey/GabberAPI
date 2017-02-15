@@ -15,7 +15,7 @@ def projects():
     # TODO: use built-in __dict__ and filter to simplify accessing from models.
     res = []
     for project in Project.query.join(ProjectPrompt).all():
-        uri = request.url_root + 'static/img/' + str(project.id) + '/'
+        uri = app.config['IMG_FOLDER'] + str(project.id) + '/'
         res.append({
             'theme': project.title,
             'prompts': [
