@@ -60,10 +60,10 @@ def edit(project=None):
 
         prompts = project.prompts.all()
 
-        for fieldname, prompt_text in _form.iteritems():
+        for fieldname, prompt_text in _form.items():
             __update_prompt(prompts, fieldname.split("-")[-1], text=prompt_text)
 
-        for fieldname, uploaded_file in request.files.iteritems():
+        for fieldname, uploaded_file in request.files.items():
             if uploaded_file.filename:
                 folder = os.path.join(app.config['IMG_FOLDER'] + str(project.id))
                 if not os.path.exists(folder):

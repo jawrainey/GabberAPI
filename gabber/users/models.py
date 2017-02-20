@@ -19,4 +19,4 @@ class User(UserMixin, db.Model):
         return bcrypt.check_password_hash(self.password, plaintext)
 
     def get_id(self):
-        return unicode(self.username)
+        return self.username
