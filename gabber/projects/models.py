@@ -43,7 +43,8 @@ class Interview(db.Model):
 
     prompt_id = db.Column(db.Integer, db.ForeignKey('projectprompt.id'))
     participants = db.relationship('Participant', secondary=participants,
-                                   backref=db.backref('participants', lazy='dynamic'))
+                                   backref=db.backref('participants', lazy='dynamic'),
+                                   lazy='dynamic')
     # Each of which provide individual consent for the audio recording.
     consents = db.relationship('InterviewConsent', backref='consentid', lazy='dynamic')
 
