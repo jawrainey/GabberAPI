@@ -105,7 +105,6 @@ def upload():
     expPath = os.path.join(app.config['UPLOAD_FOLDER'], interview.filename)
     interview.save(expPath)
 
-
     interview = Interview(
         audio = interview.filename,
         image = None,
@@ -119,9 +118,5 @@ def upload():
 
     db.session.add(interview)
     db.session.commit()
-
-    for participant in participants:
-        if participant['email']:
-            helper.email_consent(interview, participant['email'])
 
     return jsonify({'success': 'We did it!'}), 200
