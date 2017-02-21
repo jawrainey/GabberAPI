@@ -53,4 +53,22 @@ class Participant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
     email = db.Column(db.String(64))
+    age = db.Column(db.Integer)
+    gender = db.Column(db.Integer)
+    complexneeds = db.relationship('ComplexNeeds', backref="participant")
     consent = db.relationship('InterviewConsent', backref='consents', lazy='dynamic')
+
+
+class ComplexNeeds(db.Model):
+    """
+    This is specific to the FF deployment.
+    """
+    __tablename__ = 'complexneeds'
+
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String)
+    timeline = db.Column(db.String)
+    month = db.Column(db.String)
+    year = db.Column(db.String)
+    participant_id = db.Column(db.Integer, db.ForeignKey('participant.id'))
+    interview_id = db.Column(db.Integer, db.ForeignKey('interview.id'))
