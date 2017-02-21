@@ -96,10 +96,6 @@ def upload():
         parts = [Participant(name=i['name'], email=i['email'],
                              consent=[InterviewConsent(type='ALL')])
                  for i in participants]
-
-    location = request.form.get('location', None)
-    prompt_text = request.form.get('promptText', None)
-
     # Save file to disk and capture path.
     # TODO: validate: check mime type, use magic_python.
     expPath = os.path.join(app.config['UPLOAD_FOLDER'], interview.filename)
@@ -108,8 +104,9 @@ def upload():
     interview = Interview(
         audio = interview.filename,
         image = None,
-        location = location,
-        prompt_id = ProjectPrompt.query.filter_by(text_prompt=prompt_text).first().id
+        location = request.form.get('location', None),
+        prompt_id = ProjectPrompt.query.filter_by(
+            text_prompt=request.form.get('promptText', None)).first().id
     )
 
     # Populating relationship fields outside constructor due to extending lists.
