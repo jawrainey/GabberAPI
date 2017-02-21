@@ -1,7 +1,7 @@
 from gabber import app, db
 from gabber.consent import helper
 from gabber.users.models import User
-from gabber.projects.models import Interview, Project, ProjectPrompt, Participant
+from gabber.projects.models import Interview, Project, ProjectPrompt, Participant, ComplexNeeds
 from gabber.consent.models import InterviewConsent
 from flask import jsonify, request, Blueprint, url_for
 import json, os
@@ -86,7 +86,9 @@ def upload():
         participants = [
             {
                 'name': request.form.get('intervieweeName', None),
-                'email': request.form.get('intervieweeEmail', None)
+                'email': request.form.get('intervieweeEmail', None),
+                'gender': request.form.get('intervieweeGender', None),
+                'age': request.form.get('intervieweeAge', None)
             },
             {
                 'name': fname.fullname if fname else None,
@@ -108,6 +110,16 @@ def upload():
         prompt_id = ProjectPrompt.query.filter_by(
             text_prompt=request.form.get('promptText', None)).first().id
     )
+
+    needs = request.form.get('ComplexNeedsAsJSON', None)
+    if needs:
+        cn = [ComplexNeeds(type=key, timeline=value['timeline'],
+                           month=value['month'], year=value['year'],
+                           interview_id=interview.id,
+                           participant_id=parts[0].id)
+            for key, value in json.loads(needs).items()]
+
+        parts[0].complexneeds.extend(cn)
 
     # Populating relationship fields outside constructor due to extending lists.
     interview.consents.extend([i.consent.first() for i in parts])
