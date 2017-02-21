@@ -1,6 +1,6 @@
 from gabber import db
 from gabber.projects.models import Project
-from flask import Blueprint, redirect, render_template
+from flask import Blueprint, redirect, render_template, flash, url_for
 import json
 
 main = Blueprint('main', __name__)
@@ -18,4 +18,5 @@ def about():
 
 @main.route('projects/', methods=['GET'])
 def projects():
-    return render_template('views/main/projects.html', projects=db.session.query(Project).all())
+    flash('No projects are currently public for you to listen to or curate.')
+    return redirect(url_for('main.about'))
