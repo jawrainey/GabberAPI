@@ -94,7 +94,7 @@ def upload():
                 }
         ]
         parts = [Participant(name=i['name'], email=i['email'],
-                             consent=[InterviewConsent(type='NONE')])
+                             consent=[InterviewConsent(type='ALL')])
                  for i in participants]
 
     location = request.form.get('location', None)
