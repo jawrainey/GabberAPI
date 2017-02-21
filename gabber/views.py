@@ -1,5 +1,5 @@
 from gabber import db
-from gabber.projects.models import Project
+from gabber.projects.models import Project, ProjectPrompt, Participant, Interview
 from flask import Blueprint, redirect, render_template, flash, url_for
 import json
 
@@ -20,3 +20,23 @@ def about():
 def projects():
     flash('No projects are currently public for you to listen to or curate.')
     return redirect(url_for('main.about'))
+
+
+@main.route('idm/', methods=['GET'])
+def idm():
+    from sqlalchemy.sql import and_
+    import datetime
+    prompt_ids = [i.id for i in Project.query.filter_by(id=1).first().prompts.all()]
+
+    interviews = Interview.query.filter(
+        and_(Interview.prompt_id.in_(prompt_ids),
+             Interview.created_on >= datetime.datetime(2017,2,15,15,00,00))
+    ).order_by(Interview.created_on.desc()).all()
+
+    interviews = [i for i in interviews for interview in i.participants.all()
+                  if 'ncl' in interview.email or 'newcastle' in interview.email]
+    prompts = ProjectPrompt.query.filter(ProjectPrompt.id.in_(prompt_ids)).all()
+    prompts = dict((p.id, p.text_prompt) for p in prompts)
+    return render_template('views/main/idm.html',
+                           interviews=interviews,
+                           prompts=prompts)
