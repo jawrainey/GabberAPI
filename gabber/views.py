@@ -1,7 +1,5 @@
-from gabber import db
-from gabber.projects.models import Project, ProjectPrompt, Participant, Interview
+from gabber.projects.models import Project, ProjectPrompt, Interview
 from flask import Blueprint, redirect, render_template, flash, url_for
-import json
 
 main = Blueprint('main', __name__)
 
@@ -31,7 +29,7 @@ def idm():
 
     interviews = Interview.query.filter(
         and_(Interview.prompt_id.in_(prompt_ids),
-             Interview.created_on >= datetime.datetime(2017,2,15,15,00,00))
+             Interview.created_on >= datetime.datetime(2017, 2, 15, 15, 00, 00))
     ).order_by(Interview.created_on.desc()).all()
 
     print len(interviews)
