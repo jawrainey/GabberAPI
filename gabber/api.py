@@ -96,6 +96,7 @@ def upload():
                 }
         ]
         parts = [Participant(name=i['name'], email=i['email'],
+                             gender=i['gender'], age=i['age'],
                              consent=[InterviewConsent(type='ALL')])
                  for i in participants]
     # Save file to disk and capture path.
