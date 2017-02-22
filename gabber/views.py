@@ -32,11 +32,9 @@ def idm():
              Interview.created_on >= datetime.datetime(2017, 2, 15, 15, 00, 00))
     ).order_by(Interview.created_on.desc()).all()
 
-    print len(interviews)
     filtered_interviews = []
 
     for i in interviews:
-        print i.participants.all()
         for j in i.participants.all():
             if 'ncl' in j.email or 'newcastle' in j.email:
                 filtered_interviews.append(i)
