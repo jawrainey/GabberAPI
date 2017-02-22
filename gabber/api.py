@@ -93,7 +93,9 @@ def upload():
             },
             {
                 'name': fname.fullname if fname else None,
-                'email': email
+                'email': email,
+                'gender': None,
+                'age': None
                 }
         ]
         parts = [Participant(name=i['name'], email=i['email'],
