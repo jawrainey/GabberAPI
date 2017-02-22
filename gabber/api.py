@@ -1,10 +1,10 @@
 from gabber import app, db
-from gabber.consent import helper
 from gabber.users.models import User
 from gabber.projects.models import Interview, Project, ProjectPrompt, Participant, ComplexNeeds
 from gabber.consent.models import InterviewConsent
-from flask import jsonify, request, Blueprint, url_for
-import json, os
+from flask import jsonify, request, Blueprint
+import json
+import os
 
 api = Blueprint('api', __name__)
 
@@ -15,13 +15,13 @@ def projects():
     # TODO: use built-in __dict__ and filter to simplify accessing from models.
     res = []
     for project in Project.query.join(ProjectPrompt).all():
-        uri = (request.url_root[0:(len(request.url_root )-1)] +
+        uri = (request.url_root[0:(len(request.url_root)-1)] +
                app.static_url_path + '/img/' + str(project.id) + '/')
         res.append({
             'theme': project.title,
             'prompts': [
                 {'imageName': uri + p.image_path,
-                 'prompt' : p.text_prompt}
+                 'prompt': p.text_prompt}
                 for p in project.prompts]})
     return jsonify(res), 200
 
@@ -83,6 +83,7 @@ def upload():
     else:
         email = request.form.get('interviewerEmail', None)
         fname = User.query.filter_by(username=email).first()
+
         participants = [
             {
                 'name': request.form.get('intervieweeName', None),
@@ -99,16 +100,18 @@ def upload():
                              gender=i['gender'], age=i['age'],
                              consent=[InterviewConsent(type='ALL')])
                  for i in participants]
+
     # Save file to disk and capture path.
     # TODO: validate: check mime type, use magic_python.
-    expPath = os.path.join(app.config['UPLOAD_FOLDER'], interview.filename.split(".")[0] + ".mp4")
+    filename = interview.filename.split(".")[0] + ".mp4"
+    expPath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     interview.save(expPath)
 
     interview = Interview(
-        audio = interview.filename,
-        image = None,
-        location = request.form.get('location', None),
-        prompt_id = ProjectPrompt.query.filter_by(
+        audio=filename,
+        image=None,
+        location=request.form.get('location', None),
+        prompt_id=ProjectPrompt.query.filter_by(
             text_prompt=request.form.get('promptText', None)).first().id
     )
 
@@ -118,7 +121,7 @@ def upload():
                            month=value['month'], year=value['year'],
                            interview_id=interview.id,
                            participant_id=parts[0].id)
-            for key, value in json.loads(needs).items()]
+              for key, value in json.loads(needs).items()]
 
         parts[0].complexneeds.extend(cn)
 
