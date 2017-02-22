@@ -100,7 +100,7 @@ def upload():
                  for i in participants]
     # Save file to disk and capture path.
     # TODO: validate: check mime type, use magic_python.
-    expPath = os.path.join(app.config['UPLOAD_FOLDER'], interview.filename)
+    expPath = os.path.join(app.config['UPLOAD_FOLDER'], interview.filename.split(".")[0] + ".mp4")
     interview.save(expPath)
 
     interview = Interview(
