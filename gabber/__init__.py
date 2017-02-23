@@ -36,9 +36,9 @@ app.config['MAIL_USE_SSL'] = True
 db = SQLAlchemy(app)
 mail = Mail(app)
 
-from gabber.views import main
+from gabber.main.views import main
 app.register_blueprint(main, url_prefix=PROXY_PATH)
-from gabber.api import api
+from gabber.api.views import api
 app.register_blueprint(api, url_prefix=os.path.join(PROXY_PATH, 'api/'))
 from gabber.users.views import users
 app.register_blueprint(users, url_prefix=PROXY_PATH)
