@@ -70,54 +70,31 @@ def upload():
     if not request.files or not request.form:
         return jsonify({'error': 'Required data has not been sent.'}), 400
 
-    # TODO: validate fields
-    interview = request.files['experience']
+    #TODO: this is a string that we expect to be in JSON serialised.
+    participants = request.form.get('participants', None)
 
-    if 'participants' in request.files:
-        participants = request.files['participants']
-
-        parts = [Participant(name=i['name'], email=i['email'],
-                             consent=[InterviewConsent(type='NONE')])
-                 for i in json.loads(participants.read())]
-
-    else:
-        email = request.form.get('interviewerEmail', None)
-        fname = User.query.filter_by(username=email).first()
-
-        participants = [
-            {
-                'name': request.form.get('intervieweeName', None),
-                'email': request.form.get('intervieweeEmail', None),
-                'gender': request.form.get('intervieweeGender', None),
-                'age': request.form.get('intervieweeAge', None)
-            },
-            {
-                'name': fname.fullname if fname else None,
-                'email': email,
-                'gender': None,
-                'age': None
-                }
-        ]
-        parts = [Participant(name=i['name'], email=i['email'],
-                             gender=i['gender'], age=i['age'],
+    if participants:
+        parts = [Participant(name=i['Name'], email=i['Email'],
+                             gender=i['Gender'], age=i['Age'],
                              consent=[InterviewConsent(type='ALL')])
-                 for i in participants]
+                 for i in json.loads(participants)]
+    else:
+        return jsonify({'error': 'No participants were interviewed.'}), 400
 
-    # Save file to disk and capture path.
-    # TODO: validate: check mime type, use magic_python.
-    filename = interview.filename.split(".")[0] + ".mp4"
-    expPath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    interview.save(expPath)
+    #TODO: validate: check mime type, use magic_python.
+    interviewFile = request.files['experience']
+    filename = interviewFile.filename.split(".")[0] + ".mp4"
+    interviewFile.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
     interview = Interview(
         audio=filename,
-        image=None,
         location=request.form.get('location', None),
         prompt_id=ProjectPrompt.query.filter_by(
             text_prompt=request.form.get('promptText', None)).first().id
     )
 
     needs = request.form.get('ComplexNeedsAsJSON', None)
+    # These are optional (only for FF deployment) so don't produce an error.
     if needs:
         cn = [ComplexNeeds(type=key, timeline=value['timeline'],
                            month=value['month'], year=value['year'],
