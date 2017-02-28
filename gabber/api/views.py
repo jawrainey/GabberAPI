@@ -17,12 +17,12 @@ def projects():
     for project in Project.query.join(ProjectPrompt).all():
         uri = (request.url_root[0:(len(request.url_root)-1)] +
                app.static_url_path + '/img/' + str(project.id) + '/')
-        res.append({
-            'theme': project.title,
-            'prompts': [
-                {'imageName': uri + p.image_path,
-                 'prompt': p.text_prompt}
-                for p in project.prompts]})
+
+        prompts = [{'imageName': uri + p.image_path, 'prompt': p.text_prompt}
+                   for p in project.prompts]
+
+        res.append({'theme': project.title, 'prompts': prompts})
+
     return jsonify(res), 200
 
 
