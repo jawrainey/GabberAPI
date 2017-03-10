@@ -9,8 +9,8 @@ users = Blueprint('users', __name__)
 
 
 @login_manager.user_loader
-def load_user(email):
-    return User.query.get(email)
+def load_user(user_id):
+    return User.query.get(user_id)
 
 
 @users.route('login/', methods=['GET', 'POST'])
