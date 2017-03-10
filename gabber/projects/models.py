@@ -12,6 +12,8 @@ class Project(db.Model):
     banner = db.Column(db.String(64))
 
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
+    type = db.Column(db.SmallInteger, default=1)
+    consent = db.Column(db.SmallInteger, default=0)
 
     prompts = db.relationship('ProjectPrompt', backref='prompts', lazy='dynamic')
     members = db.relationship('User', secondary=members, back_populates="projects")
