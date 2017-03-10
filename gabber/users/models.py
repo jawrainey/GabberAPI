@@ -8,6 +8,8 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), unique=True)
     password = db.Column(db.String(192))
     fullname = db.Column(db.String(64))
+    role = db.Column(db.SmallInteger, default=2)
+
     projects = db.relationship("Project", secondary=members, back_populates="members")
 
     created_on = db.Column(db.DateTime, default=db.func.now())
@@ -26,3 +28,10 @@ class User(UserMixin, db.Model):
         Overriding method from UserMixin
         """
         return unicode(self.id)
+
+    def get_role(self):
+        """
+        returns string form of role to improve readability in views
+        """
+        roles = {0: 'admin', 1: 'staff', 2: 'user'}
+        return roles[self.role]
