@@ -1,11 +1,14 @@
 from gabber import db, bcrypt
 from flask_login import UserMixin
+from gabber.projects.models import members
 
 
 class User(UserMixin, db.Model):
-    username = db.Column(db.String(64), unique=True, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), unique=True)
     password = db.Column(db.String(192))
     fullname = db.Column(db.String(64))
+    projects = db.relationship("Project", secondary=members, back_populates="members")
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
@@ -19,4 +22,7 @@ class User(UserMixin, db.Model):
         return bcrypt.check_password_hash(self.password, plaintext)
 
     def get_id(self):
-        return self.username
+        """
+        Overriding method from UserMixin
+        """
+        return unicode(self.id)

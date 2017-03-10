@@ -1,13 +1,20 @@
 from gabber import db
 
 
+members = db.Table('members',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('project_id', db.Integer, db.ForeignKey('project.id')))
+
+
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(64))
     banner = db.Column(db.String(64))
 
-    creator = db.Column(db.Integer, db.ForeignKey('user.username'))
+    creator = db.Column(db.Integer, db.ForeignKey('user.id'))
+
     prompts = db.relationship('ProjectPrompt', backref='prompts', lazy='dynamic')
+    members = db.relationship('User', secondary=members, back_populates="projects")
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
