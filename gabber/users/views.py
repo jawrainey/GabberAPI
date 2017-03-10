@@ -15,10 +15,10 @@ def load_user(user_id):
 
 @users.route('login/', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()
-
     if current_user.is_authenticated:
         return redirect(url_for('users.dashboard'))
+
+    form = LoginForm()
 
     if form.validate_on_submit():
         login_user(User.query.filter_by(username=form.email.data).first())
