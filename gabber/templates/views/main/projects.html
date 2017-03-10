@@ -1,12 +1,9 @@
 {% extends "views/shared/layout.html" %}
+{% from "views/shared/macros.html" import render_projects %}
 {% block title %}Projects{% endblock %}
 {% block content %}
       <h1>Gabber Projects</h1>
-      <hr>{% for project in projects %}
-      <div class="project">
-        <a class="project-ref" href="{{ url_for('project.display', project=project.title.lower().replace(" ", "-")) }}">
-          <img src="{{ url_for('static', filename='img/' + (project.banner if project.banner else "default-banner.jpg")) }}">
-          <h4 class="project-title">{{ project.title.replace("-", " ") }}</h4>
-        </a>
-      </div>{% endfor %}
+      <hr>
+{{- render_projects(user_projects) -}}
+{{ render_projects(public_projects) }}
 {%- endblock %}
