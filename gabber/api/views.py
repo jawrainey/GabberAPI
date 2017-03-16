@@ -89,6 +89,7 @@ def upload():
     interview = Interview(
         audio=filename,
         location=request.form.get('location', None),
+        creator=User.query.filter_by(username=participants[0]['Email']).first().id,
         prompt_id=ProjectPrompt.query.filter_by(
             text_prompt=request.form.get('promptText', None)).first().id
     )
