@@ -47,6 +47,7 @@ class Interview(db.Model):
     audio = db.Column(db.String(260))
     image = db.Column(db.String(260))
     location = db.Column(db.String(10))
+    creator = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     created_on = db.Column(db.DateTime, default=db.func.now())
 
