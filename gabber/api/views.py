@@ -74,12 +74,25 @@ def upload():
     participants = request.form.get('participants', None)
 
     if participants:
+        # Not scope: as an error will be thrown otherwise, we use this below.
+        participants = json.loads(participants)
+        #TODO: only add participant if it does not exist?
+        #Otherwise, insert into parts the selected one?
         parts = [Participant(name=i['Name'], email=i['Email'],
                              gender=i['Gender'], age=i['Age'],
                              consent=[InterviewConsent(type='ALL')])
-                 for i in json.loads(participants)]
+                 for i in participants]
     else:
         return jsonify({'error': 'No participants were interviewed.'}), 400
+
+    # Only allow those who have been made members of projects (i.e. by admins
+    # of those projects) to upload datafiles to that project.
+    interviewer_id = User.query.filter_by(username=participants[0]['Email']).first().id
+    interview_prompt = ProjectPrompt.query.filter_by(text_prompt=request.form.get('promptText', None)).first()
+    members = Project.query.filter_by(id=interview_prompt.project_id).first().members
+
+    if interviewer_id not in [m.id for m in members]:
+        return jsonify({'error': 'You do not have authorization to upload to this project'}), 401
 
     #TODO: validate: check mime type, use magic_python.
     interviewFile = request.files['experience']
@@ -89,9 +102,8 @@ def upload():
     interview = Interview(
         audio=filename,
         location=request.form.get('location', None),
-        creator=User.query.filter_by(username=participants[0]['Email']).first().id,
-        prompt_id=ProjectPrompt.query.filter_by(
-            text_prompt=request.form.get('promptText', None)).first().id
+        creator=interviewer_id,
+        prompt_id=interview_prompt.id
     )
 
     needs = request.form.get('ComplexNeedsAsJSON', None)
