@@ -37,6 +37,6 @@ def logout():
 @login_required
 def dashboard():
     if current_user.get_role() == 'admin':
-        projects = Project.query.filter_by(creator=current_user.username).all()
+        projects = Project.query.filter_by(creator=current_user.id).all()
         return render_template('views/users/dashboard.html', projects=projects)
     return redirect(url_for('main.projects'))

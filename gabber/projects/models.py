@@ -26,7 +26,7 @@ class ProjectPrompt(db.Model):
     __tablename__ = 'projectprompt'
 
     id = db.Column(db.Integer, primary_key=True)
-    creator = db.Column(db.Integer, db.ForeignKey('user.username'))
+    creator = db.Column(db.Integer, db.ForeignKey('user.id'))
     text_prompt = db.Column(db.String(64))
     image_path = db.Column(db.String(64))
 
