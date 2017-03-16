@@ -106,16 +106,20 @@ def upload():
         prompt_id=interview_prompt.id
     )
 
-    needs = request.form.get('ComplexNeedsAsJSON', None)
+    # TODO: how to abstract this per project basis?
     # These are optional (only for FF deployment) so don't produce an error.
-    if needs:
-        cn = [ComplexNeeds(type=key, timeline=value['timeline'],
-                           month=value['month'], year=value['year'],
-                           interview_id=interview.id,
-                           participant_id=parts[0].id)
-              for key, value in json.loads(needs).items()]
-
-        parts[0].complexneeds.extend(cn)
+    if 'Needs' in participants[0]:
+        iid = db.session.query(Interview).order_by(Interview.id.desc()).first().id + 1
+        # First item is excluded as we want to keep in sync with parts above.
+        for index, participant in enumerate(participants[1:]):
+            # Do not update as we want to track how the participants needs
+            # have changed between interview sessions
+            cn = [ComplexNeeds(type=key, timeline=value['timeline'],
+                               month=value['month'], year=value['year'],
+                               interview_id=iid,
+                               participant_id=parts[index+1].id)
+                  for key, value in json.loads(participant['Needs']).items()]
+            parts[index+1].complexneeds.extend(cn)
 
     # Populating relationship fields outside constructor due to extending lists.
     interview.consents.extend([i.consent.first() for i in parts])
