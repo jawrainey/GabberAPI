@@ -1,10 +1,10 @@
 from gabber.users.models import User
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import TextField, PasswordField
 from wtforms.validators import DataRequired, Length, Email
 
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     email = TextField('Email: ', [DataRequired(
         message='An email address must be provided.'),
         Email(),
@@ -14,7 +14,7 @@ class LoginForm(Form):
         Length(min=4, max=40)])
 
     def validate(self):
-        if not Form.validate(self):
+        if not FlaskForm.validate(self):
             return False
 
         user = User.query.filter_by(username=self.email.data).first()
