@@ -2,7 +2,6 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import current_user, login_user, login_required, logout_user
 from gabber.users.forms import LoginForm
 from gabber.users.models import User
-from gabber.projects.models import Project
 from gabber import login_manager
 
 users = Blueprint('users', __name__)
