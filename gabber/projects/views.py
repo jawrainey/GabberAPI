@@ -1,6 +1,6 @@
 from gabber.projects.models import Interview,  Project, ProjectPrompt
 from flask import Blueprint, render_template, url_for, redirect, request, flash
-from flask_login import login_required
+from flask_login import current_user, login_required
 from gabber import app, db
 import json
 import os
@@ -49,6 +49,10 @@ def display(project=None):
 @project.route('edit/<path:project>/', methods=['GET', 'POST'])
 @login_required
 def edit(project=None):
+    if current_user.get_role() != 'admin':
+        flash('You do not have authorization to edit this project')
+        return redirect(url_for('users.dashboard'))
+
     project = Project.query.filter_by(title=project.replace("-", " ").lower()).first()
 
     # TODO: use WTForms to process and validate form. Tricky with dynamic form.
