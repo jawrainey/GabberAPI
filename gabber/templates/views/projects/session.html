@@ -1,0 +1,121 @@
+{% extends "views/shared/layout.html" %}
+{% block scripts %}
+  <script src="//cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/1.3.2/wavesurfer.min.js"></script>
+  <script src="http://wavesurfer-js.org/dist/plugin/wavesurfer.timeline.min.js"></script>
+  <script src="http://wavesurfer-js.org/dist/plugin/wavesurfer.regions.min.js"></script>
+
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css" rel="stylesheet">
+  <style> nav {  background: white;  box-shadow: none;  }  nav ul li { float: none; }
+  .modal .modal-content { padding: 0 24px; }
+  #waveform > wave > wave {
+    border-right: 1px solid rgba(255,192,160, 1.000) !important;
+}
+  </style>
+{%- endblock %}
+{% block content %}
+    <h3><b>{{ participants[0] }}</b> interviewing <b>{{ participants[1] }}</b> and <b>{{ participants[2] }}</b></h3>
+    {%- for interview in interviews %}
+    <div class="card-panel">
+      <span class="grey-text text-darken-4">
+          {{ interview['prompt'] }}
+          <a class="modal-trigger" href="#annotate" id="{{ interview['id'] }}">
+            <i class="material-icons circle right card-title">play_arrow</i>
+          </a>
+      </span>
+    </div>
+    {%- endfor %}
+
+  <div id="annotate" class="modal">
+    <div class="modal-content">
+
+        <div class="col s12">
+          <div class="chip">
+            <span id="subtitle">&nbsp;</span>
+          </div>
+        </div>
+
+      <div id="waveform"></div>
+      <div id="waveform-timeline"></div>
+
+        <form id="comment" class="col s12" role="form" name="edit" style="display: none;">
+          <div class="row">
+            <div class="input-field col s6" style="display: none">
+              <input class="validate" type="text" id="start" name="start">
+              <label for="start">Start</label>
+            </div>
+            <div class="input-field col s6" style="display: none">
+              <input class="validate" type="text" id="end" name="end">
+              <label for="end">End</label>
+            </div>
+            <div class="input-field col s12">
+                <textarea id="note" class="materialize-textarea" rows="1" name="note"></textarea>
+                <label for="note">Comment</label>
+            </div>
+            <div class="input-field col s12">
+                <a type="submit" class="waves-effect waves-light btn" onclick="commentForm()" id="save">Save</a>
+                <a type="button" class="waves-effect waves-light btn" onclick="deleteNote()">Delete</a>
+            </div>
+          </div>
+        </form>
+
+        <form id="annotateForm" class="col s12" role="form" name="annotate" style="display: none;">
+          <div class="row">
+            <div class="input-field col s12">
+                <div class="chips chips-autocomplete"></div>
+            </div>
+            <div class="input-field col s12">
+                <a type="submit" class="waves-effect waves-light btn" id="save" >Save</a>
+                <a type="button" class="waves-effect waves-light btn" onclick="deleteNote()">Delete</a>
+            </div>
+          </div>
+        </form>
+
+        <hr>
+
+        <div class="input-field col s3 right" style="margin: 0 0 1rem 0;">
+            <a class="waves-effect waves-light btn" onclick="commentForm()" >Comment</a>
+            <a class="waves-effect waves-light btn" onclick="annotateForm()">Annotate</a>
+
+            <span data-action="play" onclick="wavesurfer.playPause()">
+                <a class="waves-effect waves-light btn" id="play">Play</a>
+                <a class="waves-effect waves-light btn" id="pause" style="display: none">Pause</a>
+            </span>
+        </div>
+    </div>
+  </div>
+
+{%- endblock %}
+{%- block fscripts %}
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>
+    <script src="{{ url_for('static', filename='js/fin.js') }}"></script>
+    <script>
+        var annotateFormEle = document.querySelector('#annotateForm');
+        var commentFormEle = document.querySelector('#comment');
+
+        function commentForm() {
+            annotateFormEle.style.display = 'none';
+            if (commentFormEle.style.display)
+            {
+                commentFormEle.style.display = '';
+            }
+            else
+            {
+                commentFormEle.style.display = 'none';
+            }
+        }
+
+        function annotateForm() {
+            commentFormEle.style.display = 'none';
+            if (annotateFormEle.style.display)
+            {
+                annotateFormEle.style.display = '';
+            }
+            else
+            {
+                annotateFormEle.style.display = 'none';
+            }
+        }
+    </script>
+{%- endblock %}

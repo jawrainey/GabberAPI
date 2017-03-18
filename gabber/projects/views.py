@@ -36,14 +36,12 @@ def display(project=None):
             prompt = ProjectPrompt.query.filter_by(id=interview.prompt_id).first()
             # The interviews that have been consented to be made public.
             interviews_to_display.append({
-                'file': url_for('consent.protected', filename=interview.audio),
-                'thumb': prompt.image_path,
-                'trackAlbum': 'default.png',
-                'trackName': prompt.text_prompt})
+                'audio': url_for('consent.protected', filename=interview.audio),
+                'prompt': prompt.text_prompt})
 
         return render_template('views/projects/display.html',
                                project_title=project,
-                               interviews=json.dumps(interviews_to_display))
+                               interviews=interviews_to_display)
 
 
 @project.route('edit/<path:project>/', methods=['GET', 'POST'])
