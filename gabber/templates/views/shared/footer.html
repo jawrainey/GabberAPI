@@ -1,11 +1,10 @@
-<footer id="footer">
-    <ul>
-      <li>&copy; 2016 Gabber</li>
-      <li><a href="{{ url_for('main.about') }}">About</a></li>
-      <li><a href="#">Contact</a></li>
-      <li><a href="#">Privacy</a></li>
-      {%- if current_user.is_authenticated %}
-      <li><a href="{{ url_for('users.logout') }}">Logout</a></li>
-      {%- endif %}
-    </ul>
+<footer>
+    <div class="container">
+      <ul id="footernav">
+        <li><a class="left" href="#">Contact</a></li>
+        <li><a class="left" href="#">Terms</a></li>
+        <li><a class="left" href="#">Privacy</a></li>
+        <li class="right">&copy; 2016 Gabber</li>
+      </ul>
+    </div>
   </footer>

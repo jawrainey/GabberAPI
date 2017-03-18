@@ -16,19 +16,45 @@
 {% endblock %}
 {% block content %}
       <form method="POST" enctype=multipart/form-data>
-        <div class="form-group">
-          <input type="text" class="form-control" name="title" value="{{ project.title }}">
+
+        <div class="row">
+          <div class="input-field col s12">
+            <input id="title" type="text" class="validate" value="{{ project.title }}">
+            <label for="title">Title</label>
+          </div>
         </div>
+
 {%- for prompt in project.prompts %}
-        <div class="project">
-            <input type="file" name="upload-{{ prompt.id }}" id="upload-{{ prompt.id }}" onchange="readURL(this)" style="display:none">
-            <label for="upload-{{ prompt.id }}">
-              <img id="promptImg-{{ prompt.id }}" src="{{ url_for('static',
-              filename='img/' + project.id|string + "/" + prompt.image_path) }}" />
-            </label>
-            <textarea type="text" class="form-control" name="promptText-{{ prompt.id }}" style="font-size: .8em; width: 100%;">{{ prompt.text_prompt.lower() }}</textarea>
+
+        <div class="col s12 m6 l4">
+          <div class="card small">
+            <div class="card-image">
+              <input type="file" name="upload-{{ prompt.id }}" id="upload-{{ prompt.id }}" onchange="readURL(this)" style="display:none">
+              <label for="upload-{{ prompt.id }}">
+                <img id="promptImg-{{ prompt.id }}" src="{{ url_for('static', filename='img/' + project.id|string + "/" + prompt.image_path) }}" />
+              </label>
+            </div>
+
+            <div class="card-content">
+              <div class="row">
+                <form class="col s12">
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <textarea type="text" class="materialize-textarea center-align" placeholder="Enter a short prompt to guide the interview" name="promptText-{{ prompt.id }}" >{{ prompt.text_prompt.lower() }}</textarea>
+                      <label for="promptText-{{ prompt.id }}">Prompt {{ loop.index }}</label>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+          </div>
         </div>
 {%- endfor %}
-        <button class="btn btn-primary btn-block" type="submit">Update</button>
+        <div class="col s12 m12">
+          <button class="btn waves-effect waves-light right" type="submit" name="action">Submit
+            <i class="material-icons right">send</i>
+          </button>
+        </div>
       </form>
 {%- endblock %}

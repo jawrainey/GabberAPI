@@ -51,7 +51,7 @@ def display(project=None):
 def edit(project=None):
     if current_user.get_role() != 'admin':
         flash('You do not have authorization to edit this project')
-        return redirect(url_for('users.dashboard'))
+        return redirect(url_for('main.projects'))
 
     project = Project.query.filter_by(title=project.replace("-", " ").lower()).first()
 
@@ -78,7 +78,7 @@ def edit(project=None):
 
         db.session.commit()
         flash('The prompts for your project have been updated if any changes were made.')
-        return redirect(url_for('users.dashboard'))
+        return redirect(url_for('main.projects'))
     return render_template('views/projects/edit.html', project=project)
 
 

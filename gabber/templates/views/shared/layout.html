@@ -2,34 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="http://fonts.googleapis.com/icon?family=Material+Icons" >
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css">
+  <link rel="stylesheet" href={{ url_for('static', filename='css/cust.css') }}>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gabber &middot; {% block title %}listen and be heard{% endblock %}</title>
-  {%- block scripts %}
-  <!--[if lte IE 8]><script src="{{ url_for('static', filename='js/ie/html5shiv.js') }}"></script><![endif]-->
-  {%- endblock %}
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" />
-  <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet" />
+  {%- block scripts %}{%- endblock %}
 </head>
 <body>
-  <div class="wrapper">
+  <header>
 {% include 'views/shared/nav.html' %}
-    <section class="main">
-  {%- with messages = get_flashed_messages() -%}
-  {% if messages %}
-      <ul class="alert alert-success">
-    {%- for message in messages %}
-        <li>{{ message }}</li>
-    {%- endfor %}
-      </ul>{%- endif -%}
-{%- endwith -%}
-{%- block content -%}
-{%- endblock %}
-    </section>
-  </div>
+  </header>
+  <main>
+    <div class="container">
+      <div class="row">
+  {%- block content -%}
+  {%- endblock %}
+      </div>
+    </div>
+  </main>
   {% include 'views/shared/footer.html' %}
-  <!--[if lte IE 8]><script src="{{ url_for('static', filename='js/ie/respond.min.js') }}"></script><![endif]-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>
+  {%- from "views/shared/macros.html" import display_flash_messages -%}
+  {{- display_flash_messages() -}}
   {%- block fscripts %}
   {%- endblock %}
-  </body>
+</body>
 </html>

@@ -1,25 +1,41 @@
 {% macro render_field(field) %}
-  <div class="form_field">
-  {% if field.errors %}
-    {% set css_class = 'has_error ' + kwargs.pop('class', '') %}
-    {{ field(class=css_class, **kwargs) }}
-    <div class="alert alert-dismissable alert-danger">
-      {% for error in field.errors %}<li>{{ error|e }}</li>{% endfor %}
-  {% else %}
+  {%- if field.errors %}
     {{ field(**kwargs) }}
-  {% endif %}
-  </div>
+      {% for error in field.errors %}<li>{{ error|e }}</li>{% endfor %}
+  {%- else -%}
+    {{ field(**kwargs) }}
+  {%- endif -%}
 {% endmacro %}
 
-{%- macro render_projects(projects) -%}
+{%- macro render_projects(projects, current_user) %}
   {% if projects %}
     {%- for project in projects %}
-      <div class="project">
-        <a class="project-ref" href="{{ url_for('project.display', project=project.title.lower().replace(" ", "-")) }}">
-          <img src="{{ url_for('static', filename='img/' + (project.banner if project.banner else "default-banner.jpg")) }}">
-          <h4 class="project-title">{{ project.title.replace("-", " ") }}</h4>
-        </a>
-      </div>
-    {%- endfor -%}
+        <div class="col s12 m6">
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title">{{ project.title.replace("-", " ").title() }}</span>
+              <p>I am a very simple card. I am good at containing small bits of information.
+              I am convenient because I require little markup to use effectively.</p>
+            </div>
+            <div class="card-action">
+              <a href="{{ url_for('project.display', project=project.title.lower().replace(" ", "-")) }}">View</a>
+            {% if current_user.is_authenticated and current_user.get_role() == 'admin' -%}
+
+              <a href="{{ url_for('project.edit', project=project.title.replace(" ", "-").lower()) }}">Edit</a>
+             {% endif %}
+
+            </div>
+          </div>
+        </div>
+    {% endfor -%}
   {% endif %}
+{%- endmacro -%}
+
+{%- macro display_flash_messages() -%}
+{%- with messages = get_flashed_messages() -%}
+  {% if messages %}
+<script>{{ messages | safe }}.forEach(function(e){Materialize.toast(e, 4000)});</script>
+{%- endif -%}
+
+{%- endwith -%}
 {%- endmacro -%}

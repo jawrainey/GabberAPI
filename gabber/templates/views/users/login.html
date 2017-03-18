@@ -1,15 +1,24 @@
 {% extends "views/shared/layout.html" %}
 {% block content %}
-    <div class="row">
-      <div class="col-md-6 col-md-offset-3">
-        <h1 class="text-center">Gabber login</h1>{% from "views/shared/macros.html" import render_field %}
+        <div class="z-depth-1 grey lighten-4 col s12 m6 l6 offset-m3 offset-l3" style="display: inline-block; padding: 32px 48px; margin-top: 1.68rem; border: 1px solid #EEE;">
+          <h5>Please login into your account</h5>
+          <div class="section"></div>
+          {% from "views/shared/macros.html" import render_field %}
           <form method="POST">
             {{ form.csrf_token }}
             <input type="hidden" name="next" value="{{ next }}"/>
-            {{ render_field(form.email, class="form-control", placeholder="Email", autofocus="") }}
-            {{ render_field(form.password, class="form-control", placeholder="Password") }}
-            <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+            <div class='row'>
+              <div class='input-field col s12'>
+                {{ render_field(form.email) }}
+                <label for='email'>Enter your email</label>
+              </div>
+            </div>
+            <div class='row'>
+              <div class='input-field col s12'>
+                {{ render_field(form.password) }}
+                <label for='password'>Enter your password</label>
+              </div>
+            </div>
+            <button class="col s12 btn waves-effect waves-light right" type='submit'>Login</button>
           </form>
-        </div>
-    </div>
-{% endblock %}
+        </div>{% endblock %}
