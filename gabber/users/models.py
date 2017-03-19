@@ -28,7 +28,7 @@ class User(UserMixin, db.Model):
         """
         Overriding method from UserMixin
         """
-        return unicode(self.id)
+        return self.id
 
     def get_role(self):
         """
