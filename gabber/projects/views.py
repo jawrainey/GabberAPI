@@ -23,7 +23,7 @@ def display(project=None):
             title=project.replace("-", " ").lower()).first()
         prompt_ids = [i.id for i in selected_project.prompts.all()]
         interviews = db.session.query(Interview) \
-            .filter(Interview.prompt_id.in_(prompt_ids)).all()
+            .filter(Interview.prompt_id.in_(prompt_ids)).order_by(Interview.created_on.desc()).all()
 
         consented_interviews = [interview for interview in interviews
                                 if 'none' not in
@@ -37,7 +37,9 @@ def display(project=None):
             # The interviews that have been consented to be made public.
             interviews_to_display.append({
                 'audio': url_for('consent.protected', filename=interview.audio),
-                'prompt': prompt.text_prompt})
+                'prompt': prompt.text_prompt,
+                'created': interview.created_on.strftime("%b %d %Y")
+            })
 
         return render_template('views/projects/display.html',
                                project_title=project,

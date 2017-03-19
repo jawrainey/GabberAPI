@@ -6,8 +6,7 @@
         <div class="collection">
          {%- for interview in interviews %}
           <a href="{{ interview['audio'] }}" class="collection-item">
-            {{ interview['prompt'] }}
-            <i class="material-icons right">file_download</i>
+            {{ interview['prompt'] }} <b class="right">{{ interview['created'] }}</b>
           </a>
           {%- endfor %}
         </div>
