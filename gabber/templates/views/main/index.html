@@ -2,14 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gabber &mdash; conversations shared to be heard</title>
-  <!--[if lte IE 8]><script src="{{ url_for('static', filename='js/ie/html5shiv.js') }}"></script><![endif]-->
-  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" />
-  <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css" rel="stylesheet" >
   <link href="{{ url_for('static', filename='css/home.css') }}" rel="stylesheet" />
-  <!--[if lte IE 8]><link rel="stylesheet" href="{{ url_for('static', filename='css/ie8.css') }}" /><![endif]-->
-  <!--[if lte IE 9]><link rel="stylesheet" href="{{ url_for('static', filename='css/ie9.css') }}" /><![endif]-->
 </head>
 <body>
   {% include 'views/shared/nav.html' %}
@@ -20,7 +16,7 @@
       of <b>local topics</b> and concerns using <b>Gabber</b></p>
       <div>
         <a href="https://play.google.com/store/apps/details?id=com.jawrainey.gabber">
-          <img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get the app" class="button">
+          <img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Download the Android app" class="button">
         </a>
       </div>
     </div>
@@ -30,14 +26,8 @@
       </div>
     </div>
   </header>
-  <!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
-  <script>
-    window.onload = function(e) {
-      document.body.className += 'is-loading';
-      window.setTimeout(function() {
-        document.body.className = ''
-      }, 150);
-    }
-  </script>
+  <script>window.onload=function(a){document.body.className+="is-loading",window.setTimeout(function(){document.body.className=""},150)};</script>
+  {%- block fscripts %}
+  {%- endblock %}
 </body>
 </html>

@@ -1,5 +1,4 @@
 body { color: white;}
-nav { position: fixed; width: 100%; }
 
 
 body.is-loading *, body.is-loading *:before, body.is-loading *:after {
@@ -250,10 +249,6 @@ body.is-loading *, body.is-loading *:before, body.is-loading *:after {
 }
 
 @media screen and (max-width: 736px) and (orientation: landscape) {
-	nav ul {
-		float: left;
-		padding-left: 1em;
-	}
 	#header {
 		padding: 2em 2em 0.1em 2em;
 	}
@@ -271,10 +266,6 @@ body.is-loading *, body.is-loading *:before, body.is-loading *:after {
 }
 
 @media screen and (max-width: 736px) and (orientation: portrait) {
-	nav ul {
-		padding: 0;
-		margin: 0;
-	}
 	#header {
 		padding: 3em 1.5em 1em 1.5em;
 	}
