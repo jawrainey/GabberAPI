@@ -52,11 +52,45 @@ class Interview(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
 
     prompt_id = db.Column(db.Integer, db.ForeignKey('projectprompt.id'))
+    comments = db.relationship('Comment', backref='interview', lazy='dynamic')
     participants = db.relationship('Participant', secondary=participants,
                                    backref=db.backref('participants', lazy='dynamic'),
                                    lazy='dynamic')
     # Each of which provide individual consent for the audio recording.
     consents = db.relationship('InterviewConsent', backref='consentid', lazy='dynamic')
+
+
+class Comment(db.Model):
+    """
+    Comments are linear for now (do not have parents/children) for simplicity.
+
+    Backrefs:
+        A comment can refer to its creator with 'user'
+        A comment can refer to its parent interview with 'interview'
+    """
+    __tablename__ = 'comments'
+
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(280), default=None)
+    start_interval = db.Column(db.Integer)
+    end_interval = db.Column(db.Integer, default=0)
+    reactions = db.Column(db.Integer, default=1)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    interview_id = db.Column(db.Integer, db.ForeignKey('interview.id'))
+
+    created_on = db.Column(db.DateTime, default=db.func.now())
+    updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+
+    def serialize(self):
+        from gabber.users.models import User
+        return {
+            'id': self.id,
+            'content': str(self.text),
+            'start': self.start_interval,
+            'end': self.end_interval,
+            'creator': str(User.query.filter_by(id=self.user_id).first().fullname)
+        }
 
 
 class Participant(db.Model):

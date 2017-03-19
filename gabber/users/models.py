@@ -11,6 +11,7 @@ class User(UserMixin, db.Model):
     role = db.Column(db.SmallInteger, default=2)
 
     projects = db.relationship("Project", secondary=members, back_populates="members")
+    comments = db.relationship('Comment', backref='user', lazy='dynamic')
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
