@@ -103,6 +103,7 @@ def upload():
         audio=filename,
         location=request.form.get('location', None),
         creator=interviewer_id,
+        session_id = request.form.get('sessionID'),
         prompt_id=interview_prompt.id
     )
 
