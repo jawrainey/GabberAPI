@@ -53,7 +53,7 @@ class Interview(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
 
     prompt_id = db.Column(db.Integer, db.ForeignKey('projectprompt.id'))
-    comments = db.relationship('Comment', backref='interview', lazy='dynamic')
+    responses = db.relationship('Response', backref='interview', lazy='dynamic')
     participants = db.relationship('Participant', secondary=participants,
                                    backref=db.backref('participants', lazy='dynamic'),
                                    lazy='dynamic')
@@ -61,20 +61,26 @@ class Interview(db.Model):
     consents = db.relationship('InterviewConsent', backref='consentid', lazy='dynamic')
 
 
-class Comment(db.Model):
+class Response(db.Model):
     """
-    Comments are linear for now (do not have parents/children) for simplicity.
+    A response to an interview, which is either a comment or annotation.
+
+    Although a separate table for annotations could be used, there are many
+    shared properties between comments/annotations. However, one disadvantage is that
+    annotation text is not stored in a separate table, thereby preventing text duplication.
 
     Backrefs:
-        A comment can refer to its creator with 'user'
-        A comment can refer to its parent interview with 'interview'
+        A response can refer to its creator with 'user'
+        A response can refer to its parent interview with 'interview'
     """
-    __tablename__ = 'comments'
+    __tablename__ = 'responses'
 
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(280), default=None)
     start_interval = db.Column(db.Integer)
     end_interval = db.Column(db.Integer, default=0)
+    # The response type can either be a comment (0) or an annotation (1).
+    type = db.Column(db.Integer)
     reactions = db.Column(db.Integer, default=1)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -90,7 +96,8 @@ class Comment(db.Model):
             'content': str(self.text),
             'start': self.start_interval,
             'end': self.end_interval,
-            'creator': str(User.query.filter_by(id=self.user_id).first().fullname)
+            'creator': str(User.query.filter_by(id=self.user_id).first().fullname),
+            'type': self.type
         }
 
 

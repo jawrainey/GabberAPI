@@ -39,7 +39,7 @@
           </span>
         </div>
 
-        <form method="POST" action="/project/interview/comment/" class="col s12" id="commentForm" style="display: none">
+        <form method="POST" class="col s12" id="commentForm" style="display: none">
           <div class="row">
             <div class="input-field col s6 hide">
               <input type="number" id="start" name="start">
@@ -59,7 +59,7 @@
           </div>
         </form>
 
-        <form method="POST" action="/project/interview/annotation/" class="col s12" id="annotationForm" style="display: none">
+        <form method="POST" class="col s12" id="annotationForm" style="display: none">
           <div class="row">
             <div class="input-field col s12">
               <div class="chips chips-autocomplete"></div>
@@ -149,7 +149,7 @@
             drag: false,
             resize: false
         });
-        var type = (item.type == "comment") ? "comment" : "tag";
+        var type = (item.type == 0) ? "comment" : "tag";
         $('[data-id=' + item.id + ']').append('<i class="material-icons tiny right">' + type + '</i>');
     }
 
@@ -180,12 +180,13 @@
                 'content' : $('textarea[name=content]').val(),
                 'start'   : start <= 0 ? start : start - 5,
                 'end'     : (end == 0 || end <= start) ? start : end,
+                'type'    : 0,
                 'iid'     : {{ interview.id }}
             };
 
             $.ajax({
                 type     : 'POST',
-                url      : '/project/interview/comment/',
+                url      : '/project/interview/response/',
                 data     : commentFormData,
                 dataType : 'json',
                 encode   : true
@@ -195,7 +196,7 @@
                 if(data.success) {
                     // Large integer that is unlikely to clash with database id
                     commentFormData.id = Math.floor(Math.random() * (100000 - 10000) + 10000);
-                    commentFormData.type = 'comment';
+                    commentFormData.type = 0;
                     addRegion(commentFormData);
                     Materialize.toast("Thanks for adding your comment", 4000);
                     wavesurfer.play();

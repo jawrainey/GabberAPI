@@ -1,4 +1,4 @@
-from gabber.projects.models import Comment, Interview, Project, ProjectPrompt
+from gabber.projects.models import Response, Interview, Project, ProjectPrompt
 from flask import Blueprint, render_template, url_for, redirect, request, flash, jsonify
 from flask_login import current_user, login_required
 from gabber import app, db
@@ -46,19 +46,19 @@ def display(project=None):
                                interviews=interviews_to_display)
 
 
-@project.route('interview/comment/', methods=['POST'])
-def comment_on_interview():
-    if request.method == 'POST':
-        comment = Comment(
-            text=request.form.get('content', ""),
-            start_interval=request.form.get('start', 0),
-            end_interval=request.form.get('end', 0),
-            user_id=current_user.id,
-            interview_id=request.form.get('iid', 0)
-        )
-        db.session.add(comment)
-        db.session.commit()
-        return jsonify({'success': True}), 200
+@project.route('interview/response/', methods=['POST'])
+def interview_response():
+    response = Response(
+        text=request.form.get('content', ""),
+        start_interval=request.form.get('start', 0),
+        end_interval=request.form.get('end', 0),
+        type=request.form.get('type', ""),
+        user_id=current_user.id,
+        interview_id=request.form.get('iid', 0),
+    )
+    db.session.add(response)
+    db.session.commit()
+    return jsonify({'success': True}), 200
 
 
 @project.route('session/<int:session_id>', methods=['GET', 'POST'])
@@ -72,10 +72,16 @@ def session(session_id=None, interview_id=None):
     interview = Interview.query.filter_by(id=interview_id).first()
     interview.audio = url_for('consent.protected', filename=interview.audio, _external=True)
 
+    response_types = {0: [], 1: []}
+
+    for response in [i.serialize() for i in interview.responses.all()]:
+        response_types[response['type']].append(response)
+
     return render_template('views/projects/session.html',
                            interview=interview,
                            participants=interview.participants.all(),
-                           comments=[i.serialize() for i in interview.comments.all()])
+                           comments=response_types[0],
+                           annotations=response_types[1])
 
 
 @project.route('edit/<path:project>/', methods=['GET', 'POST'])
