@@ -68,7 +68,7 @@
         container: '#waveform',
         waveColor: 'rgba(153, 153, 153, 1.000)',
         progressColor: 'rgba(255,192,160, 1.000)',
-        cursorColor:'rgba(255, 0, 0, 0.0)',
+        cursorColor: 'rgba(255, 0, 0, 0.0)',
         normalize: true
     });
 
@@ -109,8 +109,8 @@
 
     // When audio is loaded, decoded and draw waveform. Fires before waveform is drawn.
     wavesurfer.on('ready', function () {
-        {{ comments | safe }}.forEach(function(i) { addRegion(i, false, false) });
-        {{ annotations | safe }}.forEach(function(i) { addRegion(i, false, false) });
+        {{ comments | safe }}.forEach(function(i) { addRegion(i, false, false); });
+        {{ annotations | safe }}.forEach(function(i) { addRegion(i, false, false); });
     });
 
     wavesurfer.load('{{ interview.audio }}');
@@ -175,7 +175,7 @@
 
     function updateRegionToCreate(type)
     {
-            _content = (type == 0) ? $('textarea[name=content]').val() : JSON.stringify($('.chips-autocomplete').material_chip('data'))
+            _content = (type === 0) ? $('textarea[name=content]').val() : JSON.stringify($('.chips-autocomplete').material_chip('data'));
 
             // The ID is set here be used as a lookup and not to clash with comment/annotation database IDs.
             regionToCreate = {
@@ -210,13 +210,13 @@
             resize: resize
         });
 
-        var type = (item.type == 0) ? "comment" : "label_outline";
+        var type = (item.type === 0) ? "comment" : "label_outline";
         $('[data-id=' + item.id + ']').append('<i class="material-icons tiny right">' + type + '</i>');
     }
 
     function postForm()
     {
-        _content = (regionToCreate.type == 0) ? $('textarea[name=content]').val() : JSON.stringify($('.chips-autocomplete').material_chip('data'));
+        _content = (regionToCreate.type === 0) ? $('textarea[name=content]').val() : JSON.stringify($('.chips-autocomplete').material_chip('data'));
 
         // Update local prior to pushing to server
         regionToCreate.content = _content;
@@ -236,7 +236,7 @@
             encode   : true
         }).done(function(data) {
             if(data.success) {
-                Materialize.toast("Thanks for adding your " + (regionToCreate.type == 0 ? "comment" : "annotation"), 4000);
+                Materialize.toast("Thanks for adding your " + (regionToCreate.type === 0 ? "comment" : "annotation"), 4000);
                 wavesurfer.play();
             }
         });
