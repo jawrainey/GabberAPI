@@ -3,119 +3,176 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/1.3.2/wavesurfer.min.js"></script>
   <script src="http://wavesurfer-js.org/dist/plugin/wavesurfer.timeline.min.js"></script>
   <script src="http://wavesurfer-js.org/dist/plugin/wavesurfer.regions.min.js"></script>
-
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css" rel="stylesheet">
-  <style> nav {  background: white;  box-shadow: none;  }  nav ul li { float: none; }
-  .modal .modal-content { padding: 0 24px; }
-  #waveform > wave > wave {
-    border-right: 1px solid rgba(255,192,160, 1.000) !important;
-}
+  <style>
+  /* Adds a seekbar to the waveform */
+  #waveform > wave > wave { border-right: 1px solid rgba(255,192,160, 1.000) !important; }
+  /* Used to display the icon outside of the wave (next style) */
+  #waveform > wave { overflow: visible !important; }
+  /* Display the comment/annotation icons slightly above their related segment. */
+  .wavesurfer-region > i { margin-top: -5px; }
+  /* Force the controls to the bottom. */
+  #controls { position: absolute; bottom: 60px; }
   </style>
 {%- endblock %}
 {% block content %}
-    <h3><b>{{ participants[0] }}</b> interviewing <b>{{ participants[1] }}</b> and <b>{{ participants[2] }}</b></h3>
-    {%- for interview in interviews %}
-    <div class="card-panel">
-      <span class="grey-text text-darken-4">
-          {{ interview['prompt'] }}
-          <a class="modal-trigger" href="#annotate" id="{{ interview['id'] }}">
-            <i class="material-icons circle right card-title">play_arrow</i>
-          </a>
+    <h5><b>{{ participants[0]['name'] }}</b> interviewing <b>{{ participants[1]['name'] }}</b></h5>
+
+    <div id="waveform"></div>
+    <div id="waveform-timeline"></div>
+
+    <div class="row">
+      <div class="col s12 m6" id="comments">
+        <h5>Comments</h5>
+      </div>
+    </div>
+
+    <div id="controls">
+      <a class="waves-effect btn" onclick="addComment()"><i class="material-icons">comment</i></a>
+      <span onclick="wavesurfer.playPause()">
+        <a class="waves-effect btn" id="play"><i class="material-icons">play_arrow</i></a>
+        <a class="waves-effect btn" id="pause" style="display: none"><i class="material-icons">pause</i></a>
       </span>
     </div>
-    {%- endfor %}
 
-  <div id="annotate" class="modal">
-    <div class="modal-content">
-
-        <div class="col s12">
-          <div class="chip">
-            <span id="subtitle">&nbsp;</span>
-          </div>
+    <form method="POST" action="/project/interview/comment/" class="col s12" id="commentForm" style="display: none">
+        <div class="row">
+            <div class="input-field col s6 hide">
+                <input type="number" id="start" name="start">
+                <label for="start">Start</label>
+            </div>
+            <div class="input-field col s6 hide">
+                <input type="number" id="end" name="end">
+                <label for="end">End</label>
+            </div>
+            <div class="input-field col s12">
+                <textarea id="content" class="materialize-textarea" rows="3" name="content"></textarea>
+                <label for="content">Comment</label>
+            </div>
+            <div class="input-field col s12">
+                <button id="commentFormSubmit" name="comment" class="btn waves-effect waves-light right" type="submit">Submit</button>
+            </div>
         </div>
-
-      <div id="waveform"></div>
-      <div id="waveform-timeline"></div>
-
-        <form id="comment" class="col s12" role="form" name="edit" style="display: none;">
-          <div class="row">
-            <div class="input-field col s6" style="display: none">
-              <input class="validate" type="text" id="start" name="start">
-              <label for="start">Start</label>
-            </div>
-            <div class="input-field col s6" style="display: none">
-              <input class="validate" type="text" id="end" name="end">
-              <label for="end">End</label>
-            </div>
-            <div class="input-field col s12">
-                <textarea id="note" class="materialize-textarea" rows="1" name="note"></textarea>
-                <label for="note">Comment</label>
-            </div>
-            <div class="input-field col s12">
-                <a type="submit" class="waves-effect waves-light btn" onclick="commentForm()" id="save">Save</a>
-                <a type="button" class="waves-effect waves-light btn" onclick="deleteNote()">Delete</a>
-            </div>
-          </div>
-        </form>
-
-        <form id="annotateForm" class="col s12" role="form" name="annotate" style="display: none;">
-          <div class="row">
-            <div class="input-field col s12">
-                <div class="chips chips-autocomplete"></div>
-            </div>
-            <div class="input-field col s12">
-                <a type="submit" class="waves-effect waves-light btn" id="save" >Save</a>
-                <a type="button" class="waves-effect waves-light btn" onclick="deleteNote()">Delete</a>
-            </div>
-          </div>
-        </form>
-
-        <hr>
-
-        <div class="input-field col s3 right" style="margin: 0 0 1rem 0;">
-            <a class="waves-effect waves-light btn" onclick="commentForm()" >Comment</a>
-            <a class="waves-effect waves-light btn" onclick="annotateForm()">Annotate</a>
-
-            <span data-action="play" onclick="wavesurfer.playPause()">
-                <a class="waves-effect waves-light btn" id="play">Play</a>
-                <a class="waves-effect waves-light btn" id="pause" style="display: none">Pause</a>
-            </span>
-        </div>
-    </div>
-  </div>
+    </form>
 
 {%- endblock %}
 {%- block fscripts %}
-    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>
-    <script src="{{ url_for('static', filename='js/fin.js') }}"></script>
-    <script>
-        var annotateFormEle = document.querySelector('#annotateForm');
-        var commentFormEle = document.querySelector('#comment');
+  <script>
+    var wavesurfer = WaveSurfer.create({
+        container: '#waveform',
+        waveColor: 'rgba(153, 153, 153, 1.000)',
+        progressColor: 'rgba(255,192,160, 1.000)',
+        cursorColor:'rgba(255, 0, 0, 0.0)',
+        normalize: true
+    });
 
-        function commentForm() {
-            annotateFormEle.style.display = 'none';
-            if (commentFormEle.style.display)
-            {
-                commentFormEle.style.display = '';
-            }
-            else
-            {
-                commentFormEle.style.display = 'none';
-            }
-        }
+    wavesurfer.on('play', function () {
+        document.querySelector('#play').style.display = 'none';
+        document.querySelector('#pause').style.display = '';
+    });
 
-        function annotateForm() {
-            commentFormEle.style.display = 'none';
-            if (annotateFormEle.style.display)
-            {
-                annotateFormEle.style.display = '';
-            }
-            else
-            {
-                annotateFormEle.style.display = 'none';
-            }
-        }
-    </script>
+    wavesurfer.on('pause', function () {
+        document.querySelector('#play').style.display = '';
+        document.querySelector('#pause').style.display = 'none';
+    });
+
+    wavesurfer.on('region-in', function (region) {
+        $('#comments').append(
+            "<div id=\"r-" + region.id + "\" class=\"card-panel\">" +
+            "  <span class=\"black-text\">" +
+                  region.data.content +
+            "  </span>" +
+            "</div>");
+
+        $('#comments').show();
+    });
+
+    wavesurfer.on('region-out', function (region) {
+        // remove based on region id?
+        $('#r-'+region.id).remove();
+    });
+
+    // TODO: this should be set when the page loads
+    wavesurfer.load('http://0.0.0.0:5000/static/1.mp3');
+
+    var timeline = Object.create(WaveSurfer.Timeline);
+
+    timeline.init({
+        wavesurfer: wavesurfer,
+        container: '#waveform-timeline'
+    });
+
+    function addComment()
+    {
+        $('textarea[name=content]').val("");
+        $('#comments').toggle();
+        $('#commentForm').toggle();
+        wavesurfer.pause();
+        $('#start').val(Math.floor(wavesurfer.getCurrentTime()));
+        Materialize.updateTextFields();
+    }
+
+    function addRegion(item)
+    {
+        wavesurfer.addRegion(
+        {
+            id: item.id,
+            start: item.start,
+            end: item.end,
+            data: {
+                content: item.content,
+                // Used to differentiate between comment and annotations
+                type: item.type
+            },
+            drag: false,
+            resize: false
+        });
+        var type = (item.type == "comment") ? "comment" : "tag";
+        $('[data-id=' + item.id + ']').append('<i class="material-icons tiny right">' + type + '</i>');
+    }
+
+    // When audio is loaded, decoded and draw waveform. Fires before waveform is drawn.
+    wavesurfer.on('ready', function () {
+        {{ comments | safe }}.forEach(addRegion);
+    });
+
+    $(document).ready(function() {
+        // Using AJAX as we want to stay on this page when the form is submitted.
+        $('#commentForm').submit(function(event) {
+
+            $('#commentForm').toggle();
+
+            var start = Number($('input[name=start]').val());
+            var end = Number($('input[name=end]').val());
+
+            var commentFormData = {
+                'content' : $('textarea[name=content]').val(),
+                'start'   : start <= 0 ? start : start - 5,
+                'end'     : (end == 0 || end <= start) ? start : end,
+                'iid'     : 10125 // TODO: The selected interview ID
+            };
+
+            $.ajax({
+                type     : 'POST',
+                url      : '/project/interview/comment/',
+                data     : commentFormData,
+                dataType : 'json',
+                encode   : true
+            }).done(function(data) {
+                // Instead of reloading the page, we add the region here as
+                // once the page is refreshed it will show anyway.
+                if(data.success) {
+                    // Large integer that is unlikely to clash with database id
+                    commentFormData.id = Math.floor(Math.random() * (100000 - 10000) + 10000);
+                    commentFormData.type = 'comment';
+                    addRegion(commentFormData);
+                    Materialize.toast("Thanks for adding a comment", 4000);
+                    wavesurfer.play();
+                }
+            });
+            event.preventDefault();
+            $('#comments').show();
+        });
+
+    });
+  </script>
 {%- endblock %}

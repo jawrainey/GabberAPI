@@ -1,5 +1,4 @@
-from gabber.projects.models import Interview,  Project, ProjectPrompt
-from flask import Blueprint, render_template, url_for, redirect, request, flash
+from gabber.projects.models import Comment, Interview, Project, ProjectPrompt
 from flask_login import current_user, login_required
 from gabber import app, db
 import json
@@ -44,6 +43,21 @@ def display(project=None):
         return render_template('views/projects/display.html',
                                project_title=project,
                                interviews=interviews_to_display)
+
+
+@project.route('interview/comment/', methods=['POST'])
+def comment_on_interview():
+    if request.method == 'POST':
+        comment = Comment(
+            text=request.form.get('content', ""),
+            start_interval=request.form.get('start', 0),
+            end_interval=request.form.get('end', 0),
+            user_id=current_user.id,
+            interview_id=request.form.get('iid', 0)
+        )
+        db.session.add(comment)
+        db.session.commit()
+        return jsonify({'success': True}), 200
 
 
 @project.route('edit/<path:project>/', methods=['GET', 'POST'])
