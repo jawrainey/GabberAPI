@@ -1,4 +1,5 @@
 from gabber.projects.models import Comment, Interview, Project, ProjectPrompt
+from flask import Blueprint, render_template, url_for, redirect, request, flash, jsonify
 from flask_login import current_user, login_required
 from gabber import app, db
 import json
@@ -58,6 +59,23 @@ def comment_on_interview():
         db.session.add(comment)
         db.session.commit()
         return jsonify({'success': True}), 200
+
+
+@project.route('session/<int:session_id>', methods=['GET', 'POST'])
+@project.route('session/interview/<int:interview_id>', methods=['GET', 'POST'])
+def session(session_id=None, interview_id=None):
+    # TODO: for now we are assuming one interview to build front-end
+    if interview_id not in [i[0] for i in db.session.query(Interview.id).all()]:
+        flash('The interview you tried to view does not exist.')
+        return redirect(url_for('main.projects'))
+
+    interview = Interview.query.filter_by(id=interview_id).first()
+    interview.audio = url_for('consent.protected', filename=interview.audio, _external=True)
+
+    return render_template('views/projects/session.html',
+                           interview=interview,
+                           participants=interview.participants.all(),
+                           comments=[i.serialize() for i in interview.comments.all()])
 
 
 @project.route('edit/<path:project>/', methods=['GET', 'POST'])
