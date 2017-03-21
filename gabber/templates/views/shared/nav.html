@@ -1,12 +1,14 @@
     <nav class="teal lighten-1">
-    <div class="nav-wrapper container">
-      <ul id="nav-mobile" class="right">
-        <li><a href="{{ url_for('main.index') }}">Home</a></li>
-        <li><a href="{{ url_for('main.about') }}">About</a></li>
-        <li><a href="{{ url_for('main.projects') }}">Projects</a></li>
-        {% if current_user.is_authenticated -%}
-        <li><a href="{{ url_for('users.logout') }}">Logout</a></li>
-        {%- else %}<li class="active"><a href="{{ url_for('users.login') }}">Sign in</a></li>{%- endif %}
-      </ul>
-    </div>
-  </nav>
+      <div class="nav-wrapper container">
+        <ul id="nav-mobile" class="right">
+          <li><a href="{{ url_for('main.index') }}">Home</a></li>
+          <li><a href="{{ url_for('main.about') }}">About</a></li>
+          <li><a href="{{ url_for('main.projects') }}">Projects</a></li>
+        {%- if current_user.is_authenticated %}
+          <li><a href="{{ url_for('users.logout') }}">Logout</a></li>
+        {%- else %}
+          <li class="active"><a href="{{ url_for('users.login') }}">Sign in</a></li>
+        {%- endif %}
+        </ul>
+      </div>
+    </nav>
