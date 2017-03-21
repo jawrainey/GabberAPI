@@ -41,14 +41,6 @@
 
         <form method="POST" class="col s12" id="commentForm" style="display: none">
           <div class="row">
-            <div class="input-field col s6 hide">
-              <input type="number" id="start" name="start">
-              <label for="start">Start</label>
-            </div>
-            <div class="input-field col s6 hide">
-              <input type="number" id="end" name="end">
-              <label for="end">End</label>
-            </div>
             <div class="input-field col s12">
               <textarea id="content" class="materialize-textarea" rows="3" name="content" maxlength=280 required></textarea>
               <label for="content">Add your comment</label>
@@ -91,19 +83,29 @@
     });
 
     wavesurfer.on('region-in', function (region) {
-        $('#comments').append(
-            "<div id=\"r-" + region.id + "\" class=\"card-panel\">" +
-            "  <span class=\"black-text\">" +
-                  region.data.content +
-            "  </span>" +
-            "</div>");
+        if (region.data.type == 0) {
+            $('#comments').append(
+                "<div class=\"r-" + region.id + " card-panel\">" +
+                "  <span class=\"black-text\">" +
+                      region.data.content +
+                "  </span>" +
+                "</div>");
 
-        $('#comments').show();
+            $('#comments').show();
+        }
+        else {
+            JSON.parse(region.data.content).forEach(function(item) {
+                $('#annotations').append(
+                    "<div class=\"r-" + region.id + " chip\">" + item.tag + "</div>"
+                );
+            });
+            $('#annotations').show();
+        }
     });
 
     wavesurfer.on('region-out', function (region) {
         // remove based on region id?
-        $('#r-'+region.id).remove();
+        $('.r-'+region.id).remove();
     });
 
     wavesurfer.load('{{ interview.audio }}');
@@ -117,21 +119,39 @@
 
     function addAnnotation()
     {
-        $('#comments').toggle();
-        $('#annotations').toggle();
-        $('#annotationForm').toggle();
         wavesurfer.pause();
+        // When the annotation button is clicked and the form is open.
+        if ($('#annotationForm').is(":visible")) {
+            $('#annotationForm').hide();
+            $('#comments').show();
+            $('#annotations').show();
+        }
+        else {
+            $('#annotationForm').show();
+            $('#commentForm').hide();
+            $('#comments').hide();
+            $('#annotations').hide();
+            $('.chips-autocomplete .chip').remove();
+        }
     }
 
     function addComment()
     {
-        $('textarea[name=content]').val("");
-        $('#comments').toggle();
-        $('#annotations').toggle();
-        $('#commentForm').toggle();
         wavesurfer.pause();
-        $('#start').val(Math.floor(wavesurfer.getCurrentTime()));
-        Materialize.updateTextFields();
+
+        if ($('#commentForm').is(":visible")) {
+            $('#commentForm').hide();
+            $('#comments').show();
+            $('#annotations').show();
+        }
+        else {
+            $('#commentForm').show();
+            $('#annotationForm').hide();
+            $('#comments').hide();
+            $('#annotations').hide();
+            $('textarea[name=content]').val("");
+            Materialize.updateTextFields();
+        }
     }
 
     function addRegion(item)
@@ -149,14 +169,48 @@
             drag: false,
             resize: false
         });
-        var type = (item.type == 0) ? "comment" : "tag";
+        var type = (item.type == 0) ? "comment" : "label_outline";
         $('[data-id=' + item.id + ']').append('<i class="material-icons tiny right">' + type + '</i>');
     }
 
     // When audio is loaded, decoded and draw waveform. Fires before waveform is drawn.
     wavesurfer.on('ready', function () {
         {{ comments | safe }}.forEach(addRegion);
+        {{ annotations | safe }}.forEach(addRegion);
     });
+
+
+    function postForm(type)
+    {
+        var content = {
+            'content' : (type == 0) ? $('textarea[name=content]').val() : JSON.stringify($('.chips-autocomplete').material_chip('data')),
+            'start'   : wavesurfer.getCurrentTime() <= 10 ? wavesurfer.getCurrentTime() : wavesurfer.getCurrentTime() - 5,
+            'end'     : wavesurfer.getCurrentTime(),
+            'type'    : type,
+            'iid'     : {{ interview.id }}
+        };
+
+        $.ajax({
+            type     : 'POST',
+            url      : '/project/interview/response/',
+            data     : content,
+            dataType : 'json',
+            encode   : true
+        }).done(function(data) {
+            // Instead of reloading the page, we add the region here as
+            // once the page is refreshed it will show anyway.
+            if(data.success) {
+                // Large integer that is unlikely to clash with database id
+                content.id = Math.floor(Math.random() * (100000 - 10000) + 10000);
+                content.type = type;
+                addRegion(content);
+                Materialize.toast("Thanks for adding your " + (type == 0 ? "comment" : "annotation"), 4000);
+                wavesurfer.play();
+            }
+        });
+        $('#comments').show();
+        $('#annotations').show();
+    }
 
     $(document).ready(function() {
 
@@ -170,40 +224,15 @@
 
         // Using AJAX as we want to stay on this page when the form is submitted.
         $('#commentForm').submit(function(event) {
-
             $('#commentForm').toggle();
-
-            var start = Number($('input[name=start]').val());
-            var end = Number($('input[name=end]').val());
-
-            var commentFormData = {
-                'content' : $('textarea[name=content]').val(),
-                'start'   : start <= 0 ? start : start - 5,
-                'end'     : (end == 0 || end <= start) ? start : end,
-                'type'    : 0,
-                'iid'     : {{ interview.id }}
-            };
-
-            $.ajax({
-                type     : 'POST',
-                url      : '/project/interview/response/',
-                data     : commentFormData,
-                dataType : 'json',
-                encode   : true
-            }).done(function(data) {
-                // Instead of reloading the page, we add the region here as
-                // once the page is refreshed it will show anyway.
-                if(data.success) {
-                    // Large integer that is unlikely to clash with database id
-                    commentFormData.id = Math.floor(Math.random() * (100000 - 10000) + 10000);
-                    commentFormData.type = 0;
-                    addRegion(commentFormData);
-                    Materialize.toast("Thanks for adding your comment", 4000);
-                    wavesurfer.play();
-                }
-            });
+            postForm(0);
             event.preventDefault();
-            $('#comments').show();
+        });
+
+        $('#annotationForm').submit(function(event) {
+            $('#annotationForm').toggle();
+            postForm(1);
+            event.preventDefault();
         });
 
     });
