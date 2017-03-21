@@ -31,8 +31,8 @@
         </div>
 
         <div id="controls">
-          <a class="waves-effect btn" onclick="addAnnotation()"><i class="material-icons">label_outline</i></a>
-          <a class="waves-effect btn" onclick="addComment()"><i class="material-icons">comment</i></a>
+          <a class="waves-effect btn" onclick="showAnnotationForm()"><i class="material-icons">label_outline</i></a>
+          <a class="waves-effect btn" onclick="showCommentForm()"><i class="material-icons">comment</i></a>
           <span onclick="wavesurfer.playPause()">
             <a class="waves-effect btn" id="play"><i class="material-icons">play_arrow</i></a>
             <a class="waves-effect btn" id="pause" style="display: none"><i class="material-icons">pause</i></a>
@@ -104,8 +104,13 @@
     });
 
     wavesurfer.on('region-out', function (region) {
-        // remove based on region id?
         $('.r-'+region.id).remove();
+    });
+
+    // When audio is loaded, decoded and draw waveform. Fires before waveform is drawn.
+    wavesurfer.on('ready', function () {
+        {{ comments | safe }}.forEach(function(i) { addRegion(i, false, false) });
+        {{ annotations | safe }}.forEach(function(i) { addRegion(i, false, false) });
     });
 
     wavesurfer.load('{{ interview.audio }}');
@@ -117,7 +122,10 @@
         container: '#waveform-timeline'
     });
 
-    function addAnnotation()
+    // This is the region that will be created for an annotation/comment if the form is submitted
+    var regionToCreate = {};
+
+    function showAnnotationForm()
     {
         wavesurfer.pause();
         // When the annotation button is clicked and the form is open.
@@ -125,6 +133,10 @@
             $('#annotationForm').hide();
             $('#comments').show();
             $('#annotations').show();
+            // The 'Annotate' button was clicked again,
+            // so remove the region previously added as it was not saved.
+            wavesurfer.regions.list[regionToCreate.id].remove();
+            regionToCreate = {};
         }
         else {
             $('#annotationForm').show();
@@ -132,10 +144,12 @@
             $('#comments').hide();
             $('#annotations').hide();
             $('.chips-autocomplete .chip').remove();
+
+            updateRegionToCreate(1);
         }
     }
 
-    function addComment()
+    function showCommentForm()
     {
         wavesurfer.pause();
 
@@ -143,6 +157,8 @@
             $('#commentForm').hide();
             $('#comments').show();
             $('#annotations').show();
+            wavesurfer.regions.list[regionToCreate.id].remove();
+            regionToCreate = {};
         }
         else {
             $('#commentForm').show();
@@ -150,11 +166,36 @@
             $('#comments').hide();
             $('#annotations').hide();
             $('textarea[name=content]').val("");
+
+            updateRegionToCreate(0);
+
             Materialize.updateTextFields();
         }
     }
 
-    function addRegion(item)
+    function updateRegionToCreate(type)
+    {
+            _content = (type == 0) ? $('textarea[name=content]').val() : JSON.stringify($('.chips-autocomplete').material_chip('data'))
+
+            // The ID is set here be used as a lookup and not to clash with comment/annotation database IDs.
+            regionToCreate = {
+                'content' : _content,
+                'start'   : wavesurfer.getCurrentTime() - 10,
+                'end'     : wavesurfer.getCurrentTime(),
+                'type'    : type,
+                'id'      : Math.floor(Math.random() * (100000 - 10000) + 10000),
+                'iid'     : {{ interview.id }}
+            };
+
+            addRegion(regionToCreate, true, true);
+    }
+
+    /**
+     * Used when initially adding regions to the waveform, AND when adding a new
+     * comment or annotation, hence the need to customize drag/resize as these are
+     * not desired for all comments.
+     */
+    function addRegion(item, drag, resize)
     {
         wavesurfer.addRegion(
         {
@@ -163,48 +204,39 @@
             end: item.end,
             data: {
                 content: item.content,
-                // Used to differentiate between comment and annotations
                 type: item.type
             },
-            drag: false,
-            resize: false
+            drag: drag,
+            resize: resize
         });
+
         var type = (item.type == 0) ? "comment" : "label_outline";
         $('[data-id=' + item.id + ']').append('<i class="material-icons tiny right">' + type + '</i>');
     }
 
-    // When audio is loaded, decoded and draw waveform. Fires before waveform is drawn.
-    wavesurfer.on('ready', function () {
-        {{ comments | safe }}.forEach(addRegion);
-        {{ annotations | safe }}.forEach(addRegion);
-    });
-
-
-    function postForm(type)
+    function postForm()
     {
-        var content = {
-            'content' : (type == 0) ? $('textarea[name=content]').val() : JSON.stringify($('.chips-autocomplete').material_chip('data')),
-            'start'   : wavesurfer.getCurrentTime() <= 10 ? wavesurfer.getCurrentTime() : wavesurfer.getCurrentTime() - 5,
-            'end'     : wavesurfer.getCurrentTime(),
-            'type'    : type,
-            'iid'     : {{ interview.id }}
-        };
+        _content = (regionToCreate.type == 0) ? $('textarea[name=content]').val() : JSON.stringify($('.chips-autocomplete').material_chip('data'));
+
+        // Update local prior to pushing to server
+        regionToCreate.content = _content;
+        regionToCreate.start = wavesurfer.regions.list[regionToCreate.id].start;
+        regionToCreate.end = wavesurfer.regions.list[regionToCreate.id].end;
+
+        // Update on local machine to reflect view on refresh
+        wavesurfer.regions.list[regionToCreate.id].data.content = _content;
+        wavesurfer.regions.list[regionToCreate.id].drag = false;
+        wavesurfer.regions.list[regionToCreate.id].resize = false;
 
         $.ajax({
             type     : 'POST',
             url      : '/project/interview/response/',
-            data     : content,
+            data     : regionToCreate,
             dataType : 'json',
             encode   : true
         }).done(function(data) {
-            // Instead of reloading the page, we add the region here as
-            // once the page is refreshed it will show anyway.
             if(data.success) {
-                // Large integer that is unlikely to clash with database id
-                content.id = Math.floor(Math.random() * (100000 - 10000) + 10000);
-                content.type = type;
-                addRegion(content);
-                Materialize.toast("Thanks for adding your " + (type == 0 ? "comment" : "annotation"), 4000);
+                Materialize.toast("Thanks for adding your " + (regionToCreate.type == 0 ? "comment" : "annotation"), 4000);
                 wavesurfer.play();
             }
         });
@@ -215,8 +247,7 @@
     $(document).ready(function() {
 
         $('.chips-autocomplete').material_chip({
-            // TODO: populate autocompleteData from server-side
-            autocompleteData: { 'Apple': null },
+            autocompleteData: {{ annotations | safe }},
             autocompleteLimit: 5,
             placeholder: 'Add another annotation?',
             secondaryPlaceholder: 'Press enter to create your annotation'
@@ -225,13 +256,13 @@
         // Using AJAX as we want to stay on this page when the form is submitted.
         $('#commentForm').submit(function(event) {
             $('#commentForm').toggle();
-            postForm(0);
+            postForm();
             event.preventDefault();
         });
 
         $('#annotationForm').submit(function(event) {
             $('#annotationForm').toggle();
-            postForm(1);
+            postForm();
             event.preventDefault();
         });
 
