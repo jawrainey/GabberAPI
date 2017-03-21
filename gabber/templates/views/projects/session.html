@@ -12,6 +12,7 @@
   .wavesurfer-region > i { margin-top: -5px; }
   /* Force the controls to the bottom. */
   #controls { position: absolute; bottom: 60px; }
+  .chips-autocomplete .input { width: 250px !important; }
   </style>
 {%- endblock %}
 {% block content %}
@@ -24,9 +25,13 @@
           <div class="col s12 m6" id="comments">
             <h5>Comments</h5>
           </div>
+          <div class="col s12 m6" id="annotations">
+            <h5>Annotations</h5>
+          </div>
         </div>
 
         <div id="controls">
+          <a class="waves-effect btn" onclick="addAnnotation()"><i class="material-icons">label_outline</i></a>
           <a class="waves-effect btn" onclick="addComment()"><i class="material-icons">comment</i></a>
           <span onclick="wavesurfer.playPause()">
             <a class="waves-effect btn" id="play"><i class="material-icons">play_arrow</i></a>
@@ -46,10 +51,21 @@
             </div>
             <div class="input-field col s12">
               <textarea id="content" class="materialize-textarea" rows="3" name="content"></textarea>
-              <label for="content">Comment</label>
+              <label for="content">Add your comment</label>
             </div>
             <div class="input-field col s12">
-              <button id="commentFormSubmit" name="comment" class="btn waves-effect waves-light right" type="submit">Submit</button>
+              <button id="commentFormSubmit" name="comment" class="btn waves-effect waves-light right" type="submit">Save</button>
+            </div>
+          </div>
+        </form>
+
+        <form method="POST" action="/project/interview/annotation/" class="col s12" id="annotationForm" style="display: none">
+          <div class="row">
+            <div class="input-field col s12">
+              <div class="chips chips-autocomplete"></div>
+            </div>
+            <div class="input-field col s12">
+                <button class="btn waves-effect waves-light right" type="submit">Save</button>
             </div>
           </div>
         </form>
@@ -99,10 +115,19 @@
         container: '#waveform-timeline'
     });
 
+    function addAnnotation()
+    {
+        $('#comments').toggle();
+        $('#annotations').toggle();
+        $('#annotationForm').toggle();
+        wavesurfer.pause();
+    }
+
     function addComment()
     {
         $('textarea[name=content]').val("");
         $('#comments').toggle();
+        $('#annotations').toggle();
         $('#commentForm').toggle();
         wavesurfer.pause();
         $('#start').val(Math.floor(wavesurfer.getCurrentTime()));
@@ -134,6 +159,15 @@
     });
 
     $(document).ready(function() {
+
+        $('.chips-autocomplete').material_chip({
+            // TODO: populate autocompleteData from server-side
+            autocompleteData: { 'Apple': null },
+            autocompleteLimit: 5,
+            placeholder: 'Add another annotation?',
+            secondaryPlaceholder: 'Press enter to create your annotation'
+        });
+
         // Using AJAX as we want to stay on this page when the form is submitted.
         $('#commentForm').submit(function(event) {
 
