@@ -91,8 +91,7 @@
         $('#r-'+region.id).remove();
     });
 
-    // TODO: this should be set when the page loads
-    wavesurfer.load('http://0.0.0.0:5000/static/1.mp3');
+    wavesurfer.load('{{ interview.audio }}');
 
     var timeline = Object.create(WaveSurfer.Timeline);
 
@@ -148,7 +147,7 @@
                 'content' : $('textarea[name=content]').val(),
                 'start'   : start <= 0 ? start : start - 5,
                 'end'     : (end == 0 || end <= start) ? start : end,
-                'iid'     : 10125 // TODO: The selected interview ID
+                'iid'     : {{ interview.id }}
             };
 
             $.ajax({
@@ -165,7 +164,7 @@
                     commentFormData.id = Math.floor(Math.random() * (100000 - 10000) + 10000);
                     commentFormData.type = 'comment';
                     addRegion(commentFormData);
-                    Materialize.toast("Thanks for adding a comment", 4000);
+                    Materialize.toast("Thanks for adding your comment", 4000);
                     wavesurfer.play();
                 }
             });
