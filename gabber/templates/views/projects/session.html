@@ -16,7 +16,7 @@
   </style>
 {%- endblock %}
 {% block content %}
-        <h5><b>{{ participants[0]['name'] }}</b> interviewing <b>{{ participants[1]['name'] }}</b></h5>
+        <h5><b>Participants:</b>{% for p in participants %} {{ p['name'] }}{% if not loop.last %},{% endif %}{% endfor %}</h5>
 
         <div id="waveform"></div>
         <div id="waveform-timeline"></div>
