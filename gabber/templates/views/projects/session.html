@@ -141,16 +141,22 @@
             regionToCreate = {};
         }
         else {
-            $(".chips-autocomplete").addClass("focus");
             $('#annotationForm button').addClass('disabled');
             $('#annotationForm').show();
             $('#commentForm').hide();
             $('#comments').hide();
             $('#annotations').hide();
             $('#controls').hide();
+
             $('.chips-autocomplete .chip').remove();
-            // Required to remove old (tags) from the data array/
+            $('.chips-autocomplete > .input').val("");
+            // Required to remove old (tags) from the data array
             $('.chips-autocomplete').material_chip('data').length = 0;
+
+            setTimeout(function() {
+                $('.chips-autocomplete > .input').focus();
+            }, 0);
+
             updateRegionToCreate(1);
         }
     }
@@ -173,6 +179,10 @@
             $('#annotations').hide();
             $('#controls').hide();
             $('textarea[name=content]').val("");
+
+            setTimeout(function() {
+                $('textarea[name=content]').show().focus();
+            }, 0);
 
             updateRegionToCreate(0);
 
@@ -285,7 +295,7 @@
             $('#comments').show();
             $('#annotations').show();
 
-            $('.tooltipped').tooltip('remove');
+            $('#controls > .tooltipped').tooltip('remove');
 
             wavesurfer.regions.list[regionToCreate.id].remove();
             regionToCreate = {};
