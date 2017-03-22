@@ -26,17 +26,17 @@
             <h5>Comments</h5>
           </div>
           <div class="col s12 m6" id="annotations">
-            <h5>Annotations</h5>
+            <h5>Themes</h5>
           </div>
         </div>
 
         <div id="controls">
-          <a class="btn-floating waves-effect tooltipped" data-position="top" data-delay="40" data-tooltip="Create annotation" onclick="showAnnotationForm()"><i class="material-icons">label_outline</i></a>
+          <a class="btn-floating waves-effect tooltipped" data-position="top" data-delay="40" data-tooltip="Create comment" onclick="showCommentForm()"><i class="material-icons">comment</i></a>
           <span onclick="wavesurfer.playPause()">
             <a class="btn-large btn-floating waves-effect" id="play"><i class="material-icons">play_arrow</i></a>
             <a class="btn-large btn-floating waves-effect" id="pause" style="display: none"><i class="material-icons">pause</i></a>
           </span>
-          <a class="btn-floating waves-effect tooltipped" data-position="top" data-delay="40" data-tooltip="Create comment" onclick="showCommentForm()"><i class="material-icons">comment</i></a>
+          <a class="btn-floating waves-effect tooltipped" data-position="top" data-delay="40" data-tooltip="Create theme" onclick="showAnnotationForm()"><i class="material-icons">bookmark_border</i></a>
         </div>
 
         <form method="POST" class="col s12" id="commentForm" style="display: none">
@@ -55,7 +55,7 @@
         <form method="POST" class="col s12" id="annotationForm" style="display: none">
           <div class="row">
             <span class="closeForm btn-floating right"><i class="material-icons">close</i></span>
-            <div class="input-field col s12 tooltipped" data-position="bottom" data-delay="40" data-tooltip="Type your annotation & press <i>enter</i> to create it. You can add as many as you like.">
+            <div class="input-field col s12 tooltipped" data-position="bottom" data-delay="40" data-tooltip="Press <i>enter</i> to create it add a theme.">
               <div class="chips chips-autocomplete"></div>
             </div>
             <div class="input-field col s12">
@@ -217,7 +217,7 @@
             resize: resize
         });
 
-        var type = (item.type === 0) ? "comment" : "label_outline";
+        var type = (item.type === 0) ? "comment" : "bookmark_border";
         $('[data-id=' + item.id + ']').append('<i class="material-icons tiny right">' + type + '</i>');
     }
 
@@ -260,8 +260,8 @@
         $('.chips-autocomplete').material_chip({
             autocompleteData: {{ annotations | safe }},
             autocompleteLimit: 5,
-            placeholder: 'Add another annotation?',
-            secondaryPlaceholder: 'Press enter to create your annotation'
+            placeholder: 'Add another theme?',
+            secondaryPlaceholder: 'Press enter to create your theme'
         });
 
         // Using AJAX as we want to stay on this page when the form is submitted.
