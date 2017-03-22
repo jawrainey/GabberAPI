@@ -144,7 +144,8 @@
             $('#comments').hide();
             $('#annotations').hide();
             $('.chips-autocomplete .chip').remove();
-
+            // Required to remove old (tags) from the data array/
+            $('.chips-autocomplete').material_chip('data').length = 0;
             updateRegionToCreate(1);
         }
     }
