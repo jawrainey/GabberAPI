@@ -237,7 +237,7 @@
 
         $.ajax({
             type     : 'POST',
-            url      : '/project/interview/response/',
+            url      : '{{ url_for('project.interview_response', _external=True) }}',
             data     : regionToCreate,
             dataType : 'json',
             encode   : true
