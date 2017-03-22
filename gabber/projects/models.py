@@ -60,6 +60,9 @@ class Interview(db.Model):
     # Each of which provide individual consent for the audio recording.
     consents = db.relationship('InterviewConsent', backref='consentid', lazy='dynamic')
 
+    def prompt_text(self):
+        return ProjectPrompt.query.filter_by(id=self.prompt_id).first().text_prompt
+
 
 class Response(db.Model):
     """

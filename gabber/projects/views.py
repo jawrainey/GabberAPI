@@ -46,8 +46,30 @@ def display(project=None):
                                interviews=interviews_to_display)
 
 
+@project.route('sessions/<path:project>/', methods=['GET', 'POST'])
+def sessions(project=None):
+    _title = project.replace("-", " ").lower()
+    interviews = Interview.query.join(ProjectPrompt).join(Project).filter(Project.title == _title).all()
+
+    from collections import defaultdict
+
+    groups = defaultdict(list)
+
+    for interview in interviews:
+        groups[interview.session_id].append(interview)
+
+    sessions = [{'creation_date': interviews[0].created_on.strftime("%b %d, %Y"),
+                 'participants': interviews[0].participants.all(),
+                 'interviews': interviews,
+                 'id': sid}
+                for sid, interviews in groups.items()]
+
+    return render_template('views/projects/sessions.html', sessions=sessions, project_name=_title)
+
+
 @project.route('interview/response/', methods=['POST'])
 def interview_response():
+    # TODO: currently storing annotation tags as a JSON string...
     response = Response(
         text=request.form.get('content', ""),
         start_interval=request.form.get('start', 0),

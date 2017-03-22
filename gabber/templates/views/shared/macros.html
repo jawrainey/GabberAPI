@@ -23,7 +23,7 @@
 
               <a href="{{ url_for('project.edit', project=project.title.replace(" ", "-").lower()) }}">Edit</a>
              {% endif %}
-
+                <a href="{{ url_for('project.sessions', project=project.title.replace(" ", "-").lower()) }}">Sessions</a>
             </div>
           </div>
         </div>
