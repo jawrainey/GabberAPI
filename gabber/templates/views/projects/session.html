@@ -41,6 +41,7 @@
 
         <form method="POST" class="col s12" id="commentForm" style="display: none">
           <div class="row">
+            <span class="closeForm btn-floating right"><i class="material-icons">close</i></span>
             <div class="input-field col s12">
               <textarea id="content" class="materialize-textarea" rows="3" name="content" maxlength=280 required autofocus></textarea>
               <label for="content">Add your comment</label>
@@ -53,7 +54,8 @@
 
         <form method="POST" class="col s12" id="annotationForm" style="display: none">
           <div class="row">
-            <div class="input-field col s12">
+            <span class="closeForm btn-floating right"><i class="material-icons">close</i></span>
+            <div class="input-field col s12 tooltipped" data-position="bottom" data-delay="40" data-tooltip="Type your annotation & press <i>enter</i> to create it. You can add as many as you like.">
               <div class="chips chips-autocomplete"></div>
             </div>
             <div class="input-field col s12">
@@ -139,10 +141,13 @@
             regionToCreate = {};
         }
         else {
+            $(".chips-autocomplete").addClass("focus");
+            $('#annotationForm button').addClass('disabled');
             $('#annotationForm').show();
             $('#commentForm').hide();
             $('#comments').hide();
             $('#annotations').hide();
+            $('#controls').hide();
             $('.chips-autocomplete .chip').remove();
             // Required to remove old (tags) from the data array/
             $('.chips-autocomplete').material_chip('data').length = 0;
@@ -166,6 +171,7 @@
             $('#annotationForm').hide();
             $('#comments').hide();
             $('#annotations').hide();
+            $('#controls').hide();
             $('textarea[name=content]').val("");
 
             updateRegionToCreate(0);
@@ -243,6 +249,7 @@
         });
         $('#comments').show();
         $('#annotations').show();
+        $('#controls').show();
         // Once a comment OR annotation is made, then do not show the tooltips again.
         $('.tooltipped').tooltip('remove');
         wavesurfer.playPause();
@@ -270,8 +277,27 @@
             event.preventDefault();
         });
 
-        Materialize.toast('You can create annotations or comments when the audio is playing.', 3000);
+        $( ".closeForm" ).bind( "click", function() {
+            $('#commentForm').hide();
+            $('#annotationForm').hide();
+            $('#controls').show();
 
+            $('#comments').show();
+            $('#annotations').show();
+
+            $('.tooltipped').tooltip('remove');
+
+            wavesurfer.regions.list[regionToCreate.id].remove();
+            regionToCreate = {};
+            wavesurfer.playPause();
+        });
+
+        $('.chips').on('chip.add', function(e, chip){
+            $('#annotationForm button').removeClass('disabled');
+        });
+
+        Materialize.toast('You can create annotations or comments when the audio is playing.', 3000);
+        $('.tooltipped').tooltip({html: true});
     });
   </script>
 {%- endblock %}
