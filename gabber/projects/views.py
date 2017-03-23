@@ -2,7 +2,6 @@ from gabber.projects.models import Response, Interview, Project, ProjectPrompt
 from flask import Blueprint, render_template, url_for, redirect, request, flash, jsonify
 from flask_login import current_user, login_required
 from gabber import app, db
-import json
 import os
 
 project = Blueprint('project', __name__)

@@ -1,5 +1,5 @@
-from gabber.projects.models import Project, ProjectPrompt, Interview
-from flask import Blueprint, redirect, render_template, flash, url_for
+from gabber.projects.models import Project
+from flask import Blueprint, render_template
 from flask_login import current_user
 
 main = Blueprint('main', __name__)
