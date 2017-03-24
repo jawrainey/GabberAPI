@@ -1,12 +1,30 @@
 from gabber import db
 
 
-members = db.Table('members',
+members = db.Table(
+    'members',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('project_id', db.Integer, db.ForeignKey('project.id')))
 
 
+participants = db.Table(
+    'participants',
+    db.Column('participant_id', db.Integer, db.ForeignKey('participant.id')),
+    db.Column('interview_id', db.Integer, db.ForeignKey('interview.id')))
+
+
 class Project(db.Model):
+    """
+    A project is the overarching theme for an interview session
+
+    Backrefs:
+        Can refer to associated prompts with 'prompts'
+        Can refer to 'members' of a project with 'members'
+
+    Relationships:
+        one-to-many: a project can have many prompts
+        many-to-many: a project can have many members
+    """
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(64))
     banner = db.Column(db.String(64))
@@ -15,7 +33,7 @@ class Project(db.Model):
     type = db.Column(db.SmallInteger, default=1)
     consent = db.Column(db.SmallInteger, default=0)
 
-    prompts = db.relationship('ProjectPrompt', backref='prompts', lazy='dynamic')
+    prompts = db.relationship('ProjectPrompt', backref='project', lazy='dynamic')
     members = db.relationship('User', secondary=members, back_populates="projects")
 
     created_on = db.Column(db.DateTime, default=db.func.now())
@@ -23,6 +41,15 @@ class Project(db.Model):
 
 
 class ProjectPrompt(db.Model):
+    """
+    The discussion prompts used within the application for a project
+
+    Backrefs:
+        Can refer to its parent project with 'project'
+
+    Relationships:
+        one-to-many: a projectPrompt can be used by many interviews
+    """
     __tablename__ = 'projectprompt'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -37,44 +64,48 @@ class ProjectPrompt(db.Model):
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
 
-participants = db.Table('participants',
-    db.Column('participant_id', db.Integer, db.ForeignKey('participant.id')),
-    db.Column('interview_id', db.Integer, db.ForeignKey('interview.id')))
-
-
 class Interview(db.Model):
+    """
+    An interview between participants for a given ProjectPrompt
+
+    Relationships:
+        one-to-many: an interview can have many responses (comments or themes)
+        many-to-many: an interview can have many participants
+        one-to-many: an interview must be consented by many participants
+    """
     id = db.Column(db.Integer, primary_key=True)
     audio = db.Column(db.String(260))
     image = db.Column(db.String(260))
     location = db.Column(db.String(10))
     session_id = db.Column(db.String(260))
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
-
+    prompt_id = db.Column(db.Integer, db.ForeignKey('projectprompt.id'))
     created_on = db.Column(db.DateTime, default=db.func.now())
 
-    prompt_id = db.Column(db.Integer, db.ForeignKey('projectprompt.id'))
     responses = db.relationship('Response', backref='interview', lazy='dynamic')
     participants = db.relationship('Participant', secondary=participants,
-                                   backref=db.backref('participants', lazy='dynamic'),
+                                   backref=db.backref('interviews', lazy='dynamic'),
                                    lazy='dynamic')
-    # Each of which provide individual consent for the audio recording.
-    consents = db.relationship('InterviewConsent', backref='consentid', lazy='dynamic')
+    consents = db.relationship('InterviewConsent', backref='interview', lazy='dynamic')
 
     def prompt_text(self):
+        """
+        returns the text of the prompt used for this Interview
+        """
         return ProjectPrompt.query.filter_by(id=self.prompt_id).first().text_prompt
 
 
 class Response(db.Model):
     """
-    A response to an interview, which is either a comment or annotation.
+    A response to an interview, which is either a comment or annotation
 
     Although a separate table for annotations could be used, there are many
     shared properties between comments/annotations. However, one disadvantage is that
     annotation text is not stored in a separate table, thereby preventing text duplication.
 
     Backrefs:
-        A response can refer to its creator with 'user'
-        A response can refer to its parent interview with 'interview'
+        Can refer to its creator with 'user'
+        Can refer to its parent interview with 'interview'
     """
     __tablename__ = 'responses'
 
@@ -93,6 +124,12 @@ class Response(db.Model):
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
     def serialize(self):
+        """
+        A serialized version of a response to use within views
+
+        returns
+            dict: a human-readable serialization of the Response object
+        """
         from gabber.users.models import User
         return {
             'id': self.id,
@@ -105,18 +142,32 @@ class Response(db.Model):
 
 
 class Participant(db.Model):
+    """
+    The individual who was part of an interview
+
+    Relationships:
+        one-to-many: a participant can have many complex needs.
+        one-to-many: a participant can provide consent for many interviews
+
+    Backref:
+        Can refer to associated interviews with 'interviews'
+    """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
     email = db.Column(db.String(64))
     age = db.Column(db.Integer)
     gender = db.Column(db.Integer)
     complexneeds = db.relationship('ComplexNeeds', backref="participant")
-    consent = db.relationship('InterviewConsent', backref='consents', lazy='dynamic')
+    consent = db.relationship('InterviewConsent', backref='participant')
 
 
 class ComplexNeeds(db.Model):
     """
-    This is specific to the FF deployment.
+    This is specific to the FF deployment
+
+    Backrefs:
+        Can refer to its participant with 'participant'
+        Can refer to its interview with 'interview'
     """
     __tablename__ = 'complexneeds'
 

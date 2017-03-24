@@ -4,6 +4,13 @@ from gabber.projects.models import members
 
 
 class User(UserMixin, db.Model):
+    """
+    A registered user of the system
+
+    Relationships:
+        many-to-many: a user can be a member of many projects
+        many-to-many: a user be associated with (has created) many responses (comments or themes)
+    """
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True)
     password = db.Column(db.String(192))
