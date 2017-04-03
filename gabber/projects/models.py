@@ -39,6 +39,24 @@ class Project(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
+    def project_as_json(self):
+        """
+        Create a JSON containing the project title and project prompts (text and images) for use in API.
+
+        Returns: dict of dicts containing the project title and associated prompts formatted for API consumption.
+        """
+        from flask import request
+        from gabber import app
+        # Only required as the server is behind a proxy @OpenLab
+        uri = (request.url_root[0:(len(request.url_root)-1)] +
+               app.static_url_path + '/img/' + str(self.id) + '/')
+
+        return {
+            'theme': self.title,
+            'prompts': [{'imageName': uri + prompt.image_path, 'prompt': prompt.text_prompt}
+                        for prompt in self.prompts]
+        }
+
 
 class ProjectPrompt(db.Model):
     """

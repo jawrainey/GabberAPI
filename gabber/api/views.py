@@ -12,18 +12,7 @@ api = Blueprint('api', __name__)
 @api.route('projects', methods=['GET'])
 def projects():
     # TODO: filter based on user credentials.
-    # TODO: use built-in __dict__ and filter to simplify accessing from models.
-    res = []
-    for project in Project.query.join(ProjectPrompt).all():
-        uri = (request.url_root[0:(len(request.url_root)-1)] +
-               app.static_url_path + '/img/' + str(project.id) + '/')
-
-        prompts = [{'imageName': uri + p.image_path, 'prompt': p.text_prompt}
-                   for p in project.prompts]
-
-        res.append({'theme': project.title, 'prompts': prompts})
-
-    return jsonify(res), 200
+    return jsonify([p.project_as_json() for p in Project.query.all()]), 200
 
 
 @api.route('register', methods=['POST'])
