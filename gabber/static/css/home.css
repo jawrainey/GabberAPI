@@ -104,10 +104,15 @@ body.is-loading *, body.is-loading *:before, body.is-loading *:after {
 
 /* Header */
 
-#header {
+html {
 	background-color: #4696BB;
+	background-image: url("images/overlay.png");
+	background-position: top left, center center;
+	background-attachment: fixed, fixed;
+	background-size: auto, cover;
+}
+#header {
 	color: #d0e4f8;
-	padding: 4.5em 0 2.5em 0;
 	-moz-align-items: center;
 	-webkit-align-items: center;
 	-ms-align-items: center;
@@ -120,11 +125,7 @@ body.is-loading *, body.is-loading *:before, body.is-loading *:after {
 	-webkit-justify-content: center;
 	-ms-justify-content: center;
 	justify-content: center;
-	background-image: url("images/overlay.png"), url("images/pattern-size1.svg");
-	background-position: top left, center center;
-	background-attachment: fixed, fixed;
-	background-size: auto, cover;
-	height: 100vh;
+	height: 87vh;
 	min-height: 35em;
 }
 
@@ -201,12 +202,6 @@ body.is-loading *, body.is-loading *:before, body.is-loading *:after {
 	opacity: 1;
 }
 
-@media screen and (max-width: 1280px) {
-	#header {
-		background-image: url("images/overlay.png"), url("images/pattern-size2.svg");
-	}
-}
-
 @media screen and (max-width: 980px) {
 	#header {
 		min-height: 0;
@@ -236,9 +231,6 @@ body.is-loading *, body.is-loading *:before, body.is-loading *:after {
 }
 
 @media screen and (max-width: 736px) {
-	#header {
-		background-image: url("images/overlay.png"), url("images/pattern-size3.svg");
-	}
 	#header h1 {
 		font-size: 2em;
 	}

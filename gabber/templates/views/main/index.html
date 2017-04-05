@@ -2,18 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gabber &mdash; conversations shared to be heard</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css" rel="stylesheet" >
-  <link href="{{ url_for('static', filename='css/home.css') }}" rel="stylesheet" />
 </head>
 <body>
-  {% include 'views/shared/nav.html' %}
-  <header id="header">
+{% include 'views/shared/nav.html' %}
+  <div id="header">
     <div class="content">
       <h1>Your voice matters</h1>
-      <p><b>Record</b>, <b>publish</b>, and <b>discuss</b> experiences<br>
-      of <b>local topics</b> and concerns using <b>Gabber</b></p>
+      <p><b>Record</b>, <b>publish</b>, and <b>collaboratively<br>annotate</b>
+      audio interviews with <b>Gabber</b></p>
       <div>
         <a href="https://play.google.com/store/apps/details?id=com.jawrainey.gabber">
           <img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Download the Android app" class="button">
@@ -25,9 +25,7 @@
         <img src="{{ url_for('static', filename='img/screen.jpg') }}" alt="The three stages and workflow when using Gabber" />
       </div>
     </div>
-  </header>
+  </div>
   <script>window.onload=function(a){document.body.className+="is-loading",window.setTimeout(function(){document.body.className=""},150)};</script>
-  {%- block fscripts %}
-  {%- endblock %}
 </body>
 </html>
