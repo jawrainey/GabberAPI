@@ -1,13 +1,14 @@
-    <nav class="teal lighten-1">
+    {% from "views/shared/macros.html" import active -%}
+    <nav class="transparent z-depth-0">
       <div class="nav-wrapper container">
-        <ul id="nav-mobile" class="right">
-          <li><a href="{{ url_for('main.index') }}">Home</a></li>
-          <li><a href="{{ url_for('main.about') }}">About</a></li>
-          <li><a href="{{ url_for('main.projects') }}">Projects</a></li>
+        <ul>
+          <li{{ active("main.index") }}><a href="{{ url_for('main.index') }}">Home</a></li>
+          <li{{ active("main.about") }}><a href="{{ url_for('main.about') }}">About</a></li>
+          <li{{ active("main.projects", "project") }}><a href="{{ url_for('main.projects') }}">Projects</a></li>
         {%- if current_user.is_authenticated %}
           <li><a href="{{ url_for('users.logout') }}">Logout</a></li>
         {%- else %}
-          <li class="active"><a href="{{ url_for('users.login') }}">Sign in</a></li>
+          <li {{ active("main.index") or active("users.login") }}><a href="{{ url_for('users.login') }}">Sign in</a></li>
         {%- endif %}
         </ul>
       </div>

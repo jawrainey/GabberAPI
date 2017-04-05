@@ -39,3 +39,7 @@
 
 {%- endwith -%}
 {%- endmacro -%}
+
+{%- macro active(uri="", uri_blueprint_group="") -%}
+{% if uri == request.endpoint or request.endpoint.split(".")[0] == uri_blueprint_group %} class="active"{%- endif -%}
+{%- endmacro -%}
