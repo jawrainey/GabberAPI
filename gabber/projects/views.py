@@ -82,10 +82,8 @@ def interview_response():
     return jsonify({'success': True}), 200
 
 
-@project.route('session/<int:session_id>', methods=['GET', 'POST'])
 @project.route('session/interview/<int:interview_id>', methods=['GET', 'POST'])
-def session(session_id=None, interview_id=None):
-    # TODO: for now we are assuming one interview to build front-end
+def session(interview_id=None):
     if interview_id not in [i[0] for i in db.session.query(Interview.id).all()]:
         flash('The interview you tried to view does not exist.')
         return redirect(url_for('main.projects'))
@@ -100,6 +98,8 @@ def session(session_id=None, interview_id=None):
 
     return render_template('views/projects/session.html',
                            interview=interview,
+                           interviews=Interview.query.filter_by(
+                               session_id=int(Interview.query.filter_by(id=interview_id).first().session_id)).all(),
                            participants=interview.participants.all(),
                            comments=response_types[0],
                            annotations=response_types[1])

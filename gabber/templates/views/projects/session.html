@@ -16,6 +16,14 @@
   </style>
 {%- endblock %}
 {% block content %}
+
+        <div class="collection right" id="interviews">
+        <i class="material-icons tiny left">close</i>
+        {%- for interview in interviews %}
+          <a href="{{ url_for('project.session', interview_id=interview.id) }}" class="collection-item truncate">
+            <b>{{ loop.index }}.</b> {{ interview.prompt_text().title() }}
+          </a>{% endfor %}
+        </div>
         <h5><b>Participants:</b>{% for p in participants %} {{ p['name'] }}{% if not loop.last %},{% endif %}{% endfor %}</h5>
 
         <div id="waveform"></div>
