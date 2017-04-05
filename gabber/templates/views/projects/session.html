@@ -95,10 +95,21 @@
     wavesurfer.on('region-in', function (region) {
         if (region.data.type == 0) {
             $('#comments').append(
-                "<div class=\"r-" + region.id + " card-panel\">" +
-                "  <span class=\"black-text\">" +
-                      region.data.content +
-                "  </span>" +
+                "<div class=\"r-" + region.id + " card-panel no-padding\">" +
+                    "<div class=\"comment-header\">" +
+                    "  <strong>" +
+                    "    <a class=\"author\" href=\"#\">" + region.data.author +
+                    "    </a>" +
+                    "  </strong> &mdash; " +
+                    "  <time datetime=" + "\"" + region.data.timestamp + "\">" +
+                        region.data.days_since + " days ago" + "</time>" +
+                    "</div>" +
+                    "<div class=\"comment-body\">" +
+                    "  <p class=\"black-text\">" +
+                         region.data.content +
+                    "  </p>" +
+                    "  <a href=\"#\"><i class=\"material-icons right\" onclick=\"showRespondCommentForm()\">reply</i>&nbsp;</a>" +
+                    "</div>" +
                 "</div>");
 
             $('#comments').show();
@@ -208,6 +219,7 @@
                 'start'   : wavesurfer.getCurrentTime() - 10,
                 'end'     : wavesurfer.getCurrentTime(),
                 'type'    : type,
+                'creator' : "{{ current_user.fullname }}",
                 'id'      : Math.floor(Math.random() * (100000 - 10000) + 10000),
                 'iid'     : {{ interview.id }}
             };
@@ -229,6 +241,9 @@
             end: item.end,
             data: {
                 content: item.content,
+                author: item.creator,
+                timestamp: item.timestamp === undefined ? 0 : item.timestamp,
+                days_since: item.days_since === undefined ? 0 : item.days_since,
                 type: item.type
             },
             drag: drag,

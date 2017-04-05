@@ -149,11 +149,14 @@ class Response(db.Model):
             dict: a human-readable serialization of the Response object
         """
         from gabber.users.models import User
+        import datetime
         return {
             'id': self.id,
             'content': str(self.text),
             'start': self.start_interval,
             'end': self.end_interval,
+            'timestamp': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
+            'days_since': abs((self.created_on - datetime.datetime.now()).days),
             'creator': str(User.query.filter_by(id=self.user_id).first().fullname),
             'type': self.type
         }
