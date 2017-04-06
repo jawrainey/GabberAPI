@@ -14,15 +14,22 @@
     This is a workaround as per issue #630 of wavesurfer */
   .wavesurfer-handle { background: rgba(0, 0, 0, 0.3); min-width: 4px; }
   /* Force the controls to the bottom. */
-  #controls { position: absolute; bottom: 80px; left: 39%; }
+  #controls { position: absolute; bottom: 80px; left: 50%; margin-left: -71px; }
   .chips-autocomplete .input { width: 250px !important; }
+  .comment-header, .comment-body { padding: 18px; }
+  .comment-header { background-color: #f6f8fa; border-bottom: 1px solid #d1d5da; }
+  .comment-body > p:first-of-type { text-indent: 2.5%; margin: 0; }
+  .author { color: #586069; }
+  #interviews { position: absolute; right: 0; width: 140px; z-index: 10120; }
+  #interviews > i { position: absolute; font-weight: 600; left: 0; z-index: 1012018; cursor: pointer; }
+  .collection.with-header .collection-item { padding-left: 20px; margin-bottom: 0; }
   </style>
 {%- endblock %}
 {% block content %}
 
         <div class="collection right" id="interviews">
-        <i class="material-icons tiny left">close</i>
-        {%- for interview in interviews %}
+          <i class="material-icons tiny left">close</i>
+          {%- for interview in interviews %}
           <a href="{{ url_for('project.session', interview_id=interview.id) }}" class="collection-item truncate">
             <b>{{ loop.index }}.</b> {{ interview.prompt_text().title() }}
           </a>{% endfor %}
