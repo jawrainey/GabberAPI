@@ -10,6 +10,9 @@
   #waveform > wave { overflow: visible !important; }
   /* Display the comment/annotation icons slightly above their related segment. */
   .wavesurfer-region > i { margin-top: -5px; }
+    /* Increases the width of the re-size handle and adds a color to make it clear where to re-size.
+    This is a workaround as per issue #630 of wavesurfer */
+  .wavesurfer-handle { background: rgba(0, 0, 0, 0.3); min-width: 4px; }
   /* Force the controls to the bottom. */
   #controls { position: absolute; bottom: 80px; left: 39%; }
   .chips-autocomplete .input { width: 250px !important; }
