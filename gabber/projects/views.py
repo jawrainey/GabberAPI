@@ -99,7 +99,7 @@ def session(interview_id=None):
     return render_template('views/projects/session.html',
                            interview=interview,
                            interviews=Interview.query.filter_by(
-                               session_id=int(Interview.query.filter_by(id=interview_id).first().session_id)).all(),
+                               session_id=Interview.query.filter_by(id=interview_id).first().session_id).all(),
                            participants=interview.participants.all(),
                            comments=response_types[0],
                            annotations=response_types[1])
