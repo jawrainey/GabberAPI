@@ -178,8 +178,8 @@ class Participant(db.Model):
     email = db.Column(db.String(64))
     age = db.Column(db.Integer)
     gender = db.Column(db.Integer)
-    complexneeds = db.relationship('ComplexNeeds', backref="participant")
-    consent = db.relationship('InterviewConsent', backref='participant')
+    complexneeds = db.relationship('ComplexNeeds', backref="participant", lazy='dynamic')
+    consent = db.relationship('InterviewConsent', backref='participant', lazy='dynamic')
 
 
 class ComplexNeeds(db.Model):
