@@ -76,8 +76,10 @@ def upload():
 
     # Only allow those who have been made members of projects (i.e. by admins
     # of those projects) to upload datafiles to that project.
+    # Current approach is to lookup prompt based on text rather than ID ... oh my.
     interviewer_id = User.query.filter_by(username=participants[0]['Email']).first().id
-    interview_prompt = ProjectPrompt.query.filter_by(text_prompt=request.form.get('promptText', None)).first()
+    interview_prompt = ProjectPrompt.query.filter(
+        ProjectPrompt.text_prompt.like(request.form.get('promptText', None))).first()
     members = Project.query.filter_by(id=interview_prompt.project_id).first().members
 
     if interviewer_id not in [m.id for m in members]:
