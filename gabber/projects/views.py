@@ -55,7 +55,8 @@ def sessions(project=None):
     groups = defaultdict(list)
 
     for interview in interviews:
-        groups[interview.session_id].append(interview)
+        if interview.session_id:
+            groups[interview.session_id].append(interview)
 
     sessions = [{'creation_date': interviews[0].created_on.strftime("%b %d, %Y"),
                  'participants': interviews[0].participants.all(),
