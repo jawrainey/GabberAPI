@@ -1,5 +1,10 @@
-body { color: white;}
+#downloads { text-align: right; }
 
+#downloads a img {
+    width: 150px;
+    height: 60px;
+    margin-right: 1rem;
+}
 
 body.is-loading *, body.is-loading *:before, body.is-loading *:after {
 	-moz-animation: none !important;
@@ -105,7 +110,6 @@ body.is-loading *, body.is-loading *:before, body.is-loading *:after {
 /* Header */
 
 html {
-	background-color: #4696BB;
 	background-image: url("images/overlay.png");
 	background-position: top left, center center;
 	background-attachment: fixed, fixed;
@@ -125,32 +129,34 @@ html {
 	-webkit-justify-content: center;
 	-ms-justify-content: center;
 	justify-content: center;
-	height: 87vh;
+	height: 72.5vh;
 	min-height: 35em;
+    margin-top: 3rem;
 }
 
 #header .image {
-	box-shadow: 0 0 0 4px #4696BB, 0 0 0 5px rgba(255, 255, 255, 0.25);
+	box-shadow: 0 0 0 4px #4696BB, 0 0 0 5px rgba(160,160,160,0.2);
 }
 
 #header .image.phone {
 	box-shadow: none;
+	background-color: #FFFFFF;
 }
 
 #header .image.phone .inner, #header .image.phone:before, #header .image.phone:after {
-	border-color: rgba(255, 255, 255, 0.25);
+	border-color: rgba(160,160,160,0.2);
 }
 
 #header .image.phone .inner:before {
-	background: rgba(255, 255, 255, 0.25);
+	background: whitesmoke;
 }
 
 #header .image.phone .inner:after {
-	border-color: rgba(255, 255, 255, 0.25);
+	border-color: whitesmoke;
 }
 
 #header h1, #header p {
-	color: #ffffff;
+	color: #000000;
 }
 
 #header h1 {
@@ -175,7 +181,7 @@ html {
 	transform: translateX(0);
 	opacity: 1;
 	text-align: right;
-	margin: -3.5em 4em 0 0;
+	margin: -3.5em 1em 0 0;
 }
 
 #header .image {
@@ -255,6 +261,10 @@ html {
 	#header .image .inner, #header .image:before, #header .image:after {
 		font-size: 0.8em;
 	}
+
+	#header .col {
+		text-align: center;
+	}
 }
 
 @media screen and (max-width: 736px) and (orientation: portrait) {
@@ -265,6 +275,8 @@ html {
 		font-size: 0.6em;
 		max-width: 60vw;
 	}
+
+    .row .col {   text-align: center; }
 }
 
 @media screen and (max-width: 480px) and (orientation: landscape) {
@@ -273,15 +285,6 @@ html {
 	}
 	#header .image {
 		font-size: 0.7em;
-	}
-}
-
-@media screen and (max-width: 480px) and (orientation: portrait) {
-	#header {
-		padding: 4.5em 1em 0.1em 1em;
-	}
-	.content h1 {
-		display: none;
 	}
 }
 
@@ -323,4 +326,5 @@ body.is-loading #header .image img {
 		-ms-transform: translateY(2em);
 		transform: translateY(2em);
 	}
+    .row .col {   text-align: center; }
 }

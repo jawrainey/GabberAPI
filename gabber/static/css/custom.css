@@ -1,4 +1,74 @@
 /* Fixed footer at the bottom of the screen. */
-body { display: flex; min-height: 100vh; flex-direction: column; }
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    background-image: url("images/overlay.png");
+}
+
+
+.card-title { border-bottom: 1px solid rgba(160,160,160,0.2); }
+.card .card-content .card-title { margin-bottom: 12px; }
+.card .card-action { text-align: right; }
+.card .card-action a:not(.btn):not(.btn-large):not(.btn-large):not(.btn-floating):last-child { margin-right: 0; }
+.card .card-action a:not(.btn):not(.btn-large):not(.btn-large):not(.btn-floating):hover {
+  border-bottom: 1px solid #A0A0A0;
+}
+
+.card .card-action a:not(.btn):not(.btn-large):not(.btn-large):not(.btn-floating),
+.card .card-action a:not(.btn):not(.btn-large):not(.btn-large):not(.btn-floating):hover,
+.card-action > a,
+a {
+  color: #4696BB;
+}
+
+.card { border-top: 5px solid #4696BB; }
 main { flex: 1 0 auto; }
 #footernav > li { display: inline-block; margin: 0 .84rem 0 0; }
+nav { margin-top: 1rem; }
+nav ul { text-align: right;  }
+nav ul li { float: none; display: inline-block; }
+nav ul a { color: #000000; }
+@media screen and (max-width: 736px) {
+    nav ul { text-align: center; }
+}
+
+/* about */
+.promo i {
+    margin: 40px 0;
+    color: #4696BB;
+    font-size: 7rem;
+    display: block;
+}
+
+.promo-caption {
+  font-size: 1.7rem;
+  font-weight: 500;
+  margin-top: 5px;
+  margin-bottom: 0;
+}
+
+/* login */
+
+#loginForm {
+    display: inline-block;
+    padding: 32px 48px;
+    margin-top: 6rem;
+    border: 1px solid rgba(160,160,160,0.2);
+}
+
+#loginForm button { background-color: #4696BB; }
+#loginForm h5 { margin-bottom: 1.68rem; }
+
+input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]), input[type=password]:focus:not([readonly]), input[type=email]:focus:not([readonly]), input[type=url]:focus:not([readonly]), input[type=time]:focus:not([readonly]), input[type=date]:focus:not([readonly]), input[type=datetime]:focus:not([readonly]), input[type=datetime-local]:focus:not([readonly]), input[type=tel]:focus:not([readonly]), input[type=number]:focus:not([readonly]), input[type=search]:focus:not([readonly]), textarea.materialize-textarea:focus:not([readonly]) {
+  border-bottom: 1px solid #4696BB;
+  box-shadow: 0 1px 0 0 #4696BB;
+}
+
+input:not([type]):focus:not([readonly])+label, input[type=text]:focus:not([readonly])+label, input[type=password]:focus:not([readonly])+label, input[type=email]:focus:not([readonly])+label, input[type=url]:focus:not([readonly])+label, input[type=time]:focus:not([readonly])+label, input[type=date]:focus:not([readonly])+label, input[type=datetime]:focus:not([readonly])+label, input[type=datetime-local]:focus:not([readonly])+label, input[type=tel]:focus:not([readonly])+label, input[type=number]:focus:not([readonly])+label, input[type=search]:focus:not([readonly])+label, textarea.materialize-textarea:focus:not([readonly])+label {
+  color: #4696BB;
+}
+
+/* general */
+
+.btn-floating { background-color: #4696BB; }

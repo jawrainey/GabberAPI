@@ -60,6 +60,7 @@ def sessions(project=None):
 
     sessions = [{'creation_date': interviews[0].created_on.strftime("%b %d, %Y"),
                  'participants': interviews[0].participants.all(),
+                 'participants_names': [i.name for i in interviews[0].participants.all()],
                  'interviews': interviews,
                  'first_interview_id': interviews[0].id}
                 for sid, interviews in groups.items()]

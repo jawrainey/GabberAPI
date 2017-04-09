@@ -1,18 +1,22 @@
 {% extends "views/shared/layout.html" %}
 {% block content %}
-        <h1 class="text-center">Session for {{ project_name }}</h1>
+        <h1 class="text-center">{{ project_name }} sessions</h1>
         <hr>
-        {%- for session in sessions %}
-        <div class="col s6 m4">
-          <div class="card sticky-action">
-            <div class="card-content">
-              <span class="card-title grey-text text-darken-4"><b>{{ session['creation_date'] }}</b></span>
-              <b>{{ session['participants'] | length }}</b> participants and <b>{{ session['interviews'] | length }}</b> interviews.
-            </div>
-            <div class="card-action">
-              <a href="{{ url_for('project.session', interview_id=session['first_interview_id']) }}">View</a>
-            </div>
-          </div>
+        <div class="collection">
+         {%- for session in sessions %}
+          <a href="{{ url_for('project.session', interview_id=session['first_interview_id']) }}" class="collection-item">
+          {{ session['participants_names']|length }} participants (
+              {% if session['participants_names']|length == 1 %}
+                  {{ session['participants_names'][0].title() }}
+              {% elif session['participants_names']|length == 2 %}
+                  {{ session['participants_names'][0].title() }} &amp; {{ session['participants_names'][1] }}
+              {% elif session['participants_names']|length >= 2 %}
+                  {{ session['participants_names'][0].title() }} , {{ session['participants_names'][1] }}
+                  &amp; others
+              {% endif %}
+          )
+              discussing <b>{{ session['interviews'] | length }}</b> topics on {{ session['creation_date'] }}
+          </a>
+          {%- endfor %}
         </div>
-        {%- endfor -%}
 {%- endblock %}
