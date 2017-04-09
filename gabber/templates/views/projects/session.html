@@ -28,7 +28,7 @@
 {% block content %}
 
         <div class="collection right" id="interviews">
-          <i class="material-icons tiny left">close</i>
+          <i class="material-icons tiny left">keyboard_arrow_right</i>
           {%- for interview in interviews %}
           <a href="{{ url_for('project.session', interview_id=interview.id) }}" class="collection-item truncate">
             <b>{{ loop.index }}.</b> {{ interview.prompt_text().title() }}
@@ -299,6 +299,13 @@
     }
 
     $(document).ready(function() {
+
+        $('#interviews').find("i").click(function() {
+            if ($(this).parent().width() > 20)
+                $(this).parent().width("20").find("i").text("keyboard_arrow_left");
+            else
+                $(this).parent().width("140").find("i").text("keyboard_arrow_right");
+        });
 
         $('.chips-autocomplete').material_chip({
             autocompleteData: {{ annotations | safe }},
