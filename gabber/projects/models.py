@@ -27,7 +27,7 @@ class Project(db.Model):
     """
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(64))
-    banner = db.Column(db.String(64))
+    description = db.Column(db.String(256))
 
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
     type = db.Column(db.SmallInteger, default=1)

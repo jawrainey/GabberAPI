@@ -8,6 +8,9 @@ body {
 
 
 .card-title { border-bottom: 1px solid rgba(160,160,160,0.2); }
+
+
+.card .card-content { min-height: 160px; }
 .card .card-content .card-title { margin-bottom: 12px; }
 .card .card-action { text-align: right; }
 .card .card-action a:not(.btn):not(.btn-large):not(.btn-large):not(.btn-floating):last-child { margin-right: 0; }

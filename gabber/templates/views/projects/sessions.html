@@ -11,11 +11,9 @@
               {% elif session['participants_names']|length == 2 %}
                   {{ session['participants_names'][0].title() }} &amp; {{ session['participants_names'][1] }}
               {% elif session['participants_names']|length >= 2 %}
-                  {{ session['participants_names'][0].title() }} , {{ session['participants_names'][1] }}
-                  &amp; others
+                  {{ session['participants_names'][0].title() }}, {{ session['participants_names'][1] }} &amp; others
               {% endif %}
-          )
-              discussing <b>{{ session['interviews'] | length }}</b> topics on {{ session['creation_date'] }}
+          ) discussing <b>{{ session['interviews'] | length }}</b> topics on {{ session['creation_date'] }}
           </a>
           {%- endfor %}
         </div>
