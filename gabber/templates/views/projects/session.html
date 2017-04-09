@@ -61,8 +61,8 @@
           <div class="row">
             <span class="closeForm btn-floating right"><i class="material-icons">close</i></span>
             <div class="input-field col s12">
-              <textarea id="content" class="materialize-textarea" rows="3" name="content" maxlength=280 required autofocus></textarea>
-              <label for="content">Add your comment</label>
+              <textarea id="CommentFormContent" class="materialize-textarea" rows="3" name="CommentFormContent" maxlength=280 required autofocus></textarea>
+              <label for="CommentFormContent">Add your comment</label>
             </div>
             <div class="input-field col s12">
               <button class="btn waves-effect waves-light right" type="submit">Save</button>
@@ -207,10 +207,10 @@
             $('#comments').hide();
             $('#annotations').hide();
             $('#controls').hide();
-            $('textarea[name=content]').val("");
+            $('#CommentFormContent').val();
 
             setTimeout(function() {
-                $('textarea[name=content]').show().focus();
+                $('#CommentFormContent').show().focus();
             }, 0);
 
             updateRegionToCreate(0);
@@ -221,7 +221,7 @@
 
     function updateRegionToCreate(type)
     {
-            _content = (type === 0) ? $('textarea[name=content]').val() : JSON.stringify($('.chips-autocomplete').material_chip('data'));
+            _content = (type === 0) ? $('#CommentFormContent').val() : JSON.stringify($('.chips-autocomplete').material_chip('data'));
 
             // The ID is set here be used as a lookup and not to clash with comment/annotation database IDs.
             regionToCreate = {
@@ -266,7 +266,7 @@
 
     function postForm()
     {
-        _content = (regionToCreate.type === 0) ? $('textarea[name=content]').val() : JSON.stringify($('.chips-autocomplete').material_chip('data'));
+        _content = (regionToCreate.type === 0) ? $('#CommentFormContent').val() : JSON.stringify($('.chips-autocomplete').material_chip('data'));
 
         // Update local prior to pushing to server
         regionToCreate.content = _content;
