@@ -15,7 +15,7 @@
   .wavesurfer-handle { background: rgba(0, 0, 0, 0.3); min-width: 4px; }
   /* Force the controls to the bottom. */
   #controls { position: absolute; bottom: 80px; left: 50%; margin-left: -71px; }
-  .chips-autocomplete .input { width: 250px !important; }
+  .chips-autocomplete .input { width: 260px !important; }
   .comment-header, .comment-body { padding: 18px; }
   .comment-header { background-color: #f6f8fa; border-bottom: 1px solid #d1d5da; }
   .comment-body > p:first-of-type { text-indent: 2.5%; margin: 0; }
@@ -73,7 +73,7 @@
         <form method="POST" class="col s12" id="annotationForm" style="display: none">
           <div class="row">
             <span class="closeForm btn-floating right"><i class="material-icons">close</i></span>
-            <div class="input-field col s12 tooltipped" data-position="bottom" data-delay="40" data-tooltip="Press <i>enter</i> to create it add a theme.">
+            <div class="input-field col s12 tooltipped" data-position="top" data-delay="40" data-tooltip="Type a theme and press <b>enter</b> to create it. You can create many.">
               <div class="chips chips-autocomplete"></div>
             </div>
             <div class="input-field col s12">
@@ -286,7 +286,7 @@
             encode   : true
         }).done(function(data) {
             if(data.success) {
-                Materialize.toast("Thanks for adding your " + (regionToCreate.type === 0 ? "comment" : "annotation"), 4000);
+                Materialize.toast("Thanks for adding your " + (regionToCreate.type === 0 ? "comment" : "theme"), 4000);
                 wavesurfer.play();
             }
         });
@@ -311,7 +311,7 @@
             autocompleteData: {{ annotations | safe }},
             autocompleteLimit: 5,
             placeholder: 'Add another theme?',
-            secondaryPlaceholder: 'Press enter to create your theme'
+            secondaryPlaceholder: 'Type and press enter to create a theme'
         });
 
         // Using AJAX as we want to stay on this page when the form is submitted.
