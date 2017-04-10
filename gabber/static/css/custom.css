@@ -38,17 +38,16 @@ nav ul a { color: #000000; }
 
 /* about */
 .promo i {
-    margin: 40px 0;
+    margin: 24px 0;
     color: #4696BB;
-    font-size: 7rem;
+    font-size: 5.5rem;
     display: block;
 }
 
 .promo-caption {
   font-size: 1.7rem;
   font-weight: 500;
-  margin-top: 5px;
-  margin-bottom: 0;
+  margin: 12px 0 0 0;
 }
 
 /* login */

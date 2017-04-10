@@ -1,23 +1,44 @@
 {% extends "views/shared/layout.html" %}
 {% block title %}About{% endblock %}
 {% block content %}
-      <h1>What's Gabber?</h1>
+      <h1>How it works</h1>
       <hr>
-      <p>Gabber is an exploratory research technology for communities to
-      capture audio conversations with peers around a shared topic of interest,
-      from discussion of local issues that matter to citizens (town planning,
-      politics, etc) to use within organisations as a tool to facilitate
-      reflective practice.Data produced using the Gabber mobile application(s) is represented on a
-      per-project basis on this website for participants to listen to and reflect
-      upon audio's created by other participants within that community.  A curation
-      process of annotating interesting pieces (for that participant) of these audio's
-      exists on the website to facilitate this discussion and reflection.</p>
-      <h2>Why Gabber?</h2>
+      <div class="row">
+        <div class="col s12 m4">
+          <div class="center promo promo-example">
+            <i class="material-icons">group</i>
+            <p class="promo-caption">Find a friend</p>
+            <p class="light center">
+                Do you know someone with personal experiences of a topic
+                you are interested in understanding and discussing with others?
+            </p>
+          </div>
+        </div>
+        <div class="col s12 m4">
+          <div class="center promo promo-example">
+            <i class="material-icons">record_voice_over</i>
+            <p class="promo-caption">Record an interview</p>
+            <p class="light center">
+                Download <a href="{{ url_for('main.index') }}">Gabber</a> and record a set of interviews
+                with others about aspects of a topic you have experiences with.
+            </p>
+          </div>
+        </div>
+        <div class="col s12 m4">
+          <div class="center promo promo-example">
+            <i class="material-icons">comment</i>
+            <p class="promo-caption">Collaboratively annotate</p>
+            <p class="light center">
+                Find your <a href="{{ url_for('main.projects') }}">project</a>, select the interview
+                session, and discuss and annotate pieces of the audio interview using a novel interface.
+            </p>
+          </div>
+        </div>
+      </div>
       <hr>
-      <p>Sharing your experiences, collecting the experiences of others,
-      and having them all in one place enables <b>you</b> as a community to
-      engage with and understand the needs and concerns of others within this
-      community. By representing all of these perspectives in one place, they
-      could be used to engage local government in decision-making processes,
-      such as where to place new buildings, or understand local citizens concerns.</p>
+      <p>
+          <em>Gabber is an ongoing exploratory research project that aims to understand the value of
+          technologies for supporting the collection of speech data (interviews from Gabber),
+          and <b>interaction</b>, <b>consumption</b> and <b>collaborative interpretation</b> of this data (using this website).</em>
+      </p>
 {%- endblock %}
