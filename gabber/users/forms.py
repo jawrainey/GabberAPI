@@ -8,7 +8,7 @@ class LoginForm(FlaskForm):
     email = TextField('Email: ', [DataRequired(
         message='An email address must be provided.'),
         Email(),
-        Length(min=3, max=25)])
+        Length(min=3, max=90)])
     password = PasswordField('Password', [DataRequired(
         message='A password must provided.'),
         Length(min=4, max=40)])
