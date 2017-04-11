@@ -31,7 +31,7 @@ main { flex: 1 0 auto; }
 nav { margin-top: 1rem; }
 nav ul { text-align: right;  }
 nav ul li { float: none; display: inline-block; }
-nav ul a { color: #000000; }
+nav ul a, .collection a.collection-item { color: #000000; }
 @media screen and (max-width: 736px) {
     nav ul { text-align: center; }
 }
@@ -59,10 +59,10 @@ nav ul a { color: #000000; }
     border: 1px solid rgba(160,160,160,0.2);
 }
 
-#loginForm button { background-color: #4696BB; }
 #loginForm h5 { margin-bottom: 1.68rem; }
 
-input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]), input[type=password]:focus:not([readonly]), input[type=email]:focus:not([readonly]), input[type=url]:focus:not([readonly]), input[type=time]:focus:not([readonly]), input[type=date]:focus:not([readonly]), input[type=datetime]:focus:not([readonly]), input[type=datetime-local]:focus:not([readonly]), input[type=tel]:focus:not([readonly]), input[type=number]:focus:not([readonly]), input[type=search]:focus:not([readonly]), textarea.materialize-textarea:focus:not([readonly]) {
+input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]), input[type=password]:focus:not([readonly]), input[type=email]:focus:not([readonly]), input[type=url]:focus:not([readonly]), input[type=time]:focus:not([readonly]), input[type=date]:focus:not([readonly]), input[type=datetime]:focus:not([readonly]), input[type=datetime-local]:focus:not([readonly]), input[type=tel]:focus:not([readonly]), input[type=number]:focus:not([readonly]), input[type=search]:focus:not([readonly]), textarea.materialize-textarea:focus:not([readonly]),
+.chips.focus {
   border-bottom: 1px solid #4696BB;
   box-shadow: 0 1px 0 0 #4696BB;
 }
@@ -73,4 +73,5 @@ input:not([type]):focus:not([readonly])+label, input[type=text]:focus:not([reado
 
 /* general */
 
-.btn-floating { background-color: #4696BB; }
+#loginForm button, .btn, .btn-large, .btn-floating, .chips .chip.selected { background-color: #4696BB; }
+.btn:hover, .btn-large:hover, .btn-floating:hover  { background-color: #4696CC; }
