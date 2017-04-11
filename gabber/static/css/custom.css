@@ -7,8 +7,17 @@ body {
 }
 
 
+#annotations .chips { border: 0; }
 .card-title { border-bottom: 1px solid rgba(160,160,160,0.2); }
 
+
+.chip { cursor: pointer; }
+.chip .edit {
+  float: right;
+  font-size: 16px;
+  line-height: 30px;
+  padding-left: 6px;
+}
 
 .card .card-content { min-height: 160px; }
 .card .card-content .card-title { margin-bottom: 12px; }

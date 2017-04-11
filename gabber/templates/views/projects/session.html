@@ -45,6 +45,7 @@
           </div>
           <div class="col s12 m6" id="annotations">
             <h5>Themes</h5>
+            <div class="chips"></div>
           </div>
         </div>
 
@@ -134,7 +135,7 @@
         }
         else {
             JSON.parse(region.data.content).forEach(function(item) {
-                $('#annotations').append(
+                $("#annotations").find(".chips").append(
                     "<div class=\"r-" + region.id + " chip\">" + item.tag + "</div>"
                 );
             });
@@ -306,6 +307,34 @@
         wavesurfer.playPause();
     }
 
+    function showSuggestions(selectedTheme)
+    {
+        // TODO: the suggestion will be populated with segments from other interview sessions
+        // of this project that contains the same (or similar?) selected theme.
+        // This way, the user can (1) vote (up/down) on how related the segments are, or
+        // (2) listen to understand if the theme is well worded for the segment (peer-review).
+        _suggestion = (
+            "<div class=\"col s4 m4\">"+
+                "<div class=\"card-image\">"+
+                  "<img src=\"{{ url_for('static', filename='img/soundwave.png') }}\">" +
+                "</div>" +
+            "</div>"
+        );
+
+        return (
+            "<div class=\"card\">" +
+                "<div class=\"card-content\">" +
+                  "<span class=\"card-title\">Other audios related to <b>" + selectedTheme + "</b></span>" +
+                   "<div class=\"row\">" +
+                     _suggestion +
+                     _suggestion +
+                     _suggestion +
+                   "</div>" +
+                "</div>" +
+            "</div>"
+        );
+    }
+
     $(document).ready(function() {
 
         $('#interviews').find("i").click(function() {
@@ -352,6 +381,13 @@
 
         $('.chips').on('chip.add', function(e, chip){
             $('#annotationForm button').removeClass('disabled');
+        });
+
+        $("#annotations").find(".chips").on("click", ".chip", function() {
+            // Remove suggestions if they are already showing, e.g. when clicking between chips
+            $("#annotations").find(".card").remove();
+            // Only show the suggestions if the card has been selected
+            if (!$(this).hasClass("selected")) $("#annotations").append(showSuggestions($(this).text()));
         });
 
         Materialize.toast('You can create comments or themes when the audio is playing.', 3000);
