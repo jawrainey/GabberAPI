@@ -63,7 +63,7 @@ def upload():
     participants = request.form.get('participants', None)
 
     if participants:
-        # Not scope: as an error will be thrown otherwise, we use this below.
+        # Note scope: as an error will be thrown otherwise, we use this below.
         participants = json.loads(participants)
         #TODO: only add participant if it does not exist?
         #Otherwise, insert into parts the selected one?
@@ -94,13 +94,14 @@ def upload():
         audio=filename,
         location=request.form.get('location', None),
         creator=interviewer_id,
-        session_id = request.form.get('sessionID'),
+        session_id=request.form.get('sessionID'),
         prompt_id=interview_prompt.id
     )
 
-    # TODO: how to abstract this per project basis?
-    # These are optional (only for FF deployment) so don't produce an error.
-    if 'Needs' in participants[0]:
+    # TODO: how to abstract this per project basis? Currently only for FF deployment.
+    # Only attempt to add a participant the needs exist.
+    # Checking for string as an empty dict as we have not yet converted this to JSON.
+    if [i for i in participants if i['Needs'] and i['Needs'] != '{}']:
         iid = db.session.query(Interview).order_by(Interview.id.desc()).first().id + 1
         # First item is excluded as we want to keep in sync with parts above.
         for index, participant in enumerate(participants[1:]):
