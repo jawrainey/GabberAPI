@@ -61,16 +61,26 @@ def upload():
 
     #TODO: this is a string that we expect to be in JSON serialised.
     participants = request.form.get('participants', None)
+    # All participants involved in this Gabber as Participant objects
+    _participants = []
 
     if participants:
         # Note scope: as an error will be thrown otherwise, we use this below.
         participants = json.loads(participants)
-        #TODO: only add participant if it does not exist?
-        #Otherwise, insert into parts the selected one?
-        parts = [Participant(name=i['Name'], email=i['Email'],
-                             gender=i['Gender'], age=i['Age'],
-                             consent=[InterviewConsent(type='ALL')])
-                 for i in participants]
+
+        for p in participants:
+            # Has this registered user been previously involved in a Gabber conversation?
+            known_participant = Participant.query.filter_by(email=p['Email']).first()
+            if known_participant and p["Email"]:
+                known_participant.consent.extend([InterviewConsent(type='ALL')])
+                _participants.append(known_participant)
+            else:
+                participant = Participant(name=p['Name'], email=p['Email'], gender=p['Gender'], age=p['Age'])
+                # A registered user was involved in this uploaded conversation, but they have not
+                if p['Email'] in [i[0] for i in db.session.query(User.username).all()]:
+                    participant.name = db.session.query.filter_by(username=p['Email']).first().fullname
+                participant.consent.extend([InterviewConsent(type='ALL')])
+                _participants.append(participant)
     else:
         return jsonify({'error': 'No participants were interviewed.'}), 400
 
@@ -110,13 +120,13 @@ def upload():
             cn = [ComplexNeeds(type=key, timeline=value['timeline'],
                                month=value['month'], year=value['year'],
                                interview_id=iid,
-                               participant_id=parts[index+1].id)
+                               participant_id=_participants[index+1].id)
                   for key, value in json.loads(participant['Needs']).items()]
-            parts[index+1].complexneeds.extend(cn)
+            _participants[index+1].complexneeds.extend(cn)
 
     # Populating relationship fields outside constructor due to extending lists.
-    interview.consents.extend([i.consent.first() for i in parts])
-    interview.participants.extend(parts)
+    interview.consents.extend([i.consent.first() for i in _participants])
+    interview.participants.extend(_participants)
 
     db.session.add(interview)
     db.session.commit()
