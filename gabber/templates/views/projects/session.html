@@ -13,8 +13,7 @@
     /* Increases the width of the re-size handle and adds a color to make it clear where to re-size.
     This is a workaround as per issue #630 of wavesurfer */
   .wavesurfer-handle { background: rgba(0, 0, 0, 0.3); min-width: 4px; }
-  /* Force the controls to the bottom. */
-  #controls { position: absolute; bottom: 80px; left: 50%; margin-left: -71px; }
+  #controls { margin: .25rem auto; width: 30%; }
   .chips-autocomplete .input { width: 260px !important; }
   .comment-header, .comment-body { padding: 18px; }
   .comment-header { background-color: #f6f8fa; border-bottom: 1px solid #d1d5da; }
@@ -39,6 +38,15 @@
         <div id="waveform"></div>
         <div id="waveform-timeline"></div>
 
+        <div id="controls">
+          <a class="btn waves-effect tooltipped" data-position="top" data-delay="40" data-tooltip="Create comment" onclick="showCommentForm()"><i class="material-icons">comment</i></a>
+          <span onclick="wavesurfer.playPause()">
+            <a class="btn waves-effect" id="play"><i class="material-icons">play_arrow</i></a>
+            <a class="btn waves-effect" id="pause" style="display: none"><i class="material-icons">pause</i></a>
+          </span>
+          <a class="btn waves-effect tooltipped" data-position="top" data-delay="40" data-tooltip="Create theme" onclick="showAnnotationForm()"><i class="material-icons">bookmark_border</i></a>
+        </div>
+
         <div class="row">
           <div class="col s12 m6" id="comments">
             <h5>Comments</h5>
@@ -47,15 +55,6 @@
             <h5>Themes</h5>
             <div class="chips"></div>
           </div>
-        </div>
-
-        <div id="controls">
-          <a class="btn-floating waves-effect tooltipped" data-position="top" data-delay="40" data-tooltip="Create comment" onclick="showCommentForm()"><i class="material-icons">comment</i></a>
-          <span onclick="wavesurfer.playPause()">
-            <a class="btn-large btn-floating waves-effect" id="play"><i class="material-icons">play_arrow</i></a>
-            <a class="btn-large btn-floating waves-effect" id="pause" style="display: none"><i class="material-icons">pause</i></a>
-          </span>
-          <a class="btn-floating waves-effect tooltipped" data-position="top" data-delay="40" data-tooltip="Create theme" onclick="showAnnotationForm()"><i class="material-icons">bookmark_border</i></a>
         </div>
 
         <form method="POST" class="col s12" id="commentForm" style="display: none">
