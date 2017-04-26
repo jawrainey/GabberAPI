@@ -17,12 +17,11 @@
               <p>{{ project.description }}</p>
             </div>
             <div class="card-action">
-              <a href="{{ url_for('project.display', project=project.title.lower().replace(" ", "-")) }}">View</a>
             {% if current_user.is_authenticated and current_user.get_role() == 'admin' -%}
 
               <a href="{{ url_for('project.edit', project=project.title.replace(" ", "-").lower()) }}">Edit</a>
              {% endif %}
-                <a href="{{ url_for('project.sessions', project=project.title.replace(" ", "-").lower()) }}">Sessions</a>
+                <a href="{{ url_for('project.sessions', project=project.title.replace(" ", "-").lower()) }}">View sessions</a>
             </div>
           </div>
         </div>
