@@ -24,6 +24,7 @@
   .collection.with-header .collection-item { padding-left: 20px; margin-bottom: 0; }
   </style>
 {%- endblock %}
+{% from "views/shared/macros.html" import render_comment %}
 {% block content %}
 
         <div class="collection right" id="interviews">
@@ -50,7 +51,13 @@
         <div class="row">
           <div class="col s12 m6" id="comments">
             <h5>Comments</h5>
+            {%- for comment in comments %}
+            <div class="commentContainer">
+              {{ render_comment(comment) }}
+            </div>
+            {% endfor -%}
           </div>
+
           <div class="col s12 m6" id="annotations">
             <h5>Themes</h5>
             <div class="chips"></div>

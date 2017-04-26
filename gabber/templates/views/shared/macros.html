@@ -42,3 +42,26 @@
 {%- macro active(uri="", uri_blueprint_group="") -%}
 {% if uri == request.endpoint or request.endpoint.split(".")[0] == uri_blueprint_group %} class="active"{%- endif -%}
 {%- endmacro -%}
+
+{%- macro render_comment(comment) %}
+                <div class="r-{{ comment.id }} card-panel no-padding" style="display: none;">
+                  <div class="comment-header">
+                    <strong><a class="author" href="javascript:void(0)">{{ comment.creator }}</a></strong> &mdash;
+                    <time datetime="{{ comment.timestamp }}">{{ comment.days_since }} days ago</time>
+                  </div>
+                  <div class="comment-body">
+                    <p class="black-text">{{comment.content}}</p>
+                    <div class="options">
+                      <a href="javascript:void(0)"><i data-commentid="{{ comment.id }}" class="material-icons writeReply">reply</i></a>
+                      <a href="javascript:void(0)"><i data-commentid="{{ comment.id }}" class="material-icons showReplies">chat_bubble_outline</i>
+                        <sup>{{comment.responses | length }}</sup>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                {% for response in comment.responses %}
+                <div class="child" data-parentid="{{ comment.id }}" >
+                  {{ render_comment(response) }}
+                </div>
+                {% endfor %}
+{%- endmacro %}
