@@ -45,6 +45,11 @@ nav ul a, .collection a.collection-item { color: #000000; }
     nav ul { text-align: center; }
 }
 
+
+.options { text-align: right; }
+.options a { margin-left: 16px; }
+.options sup { top: -1rem; color: black; }
+
 /* about */
 .promo i {
     margin: 24px 0;
