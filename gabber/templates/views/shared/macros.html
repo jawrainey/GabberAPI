@@ -60,7 +60,7 @@
                   </div>
                 </div>
                 {% for response in comment.responses %}
-                <div class="child" data-parentid="{{ comment.id }}" >
+                <div class="child" data-parentid="{{ comment.id }}" style="display: none;">
                   {{ render_comment(response) }}
                 </div>
                 {% endfor %}
