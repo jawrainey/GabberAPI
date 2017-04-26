@@ -61,6 +61,18 @@
           <div class="col s12 m6" id="annotations">
             <h5>Themes</h5>
             <div class="chips"></div>
+            <form method="POST" class="col s12" data-commentid="-1" id="commentResponseForm" style="display: none">
+              <div class="row">
+                <span class="hideCommentResponse btn-floating right"><i class="material-icons">close</i></span>
+                <div class="input-field col s12">
+                  <textarea id="commentResponseContent" class="materialize-textarea" rows="3" name="commentResponseContent" maxlength=280 required autofocus></textarea>
+                  <label for="commentResponseContent">Write your response</label>
+                </div>
+                <div class="input-field col s12">
+                  <button class="btn waves-effect waves-light right" type="submit">Save</button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
 
@@ -119,25 +131,8 @@
 
     wavesurfer.on('region-in', function (region) {
         if (region.data.type == 0) {
-            $('#comments').append(
-                "<div class=\"r-" + region.id + " card-panel no-padding\">" +
-                    "<div class=\"comment-header\">" +
-                    "  <strong>" +
-                    "    <a class=\"author\" href=\"#\">" + region.data.author +
-                    "    </a>" +
-                    "  </strong> &mdash; " +
-                    "  <time datetime=" + "\"" + region.data.timestamp + "\">" +
-                        region.data.days_since + " days ago" + "</time>" +
-                    "</div>" +
-                    "<div class=\"comment-body\">" +
-                    "  <p class=\"black-text\">" +
-                         region.data.content +
-                    "  </p>" +
-                    "  <a href=\"#\"><i class=\"material-icons right\" onclick=\"showRespondCommentForm()\">reply</i>&nbsp;</a>" +
-                    "</div>" +
-                "</div>");
-
-            $('#comments').show();
+            $('.r-'+region.id).show();
+            $('.r-'+region.id).parent().show();
         }
         else {
             JSON.parse(region.data.content).forEach(function(item) {
@@ -150,7 +145,13 @@
     });
 
     wavesurfer.on('region-out', function (region) {
-        $('.r-'+region.id).remove();
+        if (region.data.type == 0) {
+            $('.r-'+region.id).hide();
+            $('.r-'+region.id).parent().hide();
+        }
+        else {
+            $('.r-' + region.id).remove();
+        }
     });
 
     // When audio is loaded, decoded and draw waveform. Fires before waveform is drawn.
@@ -368,6 +369,55 @@
             $('#annotationForm').toggle();
             postForm();
             event.preventDefault();
+        });
+
+        $('#commentResponseForm').submit(function(event) {
+            // postForm();
+            $('.chip').show();
+            $('#commentResponseForm').hide();
+            $('#annotations').show();
+            $('.chip').show();
+            $('#annotations > h5').show();
+
+            $.ajax({
+                type     : 'POST',
+                url      : '{{ url_for('project.interview_response', _external=True) }}',
+                data     : {'content': $('#commentResponseContent').val(), 'type':1, 'iid': {{ interview.id }}, 'pid': $(this).data("commentid")},
+                dataType : 'json',
+                encode   : true
+            }).done(function(data) {
+                if(data.success) {
+                    Materialize.toast("Thanks for creating a response", 4000);
+                    wavesurfer.play();
+                }
+            });
+
+            event.preventDefault();
+        });
+
+        $("#comments").on("click", ".comment-body .writeReply", function(event){
+            // Associate the response form with a particular comment id.
+            $('#commentResponseForm').data('commentid', $(this).data("commentid"));
+            wavesurfer.pause();
+            $('#annotations').find("h5").hide();
+            $('#annotations').find(".chips").hide();
+            $('textarea[name=commentResponseContent]').val("");
+            $('.chip').hide();
+            $('#annotations').find("#commentResponseForm").show();
+        });
+
+        $("#comments").on("click", ".comment-body .showReplies", function(event) {
+            wavesurfer.pause();
+            children = $('*[data-parentid="' + $(this).data("commentid") + '"]');
+            // By hiding the child container, all the children (thread) will also be hidden.
+            children.toggle();
+            children.children(".card-panel").toggle();
+        });
+
+        $( ".hideCommentResponse" ).bind( "click", function() {
+            $('#commentResponseForm').hide();
+            $('#annotations').show().find("h5").show();
+            $('.chip').show();
         });
 
         $( ".closeForm" ).bind( "click", function() {
