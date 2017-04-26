@@ -269,7 +269,8 @@
                 author: item.creator,
                 timestamp: item.timestamp === undefined ? 0 : item.timestamp,
                 days_since: item.days_since === undefined ? 0 : item.days_since,
-                type: item.type
+                type: item.type,
+                responses: item.responses === undefined ? [] : item.responses
             },
             drag: drag,
             resize: resize
@@ -336,7 +337,6 @@
                      _suggestion +
                      _suggestion +
                    "</div>" +
-                "</div>" +
             "</div>"
         );
     }
