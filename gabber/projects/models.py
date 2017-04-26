@@ -124,6 +124,7 @@ class Response(db.Model):
     Backrefs:
         Can refer to its creator with 'user'
         Can refer to its parent interview with 'interview'
+        Can refer to its parent response with 'parent'
     """
     __tablename__ = 'responses'
 
@@ -134,6 +135,9 @@ class Response(db.Model):
     # The response type can either be a comment (0) or an annotation (1).
     type = db.Column(db.Integer)
     reactions = db.Column(db.Integer, default=1)
+
+    parent_id = db.Column(db.Integer, db.ForeignKey('responses.id'))
+    children = db.relationship('Response', backref=db.backref('parent', remote_side=[id]), lazy='dynamic')
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     interview_id = db.Column(db.Integer, db.ForeignKey('interview.id'))
@@ -158,6 +162,7 @@ class Response(db.Model):
             'timestamp': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
             'days_since': abs((self.created_on - datetime.datetime.now()).days),
             'creator': str(User.query.filter_by(id=self.user_id).first().fullname),
+            'responses': [i.serialize() for i in self.children.order_by(db.desc(Response.created_on)).all()],
             'type': self.type
         }
 

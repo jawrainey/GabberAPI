@@ -78,6 +78,7 @@ def interview_response():
         type=request.form.get('type', ""),
         user_id=current_user.id,
         interview_id=request.form.get('iid', 0),
+        parent_id=request.form.get('pid', None)
     )
     db.session.add(response)
     db.session.commit()
