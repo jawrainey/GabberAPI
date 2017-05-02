@@ -1,19 +1,4 @@
 {% extends "views/shared/layout.html" %}
-{% block scripts %}
-  <script>
-  function readURL(event) {
-    var tgt = event.target || window.event.srcElement, files = tgt.files;
-    // No fallback for now: assume modern device.
-    if (FileReader && files && files.length) {
-      var fr = new FileReader();
-        fr.onload = function () {
-            document.getElementById("promptImg-" + event.id.split("-")[1]).src = fr.result;
-        }
-        fr.readAsDataURL(files[0]);
-    }
-  }
-  </script>
-{% endblock %}
 {% block content %}
         <form method="POST" enctype="multipart/form-data">
 
@@ -55,4 +40,19 @@
             </button>
           </div>
         </form>
+{%- endblock %}
+{% block fscripts %}
+  <script>
+    function readURL(event) {
+      var tgt = event.target || window.event.srcElement, files = tgt.files;
+      // No fallback for now: assume modern device.
+      if (FileReader && files && files.length) {
+        var fr = new FileReader();
+        fr.onload = function () {
+          document.getElementById("promptImg-" + event.id.split("-")[1]).src = fr.result;
+        };
+        fr.readAsDataURL(files[0]);
+      }
+    }
+  </script>
 {%- endblock %}

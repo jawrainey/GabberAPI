@@ -23,11 +23,8 @@
     </div>
   </main>
   {% include 'views/shared/footer.html' %}
-  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>
   {%- from "views/shared/macros.html" import display_flash_messages -%}
   {{- display_flash_messages() -}}
-  {%- block fscripts %}
-  {%- endblock %}
+  {%- block fscripts %}{%- endblock %}
 </body>
 </html>
