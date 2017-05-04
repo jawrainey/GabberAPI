@@ -1,9 +1,6 @@
-#downloads { text-align: right; }
-
 #downloads a img {
-    width: 150px;
-    height: 60px;
-    margin-right: 1rem;
+    max-width: 155px;
+    height: 49px;
 }
 
 body.is-loading *, body.is-loading *:before, body.is-loading *:after {
@@ -37,6 +34,7 @@ body.is-loading *, body.is-loading *:before, body.is-loading *:after {
 	display: inline-block;
 	position: relative;
 	overflow: hidden;
+	width: 85%;
 }
 
 .image img {
@@ -60,7 +58,7 @@ body.is-loading *, body.is-loading *:before, body.is-loading *:after {
 
 .image.phone .inner, .image.phone:before, .image.phone:after {
 	display: block;
-	border: solid 2px rgba(255, 255, 255, 0.25);
+	border: solid 2px rgba(160,160,160,0.5);
 }
 
 .image.phone .inner {
@@ -79,7 +77,7 @@ body.is-loading *, body.is-loading *:before, body.is-loading *:after {
 	width: 2em;
 	height: 0.25em;
 	border-radius: 0.5em;
-	background: rgba(255, 255, 255, 0.25);
+	background: rgba(160,160,160,0.5);
 }
 
 .image.phone .inner:after {
@@ -88,7 +86,7 @@ body.is-loading *, body.is-loading *:before, body.is-loading *:after {
 	width: 2em;
 	height: 2em;
 	border-radius: 100%;
-	border: solid 2px rgba(255, 255, 255, 0.25);
+	border: solid 2px rgba(160,160,160,0.5);
 }
 
 .image.phone:before, .image.phone:after {
@@ -131,11 +129,6 @@ html {
 	justify-content: center;
 	height: 72.5vh;
 	min-height: 35em;
-    margin-top: 3rem;
-}
-
-#header .image {
-	box-shadow: 0 0 0 4px #4696BB, 0 0 0 5px rgba(160,160,160,0.2);
 }
 
 #header .image.phone {
@@ -144,15 +137,11 @@ html {
 }
 
 #header .image.phone .inner, #header .image.phone:before, #header .image.phone:after {
-	border-color: rgba(160,160,160,0.2);
+	border-color: rgba(160,160,160,0.5);
 }
 
 #header .image.phone .inner:before {
 	background: whitesmoke;
-}
-
-#header .image.phone .inner:after {
-	border-color: whitesmoke;
 }
 
 #header h1, #header p {
@@ -206,6 +195,7 @@ html {
 	-ms-transition-delay: 0.75s;
 	transition-delay: 0.75s;
 	opacity: 1;
+	height: 300px;
 }
 
 @media screen and (max-width: 980px) {
@@ -238,7 +228,7 @@ html {
 
 @media screen and (max-width: 736px) {
 	#header h1 {
-		font-size: 2em;
+		font-size: 2.65em;
 	}
 	#header p {
 		font-size: 1em;
@@ -269,13 +259,15 @@ html {
 
 @media screen and (max-width: 736px) and (orientation: portrait) {
 	#header {
-		padding: 3em 1.5em 1em 1.5em;
+		padding: 0 1.5em;
 	}
 	#header .image {
 		font-size: 0.6em;
-		max-width: 60vw;
+		max-width: 50vw;
 	}
-
+	.is-loading {
+		overflow: hidden;
+	}
     .row .col {   text-align: center; }
 }
 

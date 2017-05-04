@@ -11,17 +11,16 @@
                   audio interviews with <b>Gabber</b></p>
               <div id="downloads">
                 <a href="https://play.google.com/store/apps/details?id=com.jawrainey.gabber">
-                  <img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Download the Android app">
+                    <img src="{{ url_for('static', filename='img/app-store.png') }}" alt="Download Gabber for Android">
+                </a>
+                <a href="#">
+                    <img src="{{ url_for('static', filename='img/play-store.png') }}" alt="Download Gabber for iOS">
                 </a>
               </div>
             </div>
           </div>
-          <div class="col s12 m4">
-            <div class="image phone">
-              <div class="inner">
-                <img src="{{ url_for('static', filename='img/screen.jpg') }}" alt="The three stages and workflow when using Gabber" />
-              </div>
-            </div>
+          <div class="col s12 m4 is-loading">
+            <img class="image" src="{{ url_for('static', filename='img/screen.gif') }}" alt="The three stages and workflow when using Gabber" />
           </div>
         </div>
 {%- endblock %}
