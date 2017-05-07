@@ -2,16 +2,22 @@
 {% block content %}
         <form method="POST" enctype="multipart/form-data">
 
-          <div class="row">
-            <div class="input-field col s12">
-            </div>
+          <div class="input-field col s12 m8">
             <input name="title" type="text" id="title" value="{{ project.title }}">
             <label for="title">The title of your project</label>
           </div>
 
-  {%- for prompt in project.prompts %}
+          <div class="valign-wrapper col s12 m4">
+            <h5 class="switch">
+              <label>
+                Private
+                <input {%  if project.type == 1 %}checked {% endif %} type="checkbox" name="ispublic">
+                <span class="lever"></span>
+                Public
+              </label>
+            </h5>
+          </div>
 
-          <div class="col s12 m6 l4">
           <div class="col s12">
             <h5>The prompts associated with your project</h5>
             <div class="input-field">

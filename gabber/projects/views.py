@@ -90,6 +90,12 @@ def edit(project=None):
         project.description = _form.get('description', '').lower()
         _form.pop('description')
 
+        if _form.get('ispublic'):
+            project.type = 1
+            _form.pop('ispublic', None)
+        else:
+            project.type = 0
+
         prompts = project.prompts.all()
 
         for fieldname, prompt_text in _form.items():
