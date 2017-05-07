@@ -12,6 +12,13 @@
   {%- for prompt in project.prompts %}
 
           <div class="col s12 m6 l4">
+          <div class="col s12">
+            <h5>The prompts associated with your project</h5>
+            <div class="input-field">
+              <textarea name="description" id="description" class="materialize-textarea">{{ project.description }}</textarea>
+              <label for="description">The description of your project</label>
+            </div>
+          </div>
 
             <div class="card small">
               <div class="card-image">

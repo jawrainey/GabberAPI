@@ -83,8 +83,12 @@ def edit(project=None):
     if request.method == 'POST':
         # Allows title removal to create a 'prompt only' dictionary for parsing
         _form = request.form.copy()
+
         project.title = _form.get('title', '').lower()
         _form.pop('title')
+
+        project.description = _form.get('description', '').lower()
+        _form.pop('description')
 
         prompts = project.prompts.all()
 
