@@ -20,12 +20,15 @@ def sessions(project=None):
         if interview.session_id:
             groups[interview.session_id].append(interview)
 
-    sessions = [{'creation_date': interviews[0].created_on.strftime("%b %d, %Y"),
+    sessions = [{'creator': User.query.filter_by(id=interviews[0].creator).first().fullname if User.query.filter_by(id=interviews[0].creator).first() else 'Unknown',
+                 'creation_date': interviews[0].created_on,
                  'participants': interviews[0].participants.all(),
                  'participants_names': [i.name for i in interviews[0].participants.all() if i],
                  'interviews': interviews,
                  'first_interview_id': interviews[0].id}
                 for sid, interviews in groups.items()]
+
+    sessions.sort(key=lambda item: item['creation_date'], reverse=True)
 
     return render_template('views/projects/sessions.html', sessions=sessions, project_name=_title)
 
