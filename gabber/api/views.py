@@ -78,7 +78,7 @@ def upload():
                 participant = Participant(name=p['Name'], email=p['Email'], gender=p['Gender'], age=p['Age'])
                 # A registered user was involved in this uploaded conversation, but they have not
                 if p['Email'] in [i[0] for i in db.session.query(User.username).all()]:
-                    participant.name = db.session.query.filter_by(username=p['Email']).first().fullname
+                    participant.name = User.query.filter_by(username=p['Email']).first().fullname
                 participant.consent.extend([InterviewConsent(type='ALL')])
                 _participants.append(participant)
     else:
