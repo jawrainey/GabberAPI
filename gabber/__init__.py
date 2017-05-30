@@ -3,6 +3,7 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail
+from flask_migrate import Migrate
 import os
 
 # Required when deploying to dokku @OpenLab
@@ -35,6 +36,7 @@ app.config['MAIL_USE_SSL'] = True
 
 db = SQLAlchemy(app)
 mail = Mail(app)
+migrate = Migrate(app, db)
 
 from gabber.main.views import main
 app.register_blueprint(main, url_prefix=PROXY_PATH)

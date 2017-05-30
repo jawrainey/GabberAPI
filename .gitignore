@@ -1,4 +1,5 @@
 /venv
+/migrations/*
 dati.db
 *.pyc
 *.swp
