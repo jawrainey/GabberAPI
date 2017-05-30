@@ -5,6 +5,8 @@ from gabber.consent.models import InterviewConsent
 from flask import jsonify, request, Blueprint
 import json
 import os
+from flask_login import login_required
+
 
 api = Blueprint('api', __name__)
 
@@ -132,3 +134,30 @@ def upload():
     db.session.commit()
 
     return jsonify({'success': 'We did it!'}), 200
+
+
+@api.route('prompt/delete/', methods=['POST'])
+@login_required
+def delete_prompt():
+    """
+    Soft-deletes a prompt by flagging it as inactive. This allows prompts to be
+    restored (by the admin) and remains associated with interviews for viewing.
+
+    Args:
+        prompt-id (int): the ID of the prompt to delete.
+
+    Returns:
+        json: 'success' if the prompt was deleted or 'error' and related message.
+    """
+    pid = int(request.form.get('prompt-id', -1))
+
+    if pid == -1:
+        return jsonify({'error': 'A prompt id must be provided.'}), 400
+    elif pid not in [prompt.id for prompt in db.session.query(ProjectPrompt.id)]:
+        return jsonify({'error': 'The prompt you provided is not known.'}), 400
+
+    prompt = ProjectPrompt.query.filter_by(id=pid).first()
+    prompt.is_active = 0
+    db.session.commit()
+
+    return jsonify({'success': True}), 200
