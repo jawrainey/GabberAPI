@@ -204,3 +204,34 @@ class ComplexNeeds(db.Model):
     year = db.Column(db.String)
     participant_id = db.Column(db.Integer, db.ForeignKey('participant.id'))
     interview_id = db.Column(db.Integer, db.ForeignKey('interview.id'))
+
+
+class Codebook(db.Model):
+    """
+    Holds a set of codes related to a project; acts as qualitative codebook.
+
+    Backrefs:
+        Can refer to its associated project with 'project'
+
+    Relationships:
+        one-to-many: a codebook can have many codes
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    # Used to differentiate and support multiple codebooks for the same project
+    name = db.Column(db.String)
+    codes = db.relationship('Code', backref="codebook", lazy='dynamic')
+
+
+class Code(db.Model):
+    """
+    Holds a textual "Code" for a specific Codebook.
+
+    Note: this approach is not ideal as we would have duplicate codes across books.
+
+    Backref:
+        Can refer to associated codebook with 'codebook'
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(64))
+    codebook_id = db.Column(db.Integer, db.ForeignKey('codebook.id'))
