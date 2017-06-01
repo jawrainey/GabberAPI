@@ -2,8 +2,7 @@
 {% from "views/shared/macros.html" import render_projects %}
 {% block title %}Projects{% endblock %}
 {% block content %}
-        <h1>Gabber Projects</h1>
-        <hr>
+        <h1>Projects</h1>
 {{- render_projects(user_projects, current_user) -}}
 {{ render_projects(public_projects, current_user) }}
 {%- endblock %}

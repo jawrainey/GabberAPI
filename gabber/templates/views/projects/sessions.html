@@ -1,7 +1,6 @@
 {% extends "views/shared/layout.html" %}
 {% block content %}
         <h1 class="text-center">{{ project_name }} sessions</h1>
-        <hr>
         <div class="collection">
          {%- for session in sessions %}
           <a href="{{ url_for('project.session', interview_id=session['first_interview_id']) }}" class="collection-item">

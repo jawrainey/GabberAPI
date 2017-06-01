@@ -9,6 +9,8 @@ body {
 
 
 h1, h2, h3, h4, h5, h6, .card-title { font-family: 'PT Serif', serif; }
+.card-content > p { text-indent: 10px; text-align: justify;  }
+
 #annotations .chips { border: 0; }
 .card-title { border-bottom: 1px solid rgba(160,160,160,0.2); }
 
@@ -43,6 +45,7 @@ nav { margin-top: 1rem; }
 nav ul { text-align: right;  }
 nav ul li { float: none; display: inline-block; }
 nav ul a, .collection a.collection-item { color: #000000; }
+nav ul a { padding: 0 15px; }
 @media screen and (max-width: 736px) {
     nav ul { text-align: center; }
 }
@@ -91,3 +94,5 @@ input:not([type]):focus:not([readonly])+label, input[type=text]:focus:not([reado
 
 #loginForm button, .btn, .btn-large, .btn-floating, .chips .chip.selected { background-color: #4696BB; }
 .btn:hover, .btn-large:hover, .btn-floating:hover  { background-color: #4696CC; }
+
+.fixed-action-btn { bottom: 45px; right: 24px; }

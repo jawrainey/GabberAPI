@@ -7,7 +7,7 @@
   {%- endif -%}
 {% endmacro %}
 
-{%- macro render_projects(projects, current_user) %}
+{%- macro render_projects(projects, current_user) -%}
   {% if projects %}
     {%- for project in projects %}
         <div class="col s12 m6">
@@ -18,13 +18,14 @@
             </div>
             <div class="card-action">
             {%- if current_user.is_authenticated and current_user.get_role() == 'admin' %}
-              <a href="{{ url_for('project.edit', project=project.title.replace(" ", "-").lower()) }}">Edit</a>
+             <a>Add members</a>
+             <a href="{{ url_for('project.edit', project=project.title.replace(" ", "-").lower()) }}">Edit</a>
             {%- endif %}
               <a href="{{ url_for('project.sessions', project=project.title.replace(" ", "-").lower()) }}">View sessions</a>
             </div>
           </div>
         </div>
-    {% endfor -%}
+    {%- endfor -%}
   {% endif %}
 {%- endmacro -%}
 
