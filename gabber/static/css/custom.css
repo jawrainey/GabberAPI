@@ -4,9 +4,11 @@ body {
     min-height: 100vh;
     flex-direction: column;
     background-image: url("images/overlay.png");
+    font-family: 'PT Sans', sans-serif;
 }
 
 
+h1, h2, h3, h4, h5, h6, .card-title { font-family: 'PT Serif', serif; }
 #annotations .chips { border: 0; }
 .card-title { border-bottom: 1px solid rgba(160,160,160,0.2); }
 
