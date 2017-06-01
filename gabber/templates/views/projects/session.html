@@ -27,6 +27,8 @@
   .closeForm i { line-height: 25px; font-size: 1.4em; }
   .closeForm { width: 25px; height: 25px; line-height: 25px; }
   #codebook { margin: 25px 0;}
+  #connections > ul { padding-left: 1.68em; }
+  #connections > ul > li { list-style-type: circle; }
   </style>
 {%- endblock %}
 {% from "views/shared/macros.html" import render_comment %}
@@ -71,11 +73,16 @@
           <h6><b>Creating connections</b></h6>
           <p>Once you click <i>create connection</i> you will be presented with a set of words/phrases
           to help you structure your reflection; choose those that best describe why you have chosen
-          to create a connection for this moment, and write how this relates to your experiences.</p>
-          <p>At the same time, you will notice a rectangle overlapped on a moment of the audio, which is the
-          piece of the interview that you are making this connection with. You can increase/decrease the size
-          of this moment by dragging a side in one both direction, drag it around the audio, and
-          <code>Shift+Left-Click</code> will playback that moment of the audio.</p>
+          to create a connection for this moment, and write how this relates to your experiences.
+          You will also notice a rectangle overlapped that audio moment, which is the
+          piece of the interview that you are making this connection with.</p>
+          <h6><b>Connection options</b></h6>
+          <ul>
+            <li><b>Increase or decrease</b> a moment by dragging the sides</li>
+            <li><b>Move</b> a moment by <i>dragging</i> it around</li>
+            <li>Playback a moment using <code>Shift+Left-Click</code></li>
+            <li>Pause a moment by <code>double clicking</code> on it</li>
+          </ul>
           {%- endif %}
         </div>
 
@@ -152,6 +159,9 @@
         e.shiftKey ? region.playLoop() : region.play();
     });
 
+    wavesurfer.on('region-dblclick', function () {
+        wavesurfer.playPause();
+    });
 
     wavesurfer.load(audioURL);
 
