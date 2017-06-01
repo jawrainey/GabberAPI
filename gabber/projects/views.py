@@ -1,5 +1,6 @@
-from gabber.projects.models import Response, Interview, Project, ProjectPrompt
-from flask import Blueprint, render_template, url_for, redirect, request, flash, jsonify
+from gabber.projects.models import Interview, Project, ProjectPrompt
+from gabber.users.models import User
+from flask import Blueprint, render_template, url_for, redirect, request, flash
 from flask_login import current_user, login_required
 from gabber import app, db
 import os
@@ -33,23 +34,6 @@ def sessions(project=None):
     return render_template('views/projects/sessions.html', sessions=sessions, project_name=_title)
 
 
-@project.route('interview/response/', methods=['POST'])
-def interview_response():
-    # TODO: currently storing annotation tags as a JSON string...
-    response = Response(
-        text=request.form.get('content', ""),
-        start_interval=request.form.get('start', 0),
-        end_interval=request.form.get('end', 0),
-        type=request.form.get('type', ""),
-        user_id=current_user.id,
-        interview_id=request.form.get('iid', 0),
-        parent_id=request.form.get('pid', None)
-    )
-    db.session.add(response)
-    db.session.commit()
-    return jsonify({'success': True}), 200
-
-
 @project.route('session/interview/<int:interview_id>', methods=['GET', 'POST'])
 def session(interview_id=None):
     if interview_id not in [i[0] for i in db.session.query(Interview.id).all()]:
@@ -59,18 +43,13 @@ def session(interview_id=None):
     interview = Interview.query.filter_by(id=interview_id).first()
     interview.audio = url_for('consent.protected', filename=interview.audio, _external=True)
 
-    response_types = {0: [], 1: []}
-
-    for response in [i.serialize() for i in interview.responses.all()]:
-        response_types[response['type']].append(response)
-
     return render_template('views/projects/session.html',
                            interview=interview,
                            interviews=Interview.query.filter_by(
                                session_id=Interview.query.filter_by(id=interview_id).first().session_id).all(),
                            participants=interview.participants.all(),
-                           comments=response_types[0],
-                           annotations=response_types[1])
+                           connections=[i.serialize() for i in interview.connections.all()])
+
 
 
 @project.route('edit/<path:project>/', methods=['GET', 'POST'])

@@ -9,79 +9,91 @@
   /* Used to display the icon outside of the wave (next style) */
   #waveform > wave { overflow: visible !important; }
   /* Display the comment/annotation icons slightly above their related segment. */
-  .wavesurfer-region > i { margin-top: -5px; }
+  .wavesurfer-region > i { margin-top: -15px; }
     /* Increases the width of the re-size handle and adds a color to make it clear where to re-size.
     This is a workaround as per issue #630 of wavesurfer */
   .wavesurfer-handle { background: rgba(0, 0, 0, 0.3); min-width: 4px; }
-  #controls { margin: .25rem auto; width: 30%; }
+  #controls { float: right; }
   .chips-autocomplete .input { width: 260px !important; }
   .comment-header, .comment-body { padding: 18px; }
   .comment-header { background-color: #f6f8fa; border-bottom: 1px solid #d1d5da; }
-  .comment-body > p:first-of-type { text-indent: 2.5%; margin: 0; }
+  .comment-body > p:first-of-type { margin: 0; }
   .author { color: #586069; }
-  #interviews { position: absolute; right: 0; width: 140px; z-index: 10120; }
+  #interviews { position: absolute; right: 0; width: 150px; z-index: 0; }
   #interviews > i { position: absolute; font-weight: 600; left: 0; z-index: 1012018; cursor: pointer; }
   .collection.with-header .collection-item { padding-left: 20px; margin-bottom: 0; }
+  #connections > h5 { font-weight: 700; }
+  .chip.selected { background-color: #4696BB; color: white; }
+  .closeForm i { line-height: 25px; font-size: 1.4em; }
+  .closeForm { width: 25px; height: 25px; line-height: 25px; }
+  #codebook { margin: 25px 0;}
   </style>
 {%- endblock %}
 {% from "views/shared/macros.html" import render_comment %}
 {% block content %}
-
-        <div class="collection right" id="interviews">
-          <i class="material-icons tiny left">keyboard_arrow_right</i>
+        <div class="collection with-header right" id="interviews">
+          <p class="collection-header"><b>Other interviews in this session</b></p>
           {%- for interview in interviews %}
-          <a href="{{ url_for('project.session', interview_id=interview.id) }}" class="collection-item truncate">
+          <a href="{{ url_for('project.session', interview_id=interview.id) }}"
+             class="collection-item truncate tooltipped" data-position="left" data-delay="1" data-tooltip="{{ interview.prompt_text().title() }}">
             <b>{{ loop.index }}.</b> {{ interview.prompt_text().title() }}
           </a>{% endfor %}
         </div>
-        <h5><b>Participants:</b>{% for p in participants %} {{ p['name'] }}{% if not loop.last %},{% endif %}{% endfor %}</h5>
+
+        <h5><b>{{ interview.prompt_text().capitalize() }}</b></h5>
+        <p><i>{% for p in participants %} {{ p['name'] }}{% if not loop.last %},{% endif %}{% endfor %}</i></p>
 
         <div id="waveform"></div>
         <div id="waveform-timeline"></div>
 
         <div id="controls">
-          <a class="btn waves-effect tooltipped" data-position="top" data-delay="40" data-tooltip="Create comment" onclick="showCommentForm()"><i class="material-icons">comment</i></a>
           <span onclick="wavesurfer.playPause()">
             <a class="btn waves-effect" id="play"><i class="material-icons">play_arrow</i></a>
-            <a class="btn waves-effect" id="pause" style="display: none"><i class="material-icons">pause</i></a>
+            <a class="btn waves-effect" id="pause" style="display:none;"><i class="material-icons">pause</i></a>
           </span>
-          <a class="btn waves-effect tooltipped" data-position="top" data-delay="40" data-tooltip="Create theme" onclick="showAnnotationForm()"><i class="material-icons">bookmark_border</i></a>
+          <a class="btn waves-effect" id="createConnection">Create connection</a>
         </div>
 
-        <div class="row">
-          <div class="col s12 m6" id="comments">
-            <h5>Comments</h5>
-            {%- for comment in comments %}
-            <div class="commentContainer">
-              {{ render_comment(comment) }}
-            </div>
+        <div class="col s12 m6" id="connections">
+          {%- if connections %}
+           <h5>Connections made</h5>
+            {%- for connection in connections %}
+          <div class="commentContainer">
+          {{ render_comment(connection) }}
+          </div>
             {% endfor -%}
-          </div>
-
-          <div class="col s12 m6" id="annotations">
-            <h5>Themes</h5>
-            <div class="chips"></div>
-            <form method="POST" class="col s12" data-commentid="-1" id="commentResponseForm" style="display: none">
-              <div class="row">
-                <span class="hideCommentResponse btn-floating right"><i class="material-icons">close</i></span>
-                <div class="input-field col s12">
-                  <textarea id="commentResponseContent" class="materialize-textarea" rows="3" name="commentResponseContent" maxlength=280 required autofocus></textarea>
-                  <label for="commentResponseContent">Write your response</label>
-                </div>
-                <div class="input-field col s12">
-                  <button class="btn waves-effect waves-light right" type="submit">Save</button>
-                </div>
-              </div>
-            </form>
-          </div>
+          {%- else %}
+          <h5><b>What is a connection?</b></h5>
+          <p id="instructions"><i>
+          Connections are your understanding, reflection and opinions of a moment of an interview,
+          which will be used to support dialogue between yourself, this client and other staff around
+          <b>moments</b> of an interview that may otherwise be missed in conversation.</i></p>
+          <h6><b>Creating connections</b></h6>
+          <p>Once you click <i>create connection</i> you will be presented with a set of words/phrases
+          to help you structure your reflection; choose those that best describe why you have chosen
+          to create a connection for this moment, and write how this relates to your experiences.</p>
+          <p>At the same time, you will notice a rectangle overlapped on a moment of the audio, which is the
+          piece of the interview that you are making this connection with. You can increase/decrease the size
+          of this moment by dragging a side in one both direction, drag it around the audio, and
+          <code>Shift+Left-Click</code> will playback that moment of the audio.</p>
+          {%- endif %}
         </div>
 
-        <form method="POST" class="col s12" id="commentForm" style="display: none">
+
+        <form method="POST" class="col s12" id="makeConnection" style="display:none;">
           <div class="row">
-            <span class="closeForm btn-floating right"><i class="material-icons">close</i></span>
             <div class="input-field col s12">
-              <textarea id="CommentFormContent" class="materialize-textarea" rows="3" name="CommentFormContent" maxlength=280 required autofocus></textarea>
-              <label for="CommentFormContent">Add your comment</label>
+                <span class="closeForm btn-floating right"><i class="material-icons">close</i></span>
+                <h5>Select one of the following that describes this moment of the conversation</h5>
+                <div id="codebook">
+                {%- for code in interview.codebook() %}
+                  <div class="chip" data-codeid="{{ code['id'] }}">{{ code['text'] }}</div>
+                {%- endfor %}
+                </div>
+                <div class="input-field col s12">
+                  <textarea id="justifyConnection" class="materialize-textarea" rows="4" autofocus></textarea>
+                  <label for="justifyConnection">How did these words/phrases support you?</label>
+                </div>
             </div>
             <div class="input-field col s12">
               <button class="btn waves-effect waves-light right" type="submit">Save</button>
@@ -89,29 +101,18 @@
           </div>
         </form>
 
-        <form method="POST" class="col s12" id="annotationForm" style="display: none">
-          <div class="row">
-            <span class="closeForm btn-floating right"><i class="material-icons">close</i></span>
-            <div class="input-field col s12 tooltipped" data-position="top" data-delay="40" data-tooltip="Type a theme and press <b>enter</b> to create it. You can create many.">
-              <div class="chips chips-autocomplete"></div>
-            </div>
-            <div class="input-field col s12">
-                <button class="btn waves-effect waves-light right" type="submit">Save</button>
-            </div>
-          </div>
-        </form>
 {%- endblock %}
 {%- block fscripts %}
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>
   <script>
-    // Variables rendered via templating engine (Jinja2)
-    var comments = {{ comments | safe }};
-    var annotations = {{ annotations | safe }};
+    // Variables rendered here for future js refactoring as it
+    // is not possible to render jinja2 variables inside JS files.
+    var connections = {{ connections | safe }};
     var audioURL = "{{ interview.audio }}";
     var currentUserFullName = "{{ current_user.fullname }}";
     var currentInterviewID = {{ interview.id }};
-    var createCommentURL = "{{ url_for('project.interview_response', _external=True) }}";
+    var createConnectionURL = "{{ url_for('api.create_connection', _external=True) }}";
 
     var wavesurfer = WaveSurfer.create({
         container: '#waveform',
@@ -122,45 +123,35 @@
     });
 
     wavesurfer.on('play', function () {
-        document.querySelector('#play').style.display = 'none';
-        document.querySelector('#pause').style.display = '';
+        $('#play').hide();
+        $('#pause').show();
     });
 
     wavesurfer.on('pause', function () {
-        document.querySelector('#play').style.display = '';
-        document.querySelector('#pause').style.display = 'none';
-    });
-
-    wavesurfer.on('region-in', function (region) {
-        if (region.data.type == 0) {
-            $('.r-'+region.id).show();
-            $('.r-'+region.id).parent().show();
-        }
-        else {
-            JSON.parse(region.data.content).forEach(function(item) {
-                $("#annotations").find(".chips").append(
-                    "<div class=\"r-" + region.id + " chip\">" + item.tag + "</div>"
-                );
-            });
-            $('#annotations').show();
-        }
-    });
-
-    wavesurfer.on('region-out', function (region) {
-        if (region.data.type == 0) {
-            $('.r-'+region.id).hide();
-            $('.r-'+region.id).parent().hide();
-        }
-        else {
-            $('.r-' + region.id).remove();
-        }
+        $('#play').show();
+        $('#pause').hide();
     });
 
     // When audio is loaded, decoded and draw waveform. Fires before waveform is drawn.
     wavesurfer.on('ready', function () {
-        comments.forEach(function(i) { addRegion(i, false, false); });
-        annotations.forEach(function(i) { addRegion(i, false, false); });
+        connections.forEach(function(i) { addRegion(i, false, false); });
     });
+
+    wavesurfer.on('region-in', function (region) {
+        $('.r-'+region.id).show();
+        $('.r-'+region.id).parent().show();
+    });
+
+    wavesurfer.on('region-out', function (region) {
+        $('.r-'+region.id).hide();
+        $('.r-'+region.id).parent().hide();
+    });
+
+    wavesurfer.on('region-click', function (region, e) {
+        // Play on click, loop on shift click
+        e.shiftKey ? region.playLoop() : region.play();
+    });
+
 
     wavesurfer.load(audioURL);
 
@@ -171,95 +162,24 @@
         container: '#waveform-timeline'
     });
 
-    // This is the region that will be created for an annotation/comment if the form is submitted
+    // // This is the region that will be created for a connection if the form is submitted
     var regionToCreate = {};
 
-    function showAnnotationForm()
+    function addRegionToCreate()
     {
-        wavesurfer.pause();
-        // When the annotation button is clicked and the form is open.
-        if ($('#annotationForm').is(":visible")) {
-            $('#annotationForm').hide();
-            $('#comments').show();
-            $('#annotations').show();
-            // The 'Annotate' button was clicked again,
-            // so remove the region previously added as it was not saved.
-            wavesurfer.regions.list[regionToCreate.id].remove();
-            regionToCreate = {};
-        }
-        else {
-            $('#annotationForm button').addClass('disabled');
-            $('#annotationForm').show();
-            $('#commentForm').hide();
-            $('#comments').hide();
-            $('#annotations').hide();
-            $('#controls').hide();
-
-            $('.chips-autocomplete .chip').remove();
-            $('.chips-autocomplete > .input').val("");
-            // Required to remove old (tags) from the data array
-            $('.chips-autocomplete').material_chip('data').length = 0;
-
-            setTimeout(function() {
-                $('.chips-autocomplete > .input').focus();
-            }, 0);
-
-            updateRegionToCreate(1);
-        }
+        // The ID is set here be used as a lookup and not to clash with comment/annotation database IDs.
+        regionToCreate = {
+            'content' : "",
+            'codes'   : [],
+            'start'   : wavesurfer.getCurrentTime() - 10,
+            'end'     : wavesurfer.getCurrentTime(),
+            'creator' : currentUserFullName,
+            'id'      : Math.floor(Math.random() * (100000 - 10000) + 10000),
+            'iid'     : currentInterviewID
+        };
+        addRegion(regionToCreate, true, true);
     }
 
-    function showCommentForm()
-    {
-        wavesurfer.pause();
-
-        if ($('#commentForm').is(":visible")) {
-            $('#commentForm').hide();
-            $('#comments').show();
-            $('#annotations').show();
-            wavesurfer.regions.list[regionToCreate.id].remove();
-            regionToCreate = {};
-        }
-        else {
-            $('#commentForm').show();
-            $('#annotationForm').hide();
-            $('#comments').hide();
-            $('#annotations').hide();
-            $('#controls').hide();
-            $('#CommentFormContent').val();
-
-            setTimeout(function() {
-                $('#CommentFormContent').show().focus();
-            }, 0);
-
-            updateRegionToCreate(0);
-
-            Materialize.updateTextFields();
-        }
-    }
-
-    function updateRegionToCreate(type)
-    {
-            _content = (type === 0) ? $('#CommentFormContent').val() : JSON.stringify($('.chips-autocomplete').material_chip('data'));
-
-            // The ID is set here be used as a lookup and not to clash with comment/annotation database IDs.
-            regionToCreate = {
-                'content' : _content,
-                'start'   : wavesurfer.getCurrentTime() - 10,
-                'end'     : wavesurfer.getCurrentTime(),
-                'type'    : type,
-                'creator' : currentUserFullName,
-                'id'      : Math.floor(Math.random() * (100000 - 10000) + 10000),
-                'iid'     : currentInterviewID
-            };
-
-            addRegion(regionToCreate, true, true);
-    }
-
-    /**
-     * Used when initially adding regions to the waveform, AND when adding a new
-     * comment or annotation, hence the need to customize drag/resize as these are
-     * not desired for all comments.
-     */
     function addRegion(item, drag, resize)
     {
         wavesurfer.addRegion(
@@ -269,187 +189,91 @@
             end: item.end,
             data: {
                 content: item.content,
+                codes: item.codes,
                 author: item.creator,
-                timestamp: item.timestamp === undefined ? 0 : item.timestamp,
-                days_since: item.days_since === undefined ? 0 : item.days_since,
-                type: item.type,
-                responses: item.responses === undefined ? [] : item.responses
+                timestamp: item.timestamp,
+                days_since: item.days_since
             },
             drag: drag,
             resize: resize
         });
-
-        var type = (item.type === 0) ? "comment" : "bookmark_border";
-        $('[data-id=' + item.id + ']').append('<i class="material-icons tiny right">' + type + '</i>');
+        // Only difference here would be the fact that you can have 'yours' and 'theirs'?
+        $('[data-id=' + item.id + ']').append('<i class="material-icons tiny right">bookmark_border</i>');
     }
 
-    function postForm()
+    function POSTConnection(codes, justification)
     {
-        _content = (regionToCreate.type === 0) ? $('#CommentFormContent').val() : JSON.stringify($('.chips-autocomplete').material_chip('data'));
-
         // Update local prior to pushing to server
-        regionToCreate.content = _content;
+        regionToCreate.codes = codes;
+        regionToCreate.content = justification;
         regionToCreate.start = wavesurfer.regions.list[regionToCreate.id].start;
         regionToCreate.end = wavesurfer.regions.list[regionToCreate.id].end;
 
         // Update on local machine to reflect view on refresh
-        wavesurfer.regions.list[regionToCreate.id].data.content = _content;
+        wavesurfer.regions.list[regionToCreate.id].data.content = justification;
+        wavesurfer.regions.list[regionToCreate.id].data.codes = codes;
         wavesurfer.regions.list[regionToCreate.id].drag = false;
         wavesurfer.regions.list[regionToCreate.id].resize = false;
 
         $.ajax({
             type     : 'POST',
-            url      : createCommentURL,
-            data     : regionToCreate,
-            dataType : 'json',
-            encode   : true
+            url      : createConnectionURL,
+            data     : JSON.stringify(regionToCreate),
+            contentType: "application/json",
+            dataType: 'json'
         }).done(function(data) {
             if(data.success) {
-                Materialize.toast("Thanks for adding your " + (regionToCreate.type === 0 ? "comment" : "theme"), 4000);
-                wavesurfer.play();
+                Materialize.toast("Thanks for adding making a connection");
             }
         });
-        $('#comments').show();
-        $('#annotations').show();
-        $('#controls').show();
-        // Once a comment OR annotation is made, then do not show the tooltips again.
-        $('.tooltipped').tooltip('remove');
-        wavesurfer.playPause();
     }
 
-    function showSuggestions(selectedTheme)
+    // Show the connection form (codes/why) and hide connections/controls
+    function toggleConnectionForm()
     {
-        // TODO: the suggestion will be populated with segments from other interview sessions
-        // of this project that contains the same (or similar?) selected theme.
-        // This way, the user can (1) vote (up/down) on how related the segments are, or
-        // (2) listen to understand if the theme is well worded for the segment (peer-review).
-        _suggestion = (
-            "<div class=\"col s4 m4\">"+
-                "<div class=\"card-image\">"+
-                  "<img src=\"{{ url_for('static', filename='img/soundwave.png') }}\">" +
-                "</div>" +
-            "</div>"
-        );
-
-        return (
-            "<div class=\"card\">" +
-                "<div class=\"card-content\">" +
-                  "<span class=\"card-title\">Other audios related to <b>" + selectedTheme + "</b></span>" +
-                   "<div class=\"row\">" +
-                     _suggestion +
-                     _suggestion +
-                     _suggestion +
-                   "</div>" +
-            "</div>"
-        );
+        $('#makeConnection').toggle();
+        $('#controls').toggle();
+        $('#connections').toggle();
+        $('#justifyConnection').focus();
     }
+
+    var displayInstructionsOnce = false;
 
     $(document).ready(function() {
 
-        $('#interviews').find("i").click(function() {
-            if ($(this).parent().width() > 20)
-                $(this).parent().width("20").find("i").text("keyboard_arrow_left");
-            else
-                $(this).parent().width("140").find("i").text("keyboard_arrow_right");
-        });
-
-        $('.chips-autocomplete').material_chip({
-            autocompleteData: annotations,
-            autocompleteLimit: 5,
-            placeholder: 'Add another theme?',
-            secondaryPlaceholder: 'Type and press enter to create a theme'
-        });
-
-        // Using AJAX as we want to stay on this page when the form is submitted.
-        $('#commentForm').submit(function(event) {
-            $('#commentForm').toggle();
-            postForm();
-            event.preventDefault();
-        });
-
-        $('#annotationForm').submit(function(event) {
-            $('#annotationForm').toggle();
-            postForm();
-            event.preventDefault();
-        });
-
-        $('#commentResponseForm').submit(function(event) {
-            // postForm();
-            $('.chip').show();
-            $('#commentResponseForm').hide();
-            $('#annotations').show();
-            $('.chip').show();
-            $('#annotations > h5').show();
-
-            $.ajax({
-                type     : 'POST',
-                url      : '{{ url_for('project.interview_response', _external=True) }}',
-                data     : {'content': $('#commentResponseContent').val(), 'type':1, 'iid': {{ interview.id }}, 'pid': $(this).data("commentid")},
-                dataType : 'json',
-                encode   : true
-            }).done(function(data) {
-                if(data.success) {
-                    Materialize.toast("Thanks for creating a response", 4000);
-                    wavesurfer.play();
-                }
-            });
-
-            event.preventDefault();
-        });
-
-        $("#comments").on("click", ".comment-body .writeReply", function(event){
-            // Associate the response form with a particular comment id.
-            $('#commentResponseForm').data('commentid', $(this).data("commentid"));
+        $( "#createConnection" ).bind( "click", function() {
+            toggleConnectionForm();
+            // Allows user to focus on creating connection.
             wavesurfer.pause();
-            $('#annotations').find("h5").hide();
-            $('#annotations').find(".chips").hide();
-            $('textarea[name=commentResponseContent]').val("");
-            $('.chip').hide();
-            $('#annotations').find("#commentResponseForm").show();
-        });
 
-        $("#comments").on("click", ".comment-body .showReplies", function(event) {
-            wavesurfer.pause();
-            children = $('*[data-parentid="' + $(this).data("commentid") + '"]');
-            // By hiding the child container, all the children (thread) will also be hidden.
-            children.toggle();
-            children.children(".card-panel").toggle();
-        });
+            if (!displayInstructionsOnce)  {
+                Materialize.toast('Drag a region left or right to increase its size', 4500);
+                Materialize.toast('Shift+Click to playback the region.', 4500);
+                displayInstructionsOnce = true;
+            }
 
-        $( ".hideCommentResponse" ).bind( "click", function() {
-            $('#commentResponseForm').hide();
-            $('#annotations').show().find("h5").show();
-            $('.chip').show();
+            addRegionToCreate();
         });
 
         $( ".closeForm" ).bind( "click", function() {
-            $('#commentForm').hide();
-            $('#annotationForm').hide();
-            $('#controls').show();
-
-            $('#comments').show();
-            $('#annotations').show();
-
-            $('#controls > .tooltipped').tooltip('remove');
-
+            toggleConnectionForm();
+            wavesurfer.play();
             wavesurfer.regions.list[regionToCreate.id].remove();
-            regionToCreate = {};
-            wavesurfer.playPause();
         });
 
-        $('.chips').on('chip.add', function(e, chip){
-            $('#annotationForm button').removeClass('disabled');
+        $('#makeConnection').submit(function(event) {
+            // Store all IDs of the selected codes.
+            selectedCodes = [];
+            $('.selected').show().each(function() { selectedCodes.push($(this).data("codeid")); });
+            // TODO: validate...
+            toggleConnectionForm();
+            wavesurfer.play();
+            event.preventDefault();
+            POSTConnection(selectedCodes, $('#justifyConnection').val());
         });
 
-        $("#annotations").find(".chips").on("click", ".chip", function() {
-            // Remove suggestions if they are already showing, e.g. when clicking between chips
-            $("#annotations").find(".card").remove();
-            // Only show the suggestions if the card has been selected
-            if (!$(this).hasClass("selected")) $("#annotations").append(showSuggestions($(this).text()));
-        });
-
-        Materialize.toast('You can create comments or themes when the audio is playing.', 3000);
-        $('.tooltipped').tooltip({html: true});
+        $(".chip").click(function() { $(this).toggleClass("selected", "selected"); });
     });
+
   </script>
 {%- endblock %}

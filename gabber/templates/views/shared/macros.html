@@ -49,6 +49,7 @@
                     <time datetime="{{ comment.timestamp }}">{{ comment.days_since }} days ago</time>
                   </div>
                   <div class="comment-body">
+                    <p><b>{% for code in comment.codes %}{{ code['code'] }}{% if not loop.last %}, {% endif %}{% endfor %}</b></p>
                     <p class="black-text">{{comment.content}}</p>
                     <div class="options">
                       <a href="javascript:void(0)"><i data-commentid="{{ comment.id }}" class="material-icons writeReply">reply</i></a>

@@ -161,3 +161,42 @@ def delete_prompt():
     db.session.commit()
 
     return jsonify({'success': True}), 200
+
+
+@api.route('connection/create/', methods=['POST'])
+def create_connection():
+    """
+    Creates a new connection for a user on a segment of an audio.
+
+    Args:
+        json:
+            content (str): the message
+            codes (list): a list of IDs of the codes to associate with this connection
+            start (int): the start of a segment on an audio interview
+            end (int): the end of a segment on an audio interview
+            iid (int): the interview where this connection should be made
+
+    Returns:
+        json: 'success' if the prompt was deleted or 'error' and related message.
+    """
+    from gabber.projects.models import Connection, Code
+    from flask_login import current_user
+
+    content = request.get_json()
+
+    # TODO: validation via Flask-RESTful
+
+    connection = Connection(
+        justification=content['content'],
+        start_interval=content['start'],
+        end_interval=content['end'],
+        user_id=current_user.id,
+        interview_id=content['iid'],
+    )
+
+    connection.codes.extend([Code.query.filter_by(id=cid).first() for cid in content['codes']])
+
+    db.session.add(connection)
+    db.session.commit()
+
+    return jsonify({'success': True}), 200

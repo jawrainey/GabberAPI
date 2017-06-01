@@ -9,7 +9,7 @@ class User(UserMixin, db.Model):
 
     Relationships:
         many-to-many: a user can be a member of many projects
-        many-to-many: a user be associated with (has created) many responses (comments or themes)
+        many-to-many: a user be associated with (has created) many connections
     """
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True)
@@ -18,7 +18,7 @@ class User(UserMixin, db.Model):
     role = db.Column(db.SmallInteger, default=2)
 
     projects = db.relationship("Project", secondary=members, back_populates="members")
-    responses = db.relationship('Response', backref='user', lazy='dynamic')
+    connections = db.relationship('Connection', backref='user', lazy='dynamic')
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())

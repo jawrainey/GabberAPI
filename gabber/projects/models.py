@@ -13,6 +13,13 @@ participants = db.Table(
     db.Column('interview_id', db.Integer, db.ForeignKey('interview.id')))
 
 
+codes_for_connections = db.Table(
+    'codes_for_connections',
+    db.Column('connection_id', db.Integer, db.ForeignKey('connection.id')),
+    db.Column('code_id', db.Integer, db.ForeignKey('code.id'))
+)
+
+
 class Project(db.Model):
     """
     A project is the overarching theme for an interview session
@@ -23,6 +30,7 @@ class Project(db.Model):
 
     Relationships:
         one-to-many: a project can have many prompts
+        one-to-many: a project can have many codebooks
         many-to-many: a project can have many members
     """
     id = db.Column(db.Integer, primary_key=True)
@@ -30,9 +38,12 @@ class Project(db.Model):
     description = db.Column(db.String(256))
 
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
+    # Is the project public or private? True (1) is public.
     type = db.Column(db.SmallInteger, default=1)
+    # Should consent (via email) be enabled for this project?
     consent = db.Column(db.SmallInteger, default=0)
 
+    codebook = db.relationship('Codebook', backref='project', lazy='dynamic')
     prompts = db.relationship('ProjectPrompt', backref='project', lazy='dynamic')
     members = db.relationship('User', secondary=members, back_populates="projects")
 
@@ -87,9 +98,9 @@ class Interview(db.Model):
     An interview between participants for a given ProjectPrompt
 
     Relationships:
-        one-to-many: an interview can have many responses (comments or themes)
-        many-to-many: an interview can have many participants
+        one-to-many: an interview can have many connections
         one-to-many: an interview must be consented by many participants
+        many-to-many: an interview can have many participants
     """
     id = db.Column(db.Integer, primary_key=True)
     audio = db.Column(db.String(260))
@@ -100,7 +111,7 @@ class Interview(db.Model):
     prompt_id = db.Column(db.Integer, db.ForeignKey('projectprompt.id'))
     created_on = db.Column(db.DateTime, default=db.func.now())
 
-    responses = db.relationship('Response', backref='interview', lazy='dynamic')
+    connections = db.relationship('Connection', backref='interview', lazy='dynamic')
     participants = db.relationship('Participant', secondary=participants,
                                    backref=db.backref('interviews', lazy='dynamic'),
                                    lazy='dynamic')
@@ -112,32 +123,36 @@ class Interview(db.Model):
         """
         return ProjectPrompt.query.filter_by(id=self.prompt_id).first().text_prompt
 
+    def codebook(self):
+        """
+        returns all codes associated with this project
+        """
+        pid = ProjectPrompt.query.filter_by(id=self.prompt_id).first().project_id
+        # A hack to support backwards compatibility with projects that don't have a codebook.
+        cb = Project.query.filter_by(id=pid).first().codebook.first()
+        return [{'text': str(i.text), 'id': i.id} for i in cb.codes.all()] if cb else []
 
-class Response(db.Model):
+
+class Connection(db.Model):
     """
-    A response to an interview, which is either a comment or annotation
+    A connection (reflective perspective or opinion) from a user on a segment of an interview.
 
-    Although a separate table for annotations could be used, there are many
-    shared properties between comments/annotations. However, one disadvantage is that
-    annotation text is not stored in a separate table, thereby preventing text duplication.
+    Relationships:
+        A connection can be associated with many codes.
 
     Backrefs:
         Can refer to its creator with 'user'
         Can refer to its parent interview with 'interview'
-        Can refer to its parent response with 'parent'
     """
-    __tablename__ = 'responses'
-
     id = db.Column(db.Integer, primary_key=True)
-    text = db.Column(db.String(280), default=None)
+    # Although many are chosen, a general justification by the user must be provided.
+    justification = db.Column(db.String(1120))
+    # Where in the interview this connection starts and ends
     start_interval = db.Column(db.Integer)
     end_interval = db.Column(db.Integer, default=0)
-    # The response type can either be a comment (0) or an annotation (1).
-    type = db.Column(db.Integer)
-    reactions = db.Column(db.Integer, default=1)
 
-    parent_id = db.Column(db.Integer, db.ForeignKey('responses.id'))
-    children = db.relationship('Response', backref=db.backref('parent', remote_side=[id]), lazy='dynamic')
+    # A connection can be associated with many codes
+    codes = db.relationship("Code", secondary=codes_for_connections, backref="connections")
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     interview_id = db.Column(db.Integer, db.ForeignKey('interview.id'))
@@ -147,23 +162,22 @@ class Response(db.Model):
 
     def serialize(self):
         """
-        A serialized version of a response to use within views
+        A serialized version of a connection to use within views
 
         returns
-            dict: a human-readable serialization of the Response object
+            dict: a serialization of a connection
         """
         from gabber.users.models import User
         import datetime
         return {
             'id': self.id,
-            'content': str(self.text),
+            'content': str(self.justification),
             'start': self.start_interval,
             'end': self.end_interval,
             'timestamp': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
             'days_since': abs((self.created_on - datetime.datetime.now()).days),
             'creator': str(User.query.filter_by(id=self.user_id).first().fullname),
-            'responses': [i.serialize() for i in self.children.order_by(db.desc(Response.created_on)).all()],
-            'type': self.type
+            'codes': [{'code': str(i.text), 'id': i.id} for i in self.codes]
         }
 
 
