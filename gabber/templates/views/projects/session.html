@@ -99,7 +99,7 @@
                 </div>
                 <div class="input-field col s12">
                   <textarea id="justifyConnection" class="materialize-textarea" rows="4" autofocus></textarea>
-                  <label for="justifyConnection">How did these words/phrases support you?</label>
+                  <label for="justifyConnection">What do you think about when you listen and make this connection?</label>
                 </div>
             </div>
             <div class="input-field col s12">
@@ -233,7 +233,7 @@
             dataType: 'json'
         }).done(function(data) {
             if(data.success) {
-                Materialize.toast("Thanks for adding making a connection");
+                Materialize.toast("Thanks for making a connection", 3500);
             }
         });
     }
@@ -241,6 +241,10 @@
     // Show the connection form (codes/why) and hide connections/controls
     function toggleConnectionForm()
     {
+        // Reset the form each time it was opened
+        $('.selected').show().each(function() { $(this).toggleClass("selected", "selected"); });
+        $('#justifyConnection').val("");
+
         $('#makeConnection').toggle();
         $('#controls').toggle();
         $('#connections').toggle();
@@ -275,11 +279,13 @@
             // Store all IDs of the selected codes.
             selectedCodes = [];
             $('.selected').show().each(function() { selectedCodes.push($(this).data("codeid")); });
+            justification = $('#justifyConnection').val();
+
             // TODO: validate...
             toggleConnectionForm();
             wavesurfer.play();
             event.preventDefault();
-            POSTConnection(selectedCodes, $('#justifyConnection').val());
+            POSTConnection(selectedCodes, justification);
         });
 
         $(".chip").click(function() { $(this).toggleClass("selected", "selected"); });
