@@ -1,6 +1,6 @@
 from gabber.projects.models import Interview, Project, ProjectPrompt
 from gabber.users.models import User
-from flask import Blueprint, render_template, url_for, redirect, request, flash
+from flask import Blueprint, render_template, url_for, redirect, request, flash, abort
 from flask_login import current_user, login_required
 from gabber import app, db
 import os
@@ -51,6 +51,62 @@ def session(interview_id=None):
                            connections=[i.serialize() for i in interview.connections.all()])
 
 
+@project.route('create', methods=['GET'])
+def create():
+    """
+    Renders the create view and form to the user.
+    """
+    return render_template('views/projects/edit.html')
+
+
+@project.route('create', methods=['POST'])
+def create_post():
+    """
+    Allow a user to CREATE a project
+
+    Args:
+        title (str): The name of the project
+        description (str): A brief (tweet-length) description of the project.
+        ispublic (bool): is the project for public viewing?
+    """
+    # We want to pop items from the dict and its an immutableDict by default
+    _form = request.form.copy()
+
+    nproject = Project(
+        creator=current_user.id,
+        title=_form.get('title', ''),
+        description=_form.get('description', ''),
+        type=1 if _form.get('ispublic') else 0)
+
+    # This simplifies access to other form elements (only the prompts should remain)
+    _form.pop('title')
+    _form.pop('description')
+    _form.pop('ispublic', None)
+
+    # Associate the current user as a member of the project.
+    # TODO: at this point we should also configure role for this particular project
+    nproject.members.append(User.query.filter_by(id=current_user.id).first())
+
+    # Add and flush now to gain access to the project id when creating prompts below
+    db.session.add(nproject)
+    db.session.flush()
+
+    for textfield, field_value in _form.items():
+        prompt = ProjectPrompt(creator=current_user.id, text_prompt=field_value, project_id=nproject.id)
+        # Flushing again as we need to use the prompt-id to create the image.
+        db.session.add(prompt)
+        db.session.flush()
+        # Associate related image with prompt
+        for imagefield, uploaded_file in request.files.items():
+            # Each prompt has a text and image with the same field ID
+            if (textfield.split("-")[1] == imagefield.split("-")[1]) and uploaded_file:
+                __upload_prompt_image(uploaded_file, nproject.id, prompt.id)
+                prompt.image_path = str(prompt.id) + '.jpg'
+                nproject.prompts.append(prompt)
+    db.session.commit()
+    flash('The project was created successfully!')
+    return redirect(url_for('main.projects'))
+
 
 @project.route('edit/<path:project>/', methods=['GET', 'POST'])
 @login_required
@@ -61,47 +117,57 @@ def edit(project=None):
 
     project = Project.query.filter_by(title=project.replace("-", " ").lower()).first()
 
+    if not project:
+        flash('That project you tried to <edit> does not exist.')
+        return redirect(url_for('main.projects'))
+
     # TODO: use WTForms to process and validate form. Tricky with dynamic form.
     if request.method == 'POST':
-        # Allows title removal to create a 'prompt only' dictionary for parsing
+        # Simplify field removal to create a 'prompt only' dictionary for parsing
         _form = request.form.copy()
 
         project.title = _form.get('title', '').lower()
-        _form.pop('title')
-
         project.description = _form.get('description', '').lower()
+        project.type = 1 if _form.get('ispublic') else 0
+
+        _form.pop('title')
         _form.pop('description')
-
-        if _form.get('ispublic'):
-            project.type = 1
-            _form.pop('ispublic', None)
-        else:
-            project.type = 0
-
-        prompts = project.prompts.all()
+        _form.pop('ispublic', None)
 
         for fieldname, prompt_text in _form.items():
-            __update_prompt(prompts, fieldname.split("-")[-1], text=prompt_text)
-
-        for fieldname, uploaded_file in request.files.items():
-            if uploaded_file.filename:
-                folder = os.path.join(app.config['IMG_FOLDER'] + str(project.id))
-                if not os.path.exists(folder):
-                    os.makedirs(folder)
-                fname = fieldname.split("-")[-1] + '.jpg'
-                uploaded_file.save(os.path.join(folder, fname))
-                __update_prompt(prompts, fname.split('.')[0], image=fname)
-
+            for file_id, uploaded_file in request.files.items():
+                # Match the prompt-text to the associated prompt-image
+                if fieldname.split("-")[1] == file_id.split("-")[1]:
+                    # The promptID of the text field sent from the user
+                    pid = int(fieldname.split("-")[-1])
+                    # A new prompt is always created whether the user modifies or updates a prompt
+                    new_prompt = ProjectPrompt(creator=current_user.id, text_prompt=prompt_text, project_id=project.id)
+                    # When the user modifies an exist prompt we must soft-delete it
+                    if pid in [p.id for p in project.prompts.all()]:
+                        modified_prompt = ProjectPrompt.query.filter_by(id=pid).first()
+                        # Soft delete the prompt as it has been modified
+                        modified_prompt.is_active = 0
+                        # An image may not have been updated, so we want to keep the older one.
+                        new_prompt.image_path = modified_prompt.image_path
+                    # Need to know the new prompt ID to associate with the uploaded image.
+                    db.session.add(new_prompt)
+                    db.session.flush()
+                    # Only update the prompt image if the file has changed
+                    if uploaded_file.filename:
+                        # Upload and associated the new image (if there is one) with the new prompt.
+                        new_prompt.image_path = str(new_prompt.id) + '.jpg'
+                        __upload_prompt_image(uploaded_file, project.id, new_prompt.id)
+                    # Associate this newly created prompt with this specific project
+                    project.prompts.append(new_prompt)
         db.session.commit()
         flash('The prompts for your project have been updated if any changes were made.')
         return redirect(url_for('main.projects'))
     return render_template('views/projects/edit.html', project=project)
 
 
-def __update_prompt(prompts, prompt_id, text=None, image=None):
-    for prompt in prompts:
-        if int(prompt_id) == prompt.id:
-            if text:
-                prompt.text_prompt = text
-            if image:
-                prompt.image_path = image
+def __upload_prompt_image(filetosave, projectid, promptid):
+    # Each project has a unique folder that must exist
+    folder = os.path.join(app.config['IMG_FOLDER'] + str(projectid))
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    filetosave.save(os.path.join(folder, str(promptid) + '.jpg'))

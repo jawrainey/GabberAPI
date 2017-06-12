@@ -1,17 +1,31 @@
 {% extends "views/shared/layout.html" %}
+{%- from "views/shared/macros.html" import render_prompt -%}
+{% block styles %}
+  <style>
+  .actions { height: 0; }
+  .actions .btn-floating { width: 25px; height: 25px; line-height: 25px; }
+  .actions .btn-floating i { line-height: 25px; font-size: 1.2em; }
+    .upload { right: 10px; bottom: 10px; }
+    .delete { left: 83%; bottom: 10px; }
+  .card-content .input-field { margin-top: 0; }
+  .card .card-image { background: #4696BB; height: 150px; }
+  .card-image input { height: 100%; width: 100%; display: none; }
+  .card .card-image, .card .card-image img, .card .card-image input { cursor: pointer; }
+  </style>
+{%- endblock %}
 {% block content %}
         <form method="POST" enctype="multipart/form-data">
 
-          <div class="input-field col s12 m8">
-            <input name="title" type="text" id="title" value="{{ project.title }}">
+          <div class="input-field col s12 m9">
+            <input name="title" type="text" id="title" value="{{ project.title if project }}">
             <label for="title">The title of your project</label>
           </div>
 
-          <div class="valign-wrapper col s12 m4">
+          <div class="valign-wrapper col s12 m3">
             <h5 class="switch">
               <label>
                 Private
-                <input {%  if project.type == 1 %}checked {% endif %} type="checkbox" name="ispublic">
+                <input {% if project and project.type == 1 %}checked {% endif %} type="checkbox" name="ispublic">
                 <span class="lever"></span>
                 Public
               </label>
@@ -19,39 +33,30 @@
           </div>
 
           <div class="col s12">
-            <h5>The prompts associated with your project</h5>
             <div class="input-field">
-              <textarea name="description" id="description" class="materialize-textarea">{{ project.description }}</textarea>
+              <textarea required name="description" id="description" class="materialize-textarea">{{ project.description if project }}</textarea>
               <label for="description">The description of your project</label>
             </div>
           </div>
 
-            <div class="card small">
-              <div class="card-image">
-                <input type="file" name="upload-{{ prompt.id }}" id="upload-{{ prompt.id }}" onchange="readURL(this)" style="display:none">
-                <label for="upload-{{ prompt.id }}">
-                  <img alt="" id="promptImg-{{ prompt.id }}" src="{{ url_for('static', filename='img/' + project.id|string + "/" + prompt.image_path) }}" />
-                </label>
-              </div>
-
-              <div class="card-content">
-                  <div class="row">
-                    <div class="input-field col s12">
-                      <textarea class="materialize-textarea center-align"
-                        placeholder="Enter a short prompt to guide the interview" id="promptText-{{ prompt.id }}" name="promptText-{{ prompt.id }}" >{{ prompt.text_prompt.lower() }}</textarea>
-                      <label for="promptText-{{ prompt.id }}">Prompt {{ loop.index }}</label>
-                    </div>
-                  </div>
-              </div>
-
-            </div>
+          <div id="promptContainer" class="col s12">
+            <h5>The prompts associated with your project</h5>
+            {%- if project -%}
+              {% for prompt in project.active_prompts() -%}
+                {{ render_prompt(prompt.id, prompt.text_prompt.lower(),
+                url_for('static', filename='img/' + project.id|string + "/" + prompt.image_path)) }}
+              {%- endfor -%}
+            {%- endif %}
           </div>
-  {%- endfor %}
-          <div class="col s12 m12">
-            <button class="btn waves-effect waves-light right" type="submit">Submit
-              <i class="material-icons right">send</i>
-            </button>
+
+          <div class="fixed-action-btn click-to-toggle">
+            <a class="btn-floating btn-large"><i class="material-icons">menu</i></a>
+            <ul>
+              <li><a class="btn-floating submit"><i class="material-icons">send</i></a></li>
+              <li><a class="btn-floating add-prompt"><i class="material-icons">add</i></a></li>
+            </ul>
           </div>
+
         </form>
 {%- endblock %}
 {% block fscripts %}
@@ -64,10 +69,61 @@
       if (FileReader && files && files.length) {
         var fr = new FileReader();
         fr.onload = function () {
-          document.getElementById("promptImg-" + event.id.split("-")[1]).src = fr.result;
+            // Find the image in the card-image container to set.
+            // This is preferred over matching IDs
+            $(event).parent().find('img').attr("src", fr.result);
         };
         fr.readAsDataURL(files[0]);
       }
     }
+
+    $(function() {
+        var generated_pids = [];
+
+        $(".submit").on("click", function() {
+            // By-passes form validation
+            document.forms[0].submit();
+        });
+
+        $(".add-prompt").on("click", function() {
+            // Adds a new prompt-card to the page. At this stage, a new prompt is not
+            // created server-side as the prompt may be removed locally.
+            gpid = Math.floor(Math.random() * (100000000 - 1000000 + 1)) + 1000000;
+            generated_pids.push(gpid);
+            prompt = {{ render_prompt("new", "", "/")|tojson }};
+            prompt = prompt.replace(/new/g, gpid);
+            // Problem: the ID is not necessary?
+            $("#promptContainer").append(prompt);
+        });
+
+        $("#promptContainer").on("click", ".actions .upload", function() {
+            // The input field uses HTML5 file upload, which is hidden on the screen,
+            // which cannot easily be overlaid with the upload button.
+            // TODO: remove use of IDs as we cannot rely on those as they are the same?
+            $(this).parent().parent().find(".card-image input").click();
+        });
+
+        $("#promptContainer").on("click", ".actions .delete", function() {
+            // Declared here as cannot access this from inside an ajax request.
+            card = $(this).closest(".col");
+            // A prompt is created locally to prevent unnecessary database read/writes.
+            if (generated_pids.indexOf($(this).data("prompt-id")) > -1) { card.remove(); return false; }
+            $.ajax({
+                type     : "POST",
+                url      : "{{ url_for("api.delete_prompt", _external=True) }}",
+                data     : {"prompt-id": $(this).data("prompt-id")},
+                dataType : "json",
+                encode   : true
+            }).done(function(data) {
+                if(data.success) {
+                    Materialize.toast("The prompt was successfully been deleted.", 4000);
+                    card.remove();
+                }
+            }).fail(function(data){
+                Materialize.toast(data.responseJSON.error, 4000);
+            });
+        });
+    });
+
   </script>
 {%- endblock %}

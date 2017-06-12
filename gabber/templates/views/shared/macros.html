@@ -29,6 +29,29 @@
   {% endif %}
 {%- endmacro -%}
 
+{%- macro render_prompt(prompt_id, prompt_text, image_url) %}
+            <div class="col s12 m6 l4 ">
+              <div class="card small">
+                <div class="actions">
+                  <a class="btn-floating upload" data-prompt-id="{{ prompt_id }}"><i class="material-icons">file_upload</i></a>
+                  <a class="btn-floating delete" data-prompt-id="{{ prompt_id }}"><i class="material-icons">delete</i></a>
+                </div>
+                <div class="card-image">
+                  <input type="file" name="upload-{{ prompt_id }}" id="upload-{{ prompt_id }}" onchange="readURL(this)">
+                  <label for="upload-{{ prompt_id }}">
+                    <img id="promptImg-{{ prompt_id }}" src="{{ image_url }}" />
+                  </label>
+                </div>
+                <div class="card-content">
+                  <div class="input-field col s12">
+                    <textarea class="materialize-textarea center-align" maxlength="64"
+                        placeholder="Enter a short prompt to guide the interview" id="promptText-{{ prompt_id }}" name="promptText-{{ prompt_id }}">{{ prompt_text }}</textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+{%- endmacro -%}
+
 {%- macro display_flash_messages() -%}
 {%- with messages = get_flashed_messages() -%}
   {% if messages %}
