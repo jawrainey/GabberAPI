@@ -50,6 +50,10 @@ class Project(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
+
+    def active_prompts(self):
+        return [prompt for prompt in self.prompts if prompt.is_active]
+
     def project_as_json(self):
         """
         Create a JSON containing the project title and project prompts (text and images) for use in API.
@@ -65,7 +69,7 @@ class Project(db.Model):
         return {
             'theme': self.title,
             'prompts': [{'imageName': uri + prompt.image_path, 'prompt': prompt.text_prompt}
-                        for prompt in self.prompts]
+                        for prompt in self.prompts if prompt.is_active]
         }
 
 
