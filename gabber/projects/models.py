@@ -35,6 +35,8 @@ class Project(db.Model):
     """
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(64))
+    # URL-friendly representation of the title
+    slug = db.Column(db.String(256), unique=True, index=True)
     description = db.Column(db.String(256))
 
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -50,8 +52,20 @@ class Project(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
+    def __init__(self, title, description, creator, visibility):
+        from slugify import slugify
+        self.title = title
+        self.slug = slugify(title)
+        self.description = description
+        self.creator = creator
+        self.type = visibility
 
     def active_prompts(self):
+        """
+        Obtains the prompts for this project that are active
+
+        :return: list of Prompt objects that are currently active for this project
+        """
         return [prompt for prompt in self.prompts if prompt.is_active]
 
     def project_as_json(self):
@@ -122,6 +136,14 @@ class Interview(db.Model):
                                    backref=db.backref('interviews', lazy='dynamic'),
                                    lazy='dynamic')
     consents = db.relationship('InterviewConsent', backref='interview', lazy='dynamic')
+
+    def project(self):
+        """
+        There's no relationship between Projects<->Interviews as there is through the ProjectPrompt.
+
+        :returns The project associated with this interview.
+        """
+        return ProjectPrompt.query.filter_by(id=self.prompt_id).first().project
 
     def prompt_text(self):
         """

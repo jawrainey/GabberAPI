@@ -13,15 +13,15 @@
         <div class="col s12 m6">
           <div class="card">
             <div class="card-content">
-              <span class="card-title">{{ project.title.replace("-", " ").title() }}</span>
+              <span class="card-title">{{ project.title }}</span>
               <p>{{ project.description }}</p>
             </div>
             <div class="card-action">
             {%- if current_user.is_authenticated and current_user.get_role() == 'admin' %}
              <a>Add members</a>
-             <a href="{{ url_for('project.edit', project=project.title.replace(" ", "-").lower()) }}">Edit</a>
+             <a href="{{ url_for('project.edit', slug=project.slug) }}">Edit</a>
             {%- endif %}
-              <a href="{{ url_for('project.sessions', project=project.title.replace(" ", "-").lower()) }}">View sessions</a>
+              <a href="{{ url_for('project.sessions', slug=project.slug) }}">View sessions</a>
             </div>
           </div>
         </div>

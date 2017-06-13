@@ -8,10 +8,9 @@ import os
 project = Blueprint('project', __name__)
 
 
-@project.route('sessions/<path:project>/', methods=['GET', 'POST'])
-def sessions(project=None):
-    _title = project.replace("-", " ").lower()
-    interviews = Interview.query.join(ProjectPrompt).join(Project).filter(Project.title == _title).all()
+@project.route('sessions/<path:slug>/', methods=['GET', 'POST'])
+def sessions(slug=None):
+    interviews = Interview.query.join(ProjectPrompt).join(Project).filter(Project.slug == slug).all()
 
     from collections import defaultdict
 
@@ -31,7 +30,7 @@ def sessions(project=None):
 
     sessions.sort(key=lambda item: item['creation_date'], reverse=True)
 
-    return render_template('views/projects/sessions.html', sessions=sessions, project_name=_title)
+    return render_template('views/projects/sessions.html', sessions=sessions, project_name=interviews[0].project().title)
 
 
 @project.route('session/interview/<int:interview_id>', methods=['GET', 'POST'])
@@ -76,7 +75,7 @@ def create_post():
         creator=current_user.id,
         title=_form.get('title', ''),
         description=_form.get('description', ''),
-        type=1 if _form.get('ispublic') else 0)
+        visibility=1 if _form.get('ispublic') else 0)
 
     # This simplifies access to other form elements (only the prompts should remain)
     _form.pop('title')
@@ -108,14 +107,14 @@ def create_post():
     return redirect(url_for('main.projects'))
 
 
-@project.route('edit/<path:project>/', methods=['GET', 'POST'])
+@project.route('edit/<path:slug>/', methods=['GET', 'POST'])
 @login_required
-def edit(project=None):
+def edit(slug=None):
     if current_user.get_role() != 'admin':
         flash('You do not have authorization to edit this project')
         return redirect(url_for('main.projects'))
 
-    project = Project.query.filter_by(title=project.replace("-", " ").lower()).first()
+    project = Project.query.filter_by(slug=slug).first()
 
     if not project:
         flash('That project you tried to <edit> does not exist.')
@@ -126,8 +125,8 @@ def edit(project=None):
         # Simplify field removal to create a 'prompt only' dictionary for parsing
         _form = request.form.copy()
 
-        project.title = _form.get('title', '').lower()
-        project.description = _form.get('description', '').lower()
+        project.title = _form.get('title', '')
+        project.description = _form.get('description', '')
         project.type = 1 if _form.get('ispublic') else 0
 
         _form.pop('title')
