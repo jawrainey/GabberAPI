@@ -30,7 +30,8 @@ def sessions(slug=None):
 
     sessions.sort(key=lambda item: item['creation_date'], reverse=True)
 
-    return render_template('views/projects/sessions.html', sessions=sessions, project_name=interviews[0].project().title)
+    return render_template('views/projects/sessions.html', sessions=sessions,
+                           project_name=Project.query.filter_by(slug=slug).first().title)
 
 
 @project.route('session/interview/<int:interview_id>', methods=['GET', 'POST'])
