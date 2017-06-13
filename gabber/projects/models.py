@@ -89,6 +89,8 @@ class ProjectPrompt(db.Model):
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
     text_prompt = db.Column(db.String(64))
     image_path = db.Column(db.String(64))
+    # Used as a 'soft-delete' to preserve prompt-content for viewing
+    is_active = db.Column(db.SmallInteger, default=1)
 
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     interviews = db.relationship('Interview', backref='interviews', lazy='dynamic')
