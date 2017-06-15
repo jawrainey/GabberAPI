@@ -36,8 +36,7 @@
         <div class="collection with-header right" id="interviews">
           <p class="collection-header"><b>Other interviews in this session</b></p>
           {%- for interview in interviews %}
-          <a href="{{ url_for('project.session', interview_id=interview.id) }}"
-             class="collection-item truncate tooltipped" data-position="left" data-delay="1" data-tooltip="{{ interview.prompt_text().title() }}">
+          <a href="{{ url_for('project.session', interview_id=interview.id) }}" class="collection-item truncate">
             <b>{{ loop.index }}.</b> {{ interview.prompt_text().title() }}
           </a>{% endfor %}
         </div>
