@@ -55,9 +55,8 @@
 {%- macro display_flash_messages() -%}
 {%- with messages = get_flashed_messages() -%}
   {% if messages %}
-<script>{{ messages | safe }}.forEach(function(e){Materialize.toast(e, 4000)});</script>
-{%- endif -%}
-
+  <script>{{ messages | safe }}.forEach(function(e){Materialize.toast(e, 4000)});</script>
+  {%- endif -%}
 {%- endwith -%}
 {%- endmacro -%}
 
