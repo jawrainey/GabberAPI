@@ -205,6 +205,7 @@ class Connection(db.Model):
             'timestamp': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
             'days_since': abs((self.created_on - datetime.datetime.now()).days),
             'creator': str(User.query.filter_by(id=self.user_id).first().fullname),
+            'creator_id': User.query.filter_by(id=self.user_id).first().id,
             'codes': [{'code': str(i.text), 'id': i.id} for i in self.codes]
         }
 

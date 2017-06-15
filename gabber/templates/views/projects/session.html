@@ -119,6 +119,7 @@
     var currentUserFullName = "{{ current_user.fullname }}";
     var currentInterviewID = {{ interview.id }};
     var createConnectionURL = "{{ url_for('api.create_connection', _external=True) }}";
+    var numOfConnectionsByUser = {{ user_create_a_connection }};
 
     var wavesurfer = WaveSurfer.create({
         container: '#waveform',
@@ -140,7 +141,14 @@
 
     // When audio is loaded, decoded and draw waveform. Fires before waveform is drawn.
     wavesurfer.on('ready', function () {
-        connections.forEach(function(i) { addRegion(i, false, false); });
+        if (numOfConnectionsByUser > 0) {
+            connections.forEach(function (i) {
+                addRegion(i, false, false);
+            });
+        }
+        else {
+            Materialize.toast('To view connections for this interview from other people, please create ONE connection.', 4500);
+        }
     });
 
     wavesurfer.on('region-in', function (region) {
@@ -277,12 +285,22 @@
         $('#makeConnection').submit(function(event) {
             // Store all IDs of the selected codes.
             selectedCodes = [];
-            $('.selected').show().each(function() { selectedCodes.push($(this).data("codeid")); });
+            $('.selected').show().each(function () {
+                selectedCodes.push($(this).data("codeid"));
+            });
             justification = $('#justifyConnection').val();
 
             // TODO: validate...
             toggleConnectionForm();
             wavesurfer.play();
+            if (numOfConnectionsByUser == 0) {
+                setTimeout(function () {
+                    connections.forEach(function (i) {
+                        addRegion(i, false, false);
+                    });
+                    Materialize.toast('You can now view and respond to connections other people have made', 4500);
+                }, 1750);
+            }
             event.preventDefault();
             POSTConnection(selectedCodes, justification);
         });

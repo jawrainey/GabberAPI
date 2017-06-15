@@ -43,12 +43,16 @@ def session(interview_id=None):
     interview = Interview.query.filter_by(id=interview_id).first()
     interview.audio = url_for('consent.protected', filename=interview.audio, _external=True)
 
+    connections = [i.serialize() for i in interview.connections.all()]
+    user_create_a_connection = len([i for i in connections if i['creator_id'] == current_user.get_id()])
+
     return render_template('views/projects/session.html',
                            interview=interview,
                            interviews=Interview.query.filter_by(
                                session_id=Interview.query.filter_by(id=interview_id).first().session_id).all(),
                            participants=interview.participants.all(),
-                           connections=[i.serialize() for i in interview.connections.all()])
+                           connections=connections,
+                           user_create_a_connection=user_create_a_connection)
 
 
 @project.route('create', methods=['GET'])
