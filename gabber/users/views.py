@@ -21,7 +21,7 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        login_user(User.query.filter_by(username=form.email.data).first())
+        login_user(User.query.filter_by(username=form.email.data.lower()).first())
         flash('You can view or edit your projects')
         return redirect(url_for('main.projects'))
     return render_template('views/users/login.html', form=form)
