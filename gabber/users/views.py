@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import current_user, login_user, login_required, logout_user
-from gabber.users.forms import LoginForm
+from gabber.users.forms import LoginForm, SignupForm
 from gabber.users.models import User
-from gabber import login_manager
+from gabber import login_manager, db
 
 users = Blueprint('users', __name__)
 
@@ -14,7 +14,19 @@ def load_user(user_id):
 
 @users.route('signup/', methods=['GET', 'POST'])
 def signup():
+    form = SignupForm()
+
+    if form.validate_on_submit():
+        new_user = User(form.email.data, form.password.data, form.name.data)
+        db.session.add(new_user)
+        db.session.commit()
+        login_user(new_user)
+        flash('Your account has been successfully created. A welcome email will follow.')
+        flash('You can view or edit your projects')
+        return redirect(url_for('main.projects'))
     return render_template('views/users/signup.html', form=form)
+
+
 @users.route('login/', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:

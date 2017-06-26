@@ -1,16 +1,37 @@
 from gabber.users.models import User
+from flask import url_for, Markup
 from flask_wtf import FlaskForm
-from wtforms import TextField, PasswordField
-from wtforms.validators import DataRequired, Length, Email
+from wtforms import StringField, PasswordField
+from wtforms.validators import DataRequired, Length, Email, ValidationError
+
+
+class SignupForm(FlaskForm):
+    name = StringField('Name', [DataRequired(), Length(min=4, max=20)])
+
+    email = StringField('Email: ', [DataRequired(
+        message='An email address must be provided.'),
+        Email(),
+        Length(min=6, max=90)])
+
+    password = PasswordField('Password', [DataRequired(
+        message='A password must be provided.'),
+        Length(min=6, max=40)])
+
+    def validate_email(self, field):
+        if User.query.filter_by(username=field.data).first():
+            login = "<a href=" + url_for('users.login') + ">login</a>"
+            recover = "<a href=" + url_for('users.forgot') + ">recover</a>"
+            output = Markup("This email is already registered. Want to " + login + ' or ' + recover + ' your password?')
+            raise ValidationError(output)
 
 
 class LoginForm(FlaskForm):
-    email = TextField('Email: ', [DataRequired(
+    email = StringField('Email: ', [DataRequired(
         message='An email address must be provided.'),
         Email(),
         Length(min=3, max=90)])
     password = PasswordField('Password', [DataRequired(
-        message='A password must provided.'),
+        message='A password must be provided.'),
         Length(min=4, max=40)])
 
     def validate(self):
@@ -20,7 +41,7 @@ class LoginForm(FlaskForm):
         user = User.query.filter_by(username=self.email.data).first()
 
         if not user:
-            self.email.errors.append('Unknown username provided.')
+            self.email.errors.append('Unknown email provided.')
 
         if user and not user.is_correct_password(self.password.data):
             self.password.errors.append('Invalid password provided.')
