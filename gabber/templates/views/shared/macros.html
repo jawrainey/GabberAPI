@@ -1,7 +1,7 @@
 {% macro render_field(field) %}
   {%- if field.errors %}
     {{ field(**kwargs) }}
-      {% for error in field.errors %}<li>{{ error|e }}</li>{% endfor %}
+      {% for error in field.errors %}<p class="sidetip"><i class="material-icons">error_outline</i>{{ error|e }}</p>{% endfor %}
   {%- else -%}
     {{ field(**kwargs) }}
   {%- endif -%}

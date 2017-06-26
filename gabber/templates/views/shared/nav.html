@@ -8,7 +8,7 @@
         {%- if current_user.is_authenticated %}
           <li><a href="{{ url_for('users.logout') }}">Logout</a></li>
         {%- else %}
-          <li {{ active("main.index") or active("users.login") }}><a href="{{ url_for('users.login') }}">Sign in</a></li>
+          <li {{ active("main.index") or active("users.login") }}><a href="{{ url_for('users.login') }}">Log in</a></li>
         {%- endif %}
         </ul>
       </div>

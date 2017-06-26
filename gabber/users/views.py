@@ -12,6 +12,9 @@ def load_user(user_id):
     return User.query.get(user_id)
 
 
+@users.route('signup/', methods=['GET', 'POST'])
+def signup():
+    return render_template('views/users/signup.html', form=form)
 @users.route('login/', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:

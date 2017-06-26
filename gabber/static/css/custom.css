@@ -1,12 +1,12 @@
 /* Fixed footer at the bottom of the screen. */
-body {
+.home {
     display: flex;
     min-height: 100vh;
     flex-direction: column;
-    background-image: url("images/overlay.png");
     font-family: 'PT Sans', sans-serif;
 }
 
+.home, body, .boss { background-image: url("images/overlay.png"); }
 
 h1, h2, h3, h4, h5, h6, .card-title { font-family: 'PT Serif', serif; }
 .card-content > p { text-indent: 10px; text-align: justify;  }
@@ -71,14 +71,93 @@ nav ul a { padding: 0 15px; }
 
 /* login */
 
-#loginForm {
-    display: inline-block;
-    padding: 32px 48px;
-    margin-top: 6rem;
-    border: 1px solid rgba(160,160,160,0.2);
+.valign-wrapper {
+    /*Should be 100% on smaller devices...*/
+    max-width: 493px;
 }
 
-#loginForm h5 { margin-bottom: 1.68rem; }
+/*TODO: only position right on larger screens */
+
+.sidetip {
+    position: absolute;
+    left: 380px;
+    top: 0;
+    width: 300px;
+    color: #C33;
+    font-size: .85em
+}
+
+.sidetip i {
+    font-size: 1.1rem;
+    margin-right: 3px;
+    vertical-align: middle !important;
+}
+
+.show-hide-password {
+    position: absolute;
+    cursor: pointer;
+    right: 20px;
+    top: 11px;
+}
+
+.webform  {
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.webform .row { margin: 0 auto; }
+
+.webform .description { margin-bottom: .5em; }
+
+.button-container { margin-top: 0; padding: 0 .75rem; }
+.button-container .btn, .button-container .btn-flat { width: 100%; text-align: center; }
+.terms { font-size: .8em; text-align: center; }
+input { text-indent: 6px; }
+
+.forgot {
+    position: absolute;
+    top: -15px;
+    right: 13px;
+    font-size: .8rem;
+}
+
+/* Creates a horizontal divider the main form and login/register buttons */
+
+.form-divider {
+    text-align: center;
+    position: relative;
+    top: 2px;
+    margin: 0 16px;
+}
+
+.form-divider h5 {
+    top: -3px;
+    font-size: .8em;
+    color: #666;
+    font-weight: 600;
+    z-index: 2;
+    position: relative;
+    display: inline-block;
+    background-color: #FFF;
+    padding: 0 8px;
+}
+
+.form-divider:after {
+    content: "";
+    width: 100%;
+    background-color: transparent;
+    display: block;
+    height: 1px;
+    border-top: 1px solid #e7e7e7;
+    position: absolute;
+    top: 50%;
+    margin-top: -1px;
+    z-index: 1;
+}
 
 input:not([type]):focus:not([readonly]), input[type=text]:focus:not([readonly]), input[type=password]:focus:not([readonly]), input[type=email]:focus:not([readonly]), input[type=url]:focus:not([readonly]), input[type=time]:focus:not([readonly]), input[type=date]:focus:not([readonly]), input[type=datetime]:focus:not([readonly]), input[type=datetime-local]:focus:not([readonly]), input[type=tel]:focus:not([readonly]), input[type=number]:focus:not([readonly]), input[type=search]:focus:not([readonly]), textarea.materialize-textarea:focus:not([readonly]),
 .chips.focus {
@@ -92,7 +171,8 @@ input:not([type]):focus:not([readonly])+label, input[type=text]:focus:not([reado
 
 /* general */
 
-#loginForm button, .btn, .btn-large, .btn-floating, .chips .chip.selected { background-color: #4696BB; }
-.btn:hover, .btn-large:hover, .btn-floating:hover  { background-color: #4696CC; }
+.btn, .btn-large, .btn-floating, .chips .chip.selected,
+.btn:focus, .btn-large:focus, .btn-floating:focus,
+.btn:hover, .btn-large:hover, .btn-floating:hover { background-color: #4696CC; }
 
 .fixed-action-btn { bottom: 45px; right: 24px; }
