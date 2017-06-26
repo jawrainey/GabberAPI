@@ -10,6 +10,16 @@ def index():
     return render_template('views/main/index.html')
 
 
+@main.route('tos/', methods=['GET'])
+def tos():
+    return render_template('views/main/tos.html')
+
+
+@main.route('privacy/', methods=['GET'])
+def privacy():
+    return render_template('views/main/privacy.html')
+
+
 @main.route('about/', methods=['GET'])
 def about():
     return render_template('views/main/about.html')

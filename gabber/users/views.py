@@ -32,3 +32,8 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('main.index'))
+
+
+@users.route('forgot/', methods=['GET', 'POST'])
+def forgot():
+    return render_template('views/users/forgot.html', form=None)
