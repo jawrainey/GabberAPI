@@ -15,9 +15,9 @@
   .wavesurfer-handle { background: rgba(0, 0, 0, 0.3); min-width: 4px; }
   #controls { float: right; }
   .chips-autocomplete .input { width: 260px !important; }
-  .comment-header, .comment-body { padding: 18px; }
-  .comment-header { background-color: #f6f8fa; border-bottom: 1px solid #d1d5da; }
-  .comment-body > p:first-of-type { margin: 0; }
+  .connection-header, .connection-body { padding: 18px; }
+  .connection-header { background-color: #f6f8fa; border-bottom: 1px solid #d1d5da; }
+  .connection-body > p:first-of-type { margin: 0; }
   .author { color: #586069; }
   #interviews { position: absolute; right: 0; width: 150px; z-index: 0; }
   #interviews > i { position: absolute; font-weight: 600; left: 0; z-index: 1012018; cursor: pointer; }
@@ -31,7 +31,7 @@
   #connections > ul > li { list-style-type: circle; }
   </style>
 {%- endblock %}
-{% from "views/shared/macros.html" import render_comment %}
+{% from "views/shared/macros.html" import render_connection %}
 {% block content %}
         <div class="collection with-header right" id="interviews">
           <p class="collection-header"><b>Other interviews in this session</b></p>
@@ -60,7 +60,7 @@
            <h5>Connections made</h5>
             {%- for connection in connections %}
           <div class="commentContainer">
-          {{ render_comment(connection) }}
+          {{ render_connection(connection) }}
           </div>
             {% endfor -%}
           {%- else %}

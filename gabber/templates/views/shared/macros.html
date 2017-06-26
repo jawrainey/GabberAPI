@@ -64,26 +64,26 @@
 {% if uri == request.endpoint or request.endpoint.split(".")[0] == uri_blueprint_group %} class="active"{%- endif -%}
 {%- endmacro -%}
 
-{%- macro render_comment(comment) %}
-                <div class="r-{{ comment.id }} card-panel no-padding" style="display: none;">
-                  <div class="comment-header">
-                    <strong><a class="author" href="javascript:void(0)">{{ comment.creator }}</a></strong> &mdash;
-                    <time datetime="{{ comment.timestamp }}">{{ comment.days_since }} days ago</time>
+{%- macro render_connection(connection) %}
+                <div class="r-{{ connection.id }} card-panel no-padding" style="display: none;">
+                  <div class="connection-header">
+                    <strong><a class="author" href="javascript:void(0)">{{ connection.creator }}</a></strong> &mdash;
+                    <time datetime="{{ connection.timestamp }}">{{ connection.days_since }} days ago</time>
                   </div>
-                  <div class="comment-body">
-                    <p><b>{% for code in comment.codes %}{{ code['code'] }}{% if not loop.last %}, {% endif %}{% endfor %}</b></p>
-                    <p class="black-text">{{comment.content}}</p>
+                  <div class="connection-body">
+                    <p><b>{% for code in connection.codes %}{{ code['code'] }}{% if not loop.last %}, {% endif %}{% endfor %}</b></p>
+                    <p class="black-text">{{connection.content}}</p>
                     <div class="options">
-                      <a href="javascript:void(0)"><i data-commentid="{{ comment.id }}" class="material-icons writeReply">reply</i></a>
-                      <a href="javascript:void(0)"><i data-commentid="{{ comment.id }}" class="material-icons showReplies">chat_bubble_outline</i>
-                        <sup>{{comment.responses | length }}</sup>
+                      <a href="javascript:void(0)"><i data-connectionid="{{ connection.id }}" class="material-icons writeReply">reply</i></a>
+                      <a href="javascript:void(0)"><i data-connectionid="{{ connection.id }}" class="material-icons showReplies">chat_bubble_outline</i>
+                        <sup>{{connection.comments | length }}</sup>
                       </a>
                     </div>
                   </div>
                 </div>
-                {% for response in comment.responses %}
-                <div class="child" data-parentid="{{ comment.id }}" style="display: none;">
-                  {{ render_comment(response) }}
+                {% for conn in connection.responses %}
+                <div class="child" data-parentid="{{ connection.id }}" style="display: none;">
+                  {{ render_connection(conn) }}
                 </div>
                 {% endfor %}
 {%- endmacro %}
