@@ -1,21 +1,6 @@
-{%- from "views/shared/macros.html" import render_field -%}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" >
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css">
-  <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,700|PT+Serif" rel="stylesheet">
-  <link rel="stylesheet" href={{ url_for('static', filename='css/custom.css') }}>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Gabber &middot; {% block title %}Sign up{% endblock %}</title>
-  <style>html { border-top: 6px solid #4696BB; } h1 { font-size: 2.6rem; font-weight: 600; } </style>
-</head>
-<body>
-  <main>
-    <div class="container webform">
-      <div class="row valign-wrapper">
-        <div class="col s12 m10 l10 offset-l1 offset-m1">
+{%- extends "views/users/shared-layout.html" -%}
+{% block title %}Sign up{% endblock %}
+{%- block content %}
           <h1>Sign up to Gabber</h1>
           <p class="description">Create a Gabber account to create discussions on pieces of audio through collaborative annotations.</p>
           <form method="POST">
@@ -32,7 +17,7 @@
               </div>
               <div class='col s12 input-field password-field'>
                 {{ render_field(form.password) }}
-                <i class="material-icons show-hide-password" onclick="yup(this)">remove_red_eye</i>
+                <i class="material-icons show-hide-password">remove_red_eye</i>
                 <label for='password'>Password (6 or more characters)</label>
               </div>
               <div class='col s12 input-field button-container'>
@@ -47,17 +32,4 @@
           <div class='button-container'>
             <a class="btn-flat z-depth-0 waves-effect waves-light" href="{{ url_for('users.login') }}">Log in to Gabber</a>
           </div>
-        </div>
-      </div>
-    </div>
-  </main>
-  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>
-  <script>
-  $( ".show-hide-password" ).click(function() {
-    var pwinput = $('input[name=password]');
-    pwinput.is('input:password') ? pwinput.attr("type","text") : pwinput.attr("type","password");
-  });
-  </script>
-</body>
-</html>
+{%- endblock %}

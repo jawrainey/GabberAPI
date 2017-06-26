@@ -1,0 +1,31 @@
+{%- from "views/shared/macros.html" import render_field -%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" >
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css">
+  <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,700|PT+Serif" rel="stylesheet">
+  <link rel="stylesheet" href={{ url_for('static', filename='css/custom.css') }}>
+  <style>html { border-top: 6px solid #4696BB; } h1 { font-size: 2.6rem; font-weight: 600; }</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gabber &middot; {% block title %}listen and be heard{% endblock %}</title>
+</head>
+<body>
+  <main>
+    <div class="container webform">
+      <div class="row valign-wrapper">
+        <div class="col s12 m10 l10 offset-l1 offset-m1">
+  {%- block content -%}
+  {%- endblock %}
+        </div>
+      </div>
+    </div>
+  </main>
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>
+  <script>
+  $(".show-hide-password").click(function(){var t=$("input[name=password]");t.is("input:password")?t.attr("type","text"):t.attr("type","password")});
+  </script>
+</body>
+</html>
