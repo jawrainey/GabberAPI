@@ -2,7 +2,7 @@
 {% block title %}Sign up{% endblock %}
 {%- block content %}
           <h1>Sign up to Gabber</h1>
-          <p class="description">Create a Gabber account to create discussions on pieces of audio through collaborative annotations.</p>
+          <p class="description">Collaborative annotate and discuss pieces of audio interviews using Gabber.</p>
           <form method="POST">
             {{ form.csrf_token }}
             <input type="hidden" name="next" value="{{ next }}"/>
