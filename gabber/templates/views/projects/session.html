@@ -56,7 +56,7 @@
         </div>
 
         <div class="col s12 m6" id="connections">
-          {%- if connections %}
+          {%- if connections and user_create_a_connection > 0 %}
            <h5>Connections made</h5>
             {%- for connection in connections %}
           <div class="commentContainer">
