@@ -181,6 +181,7 @@ class Connection(db.Model):
 
     # A connection can be associated with many codes
     codes = db.relationship("Code", secondary=codes_for_connections, backref="connections")
+    comments = db.relationship('ConnectionComments', backref='connection', lazy='dynamic')
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     interview_id = db.Column(db.Integer, db.ForeignKey('interview.id'))
@@ -206,7 +207,46 @@ class Connection(db.Model):
             'days_since': abs((self.created_on - datetime.datetime.now()).days),
             'creator': str(User.query.filter_by(id=self.user_id).first().fullname),
             'creator_id': User.query.filter_by(id=self.user_id).first().id,
-            'codes': [{'code': str(i.text), 'id': i.id} for i in self.codes]
+            'codes': [{'code': str(i.text), 'id': i.id} for i in self.codes],
+            'comments': [i.serialize() for i in self.comments]
+        }
+
+
+class ConnectionComments(db.Model):
+    """
+    Comments can be made on connections (where parent is 0) and on themselves.
+
+    Backrefs:
+        A comment can refer to its creator with 'user'
+        A comment can refer to the connection its associated with via 'connection'
+    """
+    __tablename__ = 'connection_comments'
+
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(1120), default=None)
+
+    # If this is zero, then it is a response to the root, e.g. the connection itself.
+    parent_id = db.Column(db.Integer, db.ForeignKey('connection_comments.id'))
+    children = db.relationship('ConnectionComments', backref=db.backref('parent', remote_side=[id]), lazy='dynamic')
+
+    # Who created it and for what purpose?
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    connection_id = db.Column(db.Integer, db.ForeignKey('connection.id'))
+
+    created_on = db.Column(db.DateTime, default=db.func.now())
+    updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+
+    def serialize(self):
+        from gabber.users.models import User
+        import datetime
+        return {
+            'id': self.id,
+            'pid': self.parent_id,
+            'content': str(self.text),
+            'timestamp': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
+            'days_since': abs((self.created_on - datetime.datetime.now()).days),
+            'creator': str(User.query.filter_by(id=self.user_id).first().fullname),
+            'children': [i.serialize() for i in self.children.order_by(db.desc(ConnectionComments.created_on)).all()],
         }
 
 

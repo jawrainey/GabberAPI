@@ -19,6 +19,7 @@ class User(UserMixin, db.Model):
 
     projects = db.relationship("Project", secondary=members, back_populates="members")
     connections = db.relationship('Connection', backref='user', lazy='dynamic')
+    connection_comments = db.relationship('ConnectionComments', backref='user', lazy='dynamic')
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())

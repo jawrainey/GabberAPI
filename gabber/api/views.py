@@ -163,6 +163,39 @@ def delete_prompt():
     return jsonify({'success': True}), 200
 
 
+@api.route('connection/comment/create/', methods=['POST'])
+def create_comment_on_connection():
+    """
+    Creates a new comment on a connection or a response to another comment.
+
+    Args:
+        json:
+            comment (str): the writing response to a connection or another comment
+            uid (int): the ID of the user creating the comment
+            cid (int): the ID of the connection where this comment was made
+            pid (int): the ID of the parent where the comment is being created.
+
+    Returns:
+        json: 'success' if the comment was created or 'error' and related message.
+    """
+    from gabber.projects.models import ConnectionComments
+    from flask_login import current_user
+
+    content = request.get_json()
+    # TODO: validation
+    response = content.get('comment', None)
+    uid = content.get('cid', current_user.id)
+    cid = content.get('cid', None)
+    pid = content.get('pid', content['cid'])
+
+    response = ConnectionComments(text=response, user_id=uid, connection_id=cid, parent_id=pid)
+
+    db.session.add(response)
+    db.session.commit()
+
+    return jsonify({'success': True}), 200
+
+
 @api.route('connection/create/', methods=['POST'])
 def create_connection():
     """

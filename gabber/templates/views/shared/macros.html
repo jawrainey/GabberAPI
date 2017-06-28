@@ -74,16 +74,16 @@
                     <p><b>{% for code in connection.codes %}{{ code['code'] }}{% if not loop.last %}, {% endif %}{% endfor %}</b></p>
                     <p class="black-text">{{connection.content}}</p>
                     <div class="options">
-                      <a href="javascript:void(0)"><i data-connectionid="{{ connection.id }}" class="material-icons writeReply">reply</i></a>
-                      <a href="javascript:void(0)"><i data-connectionid="{{ connection.id }}" class="material-icons showReplies">chat_bubble_outline</i>
-                        <sup>{{connection.comments | length }}</sup>
+                      <a href="javascript:void(0)"><i data-responseid="{{ connection.id }}" class="material-icons writeReply">reply</i></a>
+                      <a href="javascript:void(0)"><i data-responseid="{{ connection.id }}" class="material-icons showReplies">chat_bubble_outline</i>
+                        <sup>{{connection.comments | length or connection.children | length}}</sup>
                       </a>
                     </div>
                   </div>
                 </div>
-                {% for conn in connection.comments %}
-                <div class="child" data-parentid="{{ connection.id }}" style="display: none;">
-                  {{ render_connection(conn) }}
+                {% for comment in connection.comments %}
+                <div class="child" data-parentid="{{ comment.pid if comment.pid else connection.id }}" data-commentid="{{ comment.id }}" style="display: none;">
+                  {{ render_connection(comment) }}
                 </div>
                 {% endfor %}
 {%- endmacro %}

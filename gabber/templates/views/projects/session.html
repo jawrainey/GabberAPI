@@ -29,6 +29,8 @@
   #codebook { margin: 25px 0;}
   #connections > ul { padding-left: 1.68em; }
   #connections > ul > li { list-style-type: circle; }
+  #commentForm { margin-top: 1.68em; }
+  .child { margin-left: 1rem; }
   </style>
 {%- endblock %}
 {% from "views/shared/macros.html" import render_connection %}
@@ -107,6 +109,19 @@
           </div>
         </form>
 
+        <form method="POST" data-cidr="0" data-pidr="0" class="col s6" id="commentForm" style="display:none;">
+          <div class="row">
+            <span class="closeCommentForm btn-floating right"><i class="material-icons">close</i></span>
+            <div class="input-field col s12">
+              <textarea id="CommentFormContent" class="materialize-textarea" rows="3" name="CommentFormContent" maxlength=280 required autofocus></textarea>
+              <label for="CommentFormContent">Add your comment</label>
+            </div>
+            <div class="input-field col s12">
+              <button class="btn waves-effect waves-light right" type="submit">Create response</button>
+            </div>
+          </div>
+        </form>
+
 {%- endblock %}
 {%- block fscripts %}
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
@@ -119,6 +134,7 @@
     var currentUserFullName = "{{ current_user.fullname }}";
     var currentInterviewID = {{ interview.id }};
     var createConnectionURL = "{{ url_for('api.create_connection', _external=True) }}";
+    var createCommentURL = "{{ url_for('api.create_comment_on_connection', _external=True) }}";
     var numOfConnectionsByUser = {{ user_create_a_connection }};
 
     var wavesurfer = WaveSurfer.create({
@@ -274,6 +290,63 @@
             }
 
             addRegionToCreate();
+        });
+
+        $( ".showReplies" ).bind( "click", function() {
+            wavesurfer.pause();
+            // ResponseID is the ID of the comment or connection a response is being made to.
+            children = $('*[data-parentid="' + $(this).data("responseid") + '"]');
+            // By hiding the child container, all the children (thread) will also be hidden.
+            children.toggle();
+            children.children(".card-panel").toggle();
+        });
+
+        $( ".writeReply" ).bind( "click", function() {
+            wavesurfer.pause();
+            // We need to know which connection this comment is being made for.
+            // Either its a comment on a connection or a comment on a comment of this connection.
+            var parent_comment_id = $(this).closest(".child").data("commentid");
+            var connection_id = $(this).closest(".child").data("parentid");
+            // If the parent comment does not exist, then it is a connection.
+            $("#commentForm").data("pidr", parent_comment_id ? parent_comment_id : 0);
+            $("#commentForm").data("cidr", parent_comment_id ? connection_id : $(this).data("responseid"));
+
+            if ($('#commentForm').is(":visible")) {
+                $('#commentForm').hide();
+            }
+            else {
+                $('#commentForm').show();
+                $('#CommentFormContent').val("");
+            }
+        });
+
+        $('#commentForm').submit(function(event) {
+            event.preventDefault();
+            // TODO: validation
+            comment = $('#CommentFormContent').val();
+            pid = $("#commentForm").data("pidr");
+            cid = $("#commentForm").data("cidr");
+            // TODO: refactor to helper
+            $.ajax({
+                type     : 'POST',
+                url      : createCommentURL,
+                data     : JSON.stringify({'comment': comment, 'cid': cid, 'pid': pid}),
+                contentType: "application/json",
+                dataType: 'json'
+            }).done(function(data) {
+                if(data.success) {
+                    Materialize.toast('Thank you for creating a response. ' +
+                        'The author of the connection you responded to will be notified.', 4500);
+                }
+            });
+
+            $('#commentForm').hide();
+            wavesurfer.play();
+        });
+
+        $( ".closeCommentForm" ).bind( "click", function() {
+            $('#commentForm').hide();
+            wavesurfer.play();
         });
 
         $( ".closeForm" ).bind( "click", function() {
