@@ -2,9 +2,12 @@
 {% from "views/shared/macros.html" import render_projects %}
 {% block title %}Projects{% endblock %}
 {% block content %}
-        <h1>Projects</h1>
-{{- render_projects(user_projects, current_user) -}}
-{{- render_projects(public_projects, current_user) -}}
+    {%- if user_projects %}
+        <h2 class="col s12 m12">Your Projects</h2>
+    {{- render_projects(user_projects, current_user) -}}
+    {% endif %}
+        <h4 class="col s12 m12">Public projects</h4>
+        {{- render_projects(public_projects, current_user) -}}
         {% if current_user.is_authenticated %}
         <div class="fixed-action-btn">
           <a href="{{ url_for('project.create', _external=True) }}" class="btn-floating btn-large"><i class="material-icons">add</i></a>
