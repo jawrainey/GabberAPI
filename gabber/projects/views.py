@@ -1,4 +1,4 @@
-from gabber.projects.models import Interview, Project, ProjectPrompt
+from gabber.projects.models import Interview, Membership, Project, ProjectPrompt, Roles
 from gabber.users.models import User
 from flask import Blueprint, render_template, url_for, redirect, request, flash, abort
 from flask_login import current_user, login_required
@@ -88,8 +88,9 @@ def create_post():
     _form.pop('ispublic', None)
 
     # Associate the current user as a member of the project.
-    # TODO: at this point we should also configure role for this particular project
-    nproject.members.append(User.query.filter_by(id=current_user.id).first())
+    admin_role = Roles.query.filter_by(name='admin').first().id
+    membership = Membership(uid=current_user.id, pid=nproject.id, rid=admin_role)
+    nproject.members.append(membership)
 
     # Add and flush now to gain access to the project id when creating prompts below
     db.session.add(nproject)
@@ -115,14 +116,14 @@ def create_post():
 @project.route('edit/<path:slug>/', methods=['GET', 'POST'])
 @login_required
 def edit(slug=None):
-    if current_user.get_role() != 'admin':
-        flash('You do not have authorization to edit this project')
-        return redirect(url_for('main.projects'))
-
     project = Project.query.filter_by(slug=slug).first()
 
     if not project:
         flash('That project you tried to <edit> does not exist.')
+        return redirect(url_for('main.projects'))
+
+    if current_user.role_for_project(project.id) != 'admin':
+        flash('You do not have authorization to edit this project')
         return redirect(url_for('main.projects'))
 
     # TODO: use WTForms to process and validate form. Tricky with dynamic form.

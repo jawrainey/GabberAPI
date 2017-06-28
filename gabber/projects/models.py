@@ -1,12 +1,6 @@
 from gabber import db
 
 
-members = db.Table(
-    'members',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('project_id', db.Integer, db.ForeignKey('project.id')))
-
-
 participants = db.Table(
     'participants',
     db.Column('participant_id', db.Integer, db.ForeignKey('participant.id')),
@@ -18,6 +12,42 @@ codes_for_connections = db.Table(
     db.Column('connection_id', db.Integer, db.ForeignKey('connection.id')),
     db.Column('code_id', db.Integer, db.ForeignKey('code.id'))
 )
+
+
+class Membership(db.Model):
+    """
+    Holds the user membership for projects and the users role in this project.
+
+    Note: an association object is used to hold the role ontop of the many-to-many relationship(s).
+
+    Relationships:
+        many-to-many: a user can be a member of many projects
+        many-to-many: a project can have many members
+        one-to-one: each membership must have one role
+    """
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), primary_key=True)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+
+    user = db.relationship("User", back_populates="member_of")
+    project = db.relationship("Project", back_populates="members")
+    role = db.relationship("Roles", backref=db.backref("member_of", uselist=False))
+
+    def __init__(self, uid, pid, rid):
+        self.user_id = uid
+        self.project_id = pid
+        self.role_id = rid
+
+
+class Roles(db.Model):
+    """
+    The roles that can be assigned to a user, and are used to support access control on projects.
+
+    Backrefs:
+        one-to-many: a member of a project has one role, though a member can be part of many projects.
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True)
 
 
 class Project(db.Model):
@@ -47,7 +77,7 @@ class Project(db.Model):
 
     codebook = db.relationship('Codebook', backref='project', lazy='dynamic')
     prompts = db.relationship('ProjectPrompt', backref='project', lazy='dynamic')
-    members = db.relationship('User', secondary=members, back_populates="projects")
+    members = db.relationship("Membership", back_populates="project")
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())

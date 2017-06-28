@@ -29,9 +29,9 @@ def about():
 def projects():
     public_projects = Project.query.filter_by(type=1).all()
     user_projects = []
-    if current_user.is_authenticated and (current_user.get_role() == 'admin' or current_user.get_role() == 'staff'):
+    if current_user.is_authenticated:
         # Projects the user is a member of (whether private & public)
-        user_projects = current_user.projects
+        user_projects = current_user.projects()
         # Do not show the same projects in the public section if you are a member of that project
         public_projects = list(set(public_projects) - set(user_projects))
     return render_template('views/main/projects.html', user_projects=user_projects, public_projects=public_projects)

@@ -1,6 +1,5 @@
 from gabber import db, bcrypt
 from flask_login import UserMixin
-from gabber.projects.models import members
 
 
 class User(UserMixin, db.Model):
@@ -10,14 +9,14 @@ class User(UserMixin, db.Model):
     Relationships:
         many-to-many: a user can be a member of many projects
         many-to-many: a user be associated with (has created) many connections
+        many-to-many: a user be associated with (has created) many comments
     """
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True)
     password = db.Column(db.String(192))
     fullname = db.Column(db.String(64))
-    role = db.Column(db.SmallInteger, default=2)
 
-    projects = db.relationship("Project", secondary=members, back_populates="members")
+    member_of = db.relationship("Membership", back_populates="user")
     connections = db.relationship('Connection', backref='user', lazy='dynamic')
     connection_comments = db.relationship('ConnectionComments', backref='user', lazy='dynamic')
 
@@ -38,9 +37,22 @@ class User(UserMixin, db.Model):
         """
         return self.id
 
-    def get_role(self):
+    def role_for_project(self, pid):
         """
-        returns string form of role to improve readability in views
+        Obtains the role for a project based on its ID
+
+        :param pid: the project id to search for
+        :return: The type of role (such as admin, staff, or user), otherwise None
         """
-        roles = {0: 'admin', 1: 'staff', 2: 'user'}
-        return roles[self.role]
+        from gabber.projects.models import Roles
+        match = [i.role_id for i in self.member_of if i.project_id == pid]
+        return Roles.query.get(match[0]).name if match else None
+
+    def projects(self):
+        """
+        Determines the projects this user is a member of.
+
+        :return: A list of projects THIS USER is a member of
+        """
+        from gabber.projects.models import Project
+        return [Project.query.get(pid) for pid in [i.project_id for i in self.member_of]]
