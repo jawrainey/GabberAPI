@@ -52,3 +52,7 @@ app.register_blueprint(consent, url_prefix=PROXY_PATH)
 # Model meta-data required to create db correctly
 if not os.path.exists(dbp):
     db.create_all()
+
+from gabber.users.models import Anonymous
+login_manager.anonymous_user = Anonymous
+

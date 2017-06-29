@@ -1,5 +1,5 @@
 from gabber import db, bcrypt
-from flask_login import UserMixin
+from flask_login import UserMixin, AnonymousUserMixin
 
 
 class User(UserMixin, db.Model):
@@ -37,6 +37,17 @@ class User(UserMixin, db.Model):
         """
         return self.id
 
+    def is_project_member(self, pid):
+        """
+        Determines whether or not this user is a member of a project.
+
+        :param pid: the project id to search for
+        :return: True if this user is a member, otherwise False.
+        """
+        from gabber.projects.models import Roles
+        match = [i.role_id for i in self.member_of if i.project_id == pid]
+        return True if match else False
+
     def role_for_project(self, pid):
         """
         Obtains the role for a project based on its ID
@@ -56,3 +67,19 @@ class User(UserMixin, db.Model):
         """
         from gabber.projects.models import Project
         return [Project.query.get(pid) for pid in [i.project_id for i in self.member_of]]
+
+
+class Anonymous(AnonymousUserMixin, User):
+    """
+    Required as we access user details via 'current_user', which do not exist for
+    an anonymous user. By inheriting from both, and creating a fake user, we overcome that.
+
+    Note: the order of inheritence is critical as we want to use the properties set by AnonymousUserMixin,
+    e.g. is_authenticated and is_anonymous,and the methods defined above for a User.
+    The way Python implements multiple inheritence is by assigning parent attributes from left-to-right.
+    The potential problem is that User inherits from UserMixin where these properties are set to identify a user.
+    """
+    def __init__(self):
+        self.username = 'Guest'
+        self.password = 'none'
+        self.fullname = 'Yaj Yeniar'

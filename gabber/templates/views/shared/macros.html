@@ -17,8 +17,7 @@
               <p>{{ project.description }}</p>
             </div>
             <div class="card-action">
-            {%- if current_user.is_authenticated and current_user.role_for_project(project.id) == 'admin' %}
-             <a>Add members</a>
+            {%- if current_user.role_for_project(project.id) == 'admin' %}
              <a href="{{ url_for('project.edit', slug=project.slug) }}">Edit</a>
             {%- endif %}
               <a href="{{ url_for('project.sessions', slug=project.slug) }}">View sessions</a>
