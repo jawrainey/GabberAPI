@@ -8,6 +8,33 @@ import os
 project = Blueprint('project', __name__)
 
 
+@project.route('join/<path:slug>/', methods=['GET', 'POST'])
+def join(slug=None):
+    """
+    Allow members to join public projects, and in the future,
+    users to request access to private projects.
+
+    :param slug: the human-readable URL for a project
+    :return: a message to inform the user of the action that took place.
+    """
+    if not current_user.is_authenticated:
+        flash("To join a project you must first register.")
+        return redirect(url_for('users.signup'))
+
+    project = Project.query.filter_by(slug=slug).first()
+    cid = current_user.get_id()
+
+    if project.type:
+        user_role = Roles.query.filter_by(name='user').first().id
+        membership = Membership(uid=current_user.id, pid=project.id, rid=user_role)
+        project.members.append(membership)
+        db.session.add(project)
+        db.session.commit()
+        message = "You are now part of the %s project!" % str(project.title)
+    flash(message)
+    return redirect(url_for('main.projects'))
+
+
 @project.route('sessions/<path:slug>/', methods=['GET', 'POST'])
 def sessions(slug=None):
     interviews = Interview.query.join(ProjectPrompt).join(Project).filter(Project.slug == slug).all()
