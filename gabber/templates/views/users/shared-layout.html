@@ -27,5 +27,7 @@
   <script>
   $(".show-hide-password").click(function(){var t=$("input[name=password]");t.is("input:password")?t.attr("type","text"):t.attr("type","password")});
   </script>
+  {%- from "views/shared/macros.html" import display_flash_messages -%}
+  {{- display_flash_messages() -}}
 </body>
 </html>
