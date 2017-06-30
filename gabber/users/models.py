@@ -16,7 +16,7 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(192))
     fullname = db.Column(db.String(64))
 
-    member_of = db.relationship("Membership", back_populates="user")
+    member_of = db.relationship("Membership", back_populates="user", lazy='dynamic')
     connections = db.relationship('Connection', backref='user', lazy='dynamic')
     connection_comments = db.relationship('ConnectionComments', backref='user', lazy='dynamic')
 
