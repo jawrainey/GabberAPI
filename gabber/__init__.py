@@ -9,7 +9,11 @@ import os
 # Required when deploying to dokku @OpenLab
 PROXY_PATH = os.getenv('PROXY_PATH', '/')
 # Share static path behind proxy across all blueprints
-app = Flask(__name__, static_url_path=os.path.join(PROXY_PATH, 'static'))
+
+templates = os.path.join(os.pardir, 'frontend/templates')
+static_path = os.path.join(os.pardir, 'frontend/static')
+static_url_path=os.path.join(PROXY_PATH, 'static')
+app = Flask(__name__, template_folder=templates, static_url_path=static_url_path, static_folder=static_path)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 
@@ -24,7 +28,7 @@ app.config['SECRET_KEY'] = 'supersecretpasswordfromtheotherside'
 app.config['UPLOAD_FOLDER'] = xp
 app.config['SALT'] = 'supersecretsaltfromtheotherside'
 app.config['PROXY_PATH'] = PROXY_PATH
-app.config['IMG_FOLDER'] = os.path.join(root, 'static/img/')
+app.config['IMG_FOLDER'] = os.path.join(static_path, 'img/')
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
