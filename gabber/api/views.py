@@ -184,7 +184,7 @@ def create_comment_on_connection():
     content = request.get_json()
     # TODO: validation
     response = content.get('comment', None)
-    uid = content.get('cid', current_user.id)
+    uid = content.get('uid', current_user.id)
     cid = content.get('cid', None)
     pid = content.get('pid', content['cid'])
 
