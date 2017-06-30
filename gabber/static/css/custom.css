@@ -39,6 +39,13 @@ a {
 }
 
 .card { border-top: 5px solid #4696BB; }
+.activator { cursor: pointer; }
+.project-type {
+    top: 5px;
+    right: 10px;
+    position: absolute;
+    font-size: .8em;
+}
 main { flex: 1 0 auto; }
 #footernav > li { display: inline-block; margin: 0 .84rem 0 0; }
 nav { margin-top: 1rem; }

@@ -6,8 +6,10 @@
         <h2 class="col s12 m12">Your Projects</h2>
     {{- render_projects(user_projects, current_user) -}}
     {% endif %}
+    {%- if public_projects %}
         <h4 class="col s12 m12">Public projects</h4>
         {{- render_projects(public_projects, current_user) -}}
+    {% endif %}
         {% if current_user.is_authenticated %}
         <div class="fixed-action-btn">
           <a href="{{ url_for('project.create', _external=True) }}" class="btn-floating btn-large"><i class="material-icons">add</i></a>
@@ -17,4 +19,29 @@
 {%- block fscripts %}
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>
+  <script>
+  $(function() {
+    $( ".add-member-form" ).submit(function( event ) {
+      event.preventDefault();
+      cardReveal = $(this).parent();
+      email = cardReveal.find(".add-member-email");
+      // Add a registered user to this project.
+      $.ajax({
+        type     : "POST",
+        url      : "{{ url_for("api.add_member", _external=True) }}",
+        data     : JSON.stringify({"pid": email.data("project-id"), "uid": {{ current_user.id }}, "email": email.val()}),
+        contentType: "application/json",
+        dataType: "json"
+      }).done(function(data) {
+        if(data.success) {
+          Materialize.toast("A user with that email (" + email.val() + ") was added to that project.", 4000);
+          cardReveal.toggle();
+        }
+      }).fail(function(data){
+        Materialize.toast(data.responseJSON.error, 4000);
+      });
+
+    });
+  });
+  </script>
 {%- endblock %}

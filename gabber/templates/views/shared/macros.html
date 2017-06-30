@@ -8,24 +8,44 @@
 {% endmacro %}
 
 {%- macro render_projects(projects, current_user) -%}
-  {% if projects %}
-    {%- for project in projects %}
+  {%- for project in projects %}
         <div class="col s12 m6">
           <div class="card">
             <div class="card-content">
-              <span class="card-title">{{ project.title }}</span>
+              <span class="card-title">{{ project.title }}
+                <i class="material-icons project-type"
+                 title="{{ "Public" if project.type else "Private" }} project">
+                  {{ "lock_open" if project.type else "lock_outline" }}
+                </i>
+              </span>
               <p>{{ project.description }}</p>
             </div>
             <div class="card-action">
             {%- if current_user.role_for_project(project.id) == 'admin' %}
+             <a class="activator">Add member</a>
              <a href="{{ url_for('project.edit', slug=project.slug) }}">Edit</a>
+            {%- elif not current_user.is_project_member(project.id) -%}
+              <a href="{{ url_for('project.join', slug=project.slug) }}">Join project</a>
             {%- endif %}
               <a href="{{ url_for('project.sessions', slug=project.slug) }}">View sessions</a>
             </div>
+            {%- if current_user.role_for_project(project.id) == 'admin' %}
+            <div class="card-reveal">
+              <span class="card-title grey-text text-darken-4">Who would you like to add?<i class="material-icons right">close</i></span>
+              <form class="add-member-form">
+                <div class="row">
+                  <div class="input-field col s12">
+                    <input required autofocus type="email" data-project-id="{{ project.id }}" id="add-member-email-{{ project.id }}" class="add-member-email">
+                    <label for="add-member-email">Their email address</label>
+                  </div>
+                  <button class="btn z-depth-0 waves-effect waves-light right add-member" type='submit'>Add</button>
+                </div>
+              </form>
+            </div>
+            {%- endif %}
           </div>
         </div>
-    {%- endfor -%}
-  {% endif %}
+  {%- endfor -%}
 {%- endmacro -%}
 
 {%- macro render_prompt(prompt_id, prompt_text, image_url) %}
