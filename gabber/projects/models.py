@@ -230,7 +230,7 @@ class Connection(db.Model):
         import datetime
         return {
             'id': self.id,
-            'content': str(self.justification),
+            'content': u''.join(self.justification).encode('utf-8').strip(),
             'start': self.start_interval,
             'end': self.end_interval,
             'timestamp': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
