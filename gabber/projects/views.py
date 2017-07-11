@@ -1,11 +1,43 @@
 from gabber.projects.models import Interview, Membership, Project, ProjectPrompt, Roles
 from gabber.users.models import User
-from flask import Blueprint, render_template, url_for, redirect, request, flash, abort
+from flask import Blueprint, current_app, render_template, url_for, redirect, request, flash, abort
 from flask_login import current_user, login_required
+from functools import wraps
 from gabber import app, db
 import os
 
 project = Blueprint('project', __name__)
+
+
+def membership_required(func):
+    """
+    This ensures that the current user can only view public projects or projects they are a member in.
+    Currently, kwargs are used (interview id and project slug) from the wrapped function to determine this.
+    Arguably this is not perfect as decorators should not depend upon what they are wrapped.
+
+    :param func: The view function to decorate.
+    :type func: function
+    :returns The view function to decorate with project membership.
+    """
+    @wraps(func)
+    def verified_membership(*args, **kwargs):
+        iid = kwargs.get('interview_id', None)
+        slug = kwargs.get('slug', None)
+        _project = None
+
+        if iid and iid in [i[0] for i in db.session.query(Interview.id).all()]:
+            _project = Interview.query.get(iid).project()
+        elif slug and slug in [str(i[0]) for i in db.session.query(Project.slug).all()]:
+            _project = Project.query.filter_by(slug=slug).first()
+        else:
+            abort(404)
+
+        _is_member = current_user.is_authenticated and current_user.member_of.filter_by(project_id=_project.id).first()
+
+        if _project and _project.type or _is_member:
+            return func(*args, **kwargs)
+        return current_app.login_manager.unauthorized()
+    return verified_membership
 
 
 @project.route('join/<path:slug>/', methods=['GET', 'POST'])
@@ -36,6 +68,7 @@ def join(slug=None):
 
 
 @project.route('sessions/<path:slug>/', methods=['GET', 'POST'])
+@membership_required
 def sessions(slug=None):
     interviews = Interview.query.join(ProjectPrompt).join(Project).filter(Project.slug == slug).all()
 
@@ -62,6 +95,7 @@ def sessions(slug=None):
 
 
 @project.route('session/interview/<int:interview_id>', methods=['GET', 'POST'])
+@membership_required
 def session(interview_id=None):
     if interview_id not in [i[0] for i in db.session.query(Interview.id).all()]:
         flash('The interview you tried to view does not exist.')
@@ -83,6 +117,7 @@ def session(interview_id=None):
 
 
 @project.route('create', methods=['GET'])
+@login_required
 def create():
     """
     Renders the create view and form to the user.
@@ -91,6 +126,7 @@ def create():
 
 
 @project.route('create', methods=['POST'])
+@login_required
 def create_post():
     """
     Allow a user to CREATE a project

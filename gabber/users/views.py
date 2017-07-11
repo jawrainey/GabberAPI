@@ -12,6 +12,12 @@ def load_user(user_id):
     return User.query.get(user_id)
 
 
+@login_manager.unauthorized_handler
+def unauthorized():
+    flash('You not authorized to visit this page')
+    return redirect(url_for('main.projects'))
+
+
 @users.route('signup/', methods=['GET', 'POST'])
 def signup():
     form = SignupForm()
