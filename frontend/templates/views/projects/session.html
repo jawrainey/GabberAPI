@@ -213,8 +213,25 @@
         addRegion(regionToCreate, true, true);
     }
 
+    function rgba() {
+        return ~~(Math.random() * 255);
+    }
+
+    function randomColor() {
+        return 'rgba(' + [ ~~(rgba()), ~~(rgba()), ~~(rgba()), 0.1] + ')';
+    }
+
+    // { creator name => randomly generated color}; Used to represent annotations.
+    var colorsForCreators = {};
+
     function addRegion(item, drag, resize)
     {
+        // Assign a color to each unique creator; this should be configured by user instead?
+        if (!(item.creator in colorsForCreators)) {
+            color = item.creator === currentUserFullName ? "rgba(178, 214, 255, 0.25)" : randomColor();
+            colorsForCreators[item.creator] = color;
+        }
+
         wavesurfer.addRegion(
         {
             id: item.id,
@@ -227,11 +244,12 @@
                 timestamp: item.timestamp,
                 days_since: item.days_since
             },
+            color: colorsForCreators[item.creator],
             drag: drag,
             resize: resize
         });
         // Only difference here would be the fact that you can have 'yours' and 'theirs'?
-        $('[data-id=' + item.id + ']').append('<i class="material-icons tiny right">bookmark_border</i>');
+        // $('[data-id=' + item.id + ']').append('<i class="material-icons tiny right">bookmark_border</i>');
     }
 
     function POSTConnection(codes, justification)
