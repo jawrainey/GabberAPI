@@ -9,4 +9,4 @@ dati.db
 .idea/
 /experiences
 /gabber/protected
-/gabber/static/img/*
+/frontend/static/img/*
