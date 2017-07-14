@@ -102,8 +102,6 @@ def session(interview_id=None):
         return redirect(url_for('main.projects'))
 
     interview = Interview.query.filter_by(id=interview_id).first()
-    interview.audio = url_for('consent.protected', filename=interview.audio, _external=True)
-
     connections = [i.serialize() for i in interview.connections.all()]
     user_create_a_connection = len([i for i in connections if i['creator_id'] == current_user.get_id()])
 
