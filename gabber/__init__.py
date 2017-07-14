@@ -60,3 +60,21 @@ if not os.path.exists(dbp):
 from gabber.users.models import Anonymous
 login_manager.anonymous_user = Anonymous
 
+from gabber.utils import logging
+
+@app.errorhandler(Exception)
+def exceptions(error):
+    """
+    We must log here as `after_request` may not be executed.
+    """
+    logging.log_request()
+    return error
+
+
+@app.after_request
+def after_request(response):
+    """
+    Log every request that has been made to the server.
+    """
+    logging.log_request()
+    return response
