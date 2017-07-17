@@ -88,6 +88,10 @@ def sessions(slug=None):
                  'first_interview_id': interviews[0].id}
                 for sid, interviews in groups.items()]
 
+    # Only show interviews where this user was a participant when the user is a client (i.e. user).
+    if current_user.role_for_project(Project.query.filter(slug == slug).first().id) == 'user':
+        sessions = [s for s in sessions if not current_user.username not in [str(i.email) for i in s['participants']]]
+
     sessions.sort(key=lambda item: item['creation_date'], reverse=True)
 
     return render_template('views/projects/sessions.html', sessions=sessions,
