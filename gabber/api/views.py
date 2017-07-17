@@ -278,7 +278,7 @@ def add_member():
         return jsonify({'error': 'A user with that email is already a member of %s' % project.title}), 400
 
     # Make this registered user a member of this project
-    user_role = Roles.query.filter_by(name='user').first().id
+    user_role = Roles.query.filter_by(name='staff').first().id
     membership = Membership(uid=id_of_member_to_add, pid=pid, rid=user_role)
     project.members.append(membership)
 
