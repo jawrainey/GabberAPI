@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Used to log incoming requests to the server to support
-filtering and analysis of user interactions.
+Used to log incoming requests for analysis of user interactions.
 """
 from gabber import db
 from flask import request
@@ -31,13 +30,16 @@ def log_request():
     Middleware: logs each incoming request to the database.
     """
     # Ensures objects modified in the session are not committed after the request unintentionally.
-    db.session.remove()
+    # We must capture this prior to removing/expunging session data.
+    uid = current_user.id
+    db.session.expunge_all()
+
     # Only log none-private information
     form = dict(request.form)
     form.pop('password', None)
     # Cover all methods for sending data in the request as JSON string for future parsing.
     data = {'data': request.data, 'form': form, 'json': request.get_json(silent=True), 'files': dict(request.files)}
-    request_to_log = LogRequest(uid=current_user.id, method=request.method, ip=request.remote_addr,
+    request_to_log = LogRequest(uid=uid, method=request.method, ip=request.remote_addr,
                                 path=request.full_path, agent=request.user_agent.string, data=str(data))
     db.session.add(request_to_log)
     db.session.commit()
