@@ -58,14 +58,16 @@
         </div>
 
         <div class="col s12 m6" id="connections">
-          {%- if connections and user_create_a_connection > 0 %}
-           <h5>Connections made</h5>
+          <div id="ConnectionsMade" style="display:none;">
+          <h5>Connections made</h5>
             {%- for connection in connections %}
           <div class="commentContainer">
           {{ render_connection(connection) }}
           </div>
             {% endfor -%}
-          {%- else %}
+          </div>
+
+          <div id="Instructions" style="display:none;">
           <h5><b>What is a connection?</b></h5>
           <p id="instructions"><i>
           Connections are your understanding, reflection and opinions of a moment of an interview,
@@ -84,7 +86,8 @@
             <li>Playback a moment using <code>Shift+Left-Click</code></li>
             <li>Pause a moment by <code>double clicking</code> on it</li>
           </ul>
-          {%- endif %}
+          </div>
+
         </div>
 
 
@@ -266,6 +269,18 @@
         wavesurfer.regions.list[regionToCreate.id].drag = false;
         wavesurfer.regions.list[regionToCreate.id].resize = false;
 
+        // Setting this here because the 'makeConnection' submit function only draws
+        // connections if this variable is 0. Therefore, if I did before that, then
+        // they would never be draw, and likewise, this is called afterwards. Therefore,
+        // they would not be redraw again.
+        // Perform action here as, for now, we do not want to wait for a response.
+        console.log (numOfConnectionsByUser);
+        if (numOfConnectionsByUser == 0) {
+            numOfConnectionsByUser = 1;
+            $('#Instructions').hide();
+            $('#ConnectionsMade').show();
+        }
+
         $.ajax({
             type     : 'POST',
             url      : createConnectionURL,
@@ -295,6 +310,8 @@
     var displayInstructionsOnce = false;
 
     $(document).ready(function() {
+        // Only show the instructions if the user HAS NOT created a connection on this audio.
+        if (numOfConnectionsByUser == 0) { $('#Instructions').show(); } else { $('#ConnectionsMade').show(); }
 
         $( "#createConnection" ).bind( "click", function() {
             toggleConnectionForm();
