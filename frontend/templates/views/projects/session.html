@@ -168,6 +168,30 @@
         else {
             Materialize.toast('To view connections for this interview from other people, please create ONE connection.', 4500);
         }
+
+        // Hack: allow users who make a connection to view it, which required a page reload due to
+        // how the rendering of connections is implemented. As such, the current duration of
+        // the audio was saved prior to a page reload to allow seeking to that point after reload.
+        // However, we do not want to seek to that duration between interviews, hence the choice of
+        // URL as a unique key. Furthermore, we do not want to keep jumping to the connection if the page
+        // is manually reloaded (such as visiting again in the future), hence the choice of 'pageReloaded'.
+        var obj = JSON.parse(sessionStorage.getItem('firstConnection'));
+
+        // We are on the same page where the user previously created their first connection
+        // Now we want to jump to that connection and resume playing
+        // This allows the connection UI to be displayed.
+        // We ensure this is set for each interview based on unique URL
+        if (obj && obj.url == window.location.href && !obj.pageReloaded)
+        {
+            // This code should only be run once: after the first connection
+            obj.pageReloaded = true;
+            sessionStorage.setItem("firstConnection", JSON.stringify(obj));
+            // The wavesurfer API is not great: when we play from a point it does not update UI
+            wavesurfer.play(obj.currentTime);
+            // Hence we need to seek to a point, which takes a variable between 0...1, which is
+            // the current previous position divided by the length of the audio.
+            wavesurfer.seekTo((obj.currentTime) / wavesurfer.getDuration());
+        }
     });
 
     wavesurfer.on('region-in', function (region) {
@@ -291,6 +315,19 @@
             if(data.success) {
                 Materialize.toast("Thanks for making a connection", 3500);
             }
+
+            // Store details of viewing this connection so we can jump to that part of the audio
+            firstConnection = JSON.stringify({
+                url: window.location.href,
+                pageReloaded: false,
+                currentTime: wavesurfer.getCurrentTime()
+            });
+            
+            // Save these to access on reload.
+            sessionStorage.setItem("firstConnection", firstConnection);
+            // Of course, this is a terrible approach as the reload feels alien for users...
+            // However, for now, it is better than not being able to view the connection you have made.
+            location.reload();
         });
     }
 
