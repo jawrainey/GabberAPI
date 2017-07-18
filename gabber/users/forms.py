@@ -38,7 +38,7 @@ class LoginForm(FlaskForm):
         if not FlaskForm.validate(self):
             return False
 
-        user = User.query.filter_by(username=self.email.data).first()
+        user = User.query.filter_by(username=self.email.data.lower()).first()
 
         if not user:
             self.email.errors.append('Unknown email provided.')
