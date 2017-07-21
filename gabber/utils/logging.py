@@ -18,6 +18,7 @@ class LogRequest(db.Model):
     timestamp = db.Column(db.DateTime, default=db.func.now())
 
     uid = db.Column(db.Integer)
+    sid = db.Column(db.String(768))
     method = db.Column(db.String(192))
     ip = db.Column(db.String(192))
     path = db.Column(db.String(192))
@@ -37,9 +38,16 @@ def log_request():
     # Only log none-private information
     form = dict(request.form)
     form.pop('password', None)
+
+    # What if we are behind a proxy? see: https://goo.gl/XNs4GU
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip = request.remote_addr
+
     # Cover all methods for sending data in the request as JSON string for future parsing.
     data = {'data': request.data, 'form': form, 'json': request.get_json(silent=True), 'files': dict(request.files)}
-    request_to_log = LogRequest(uid=uid, method=request.method, ip=request.remote_addr,
+    request_to_log = LogRequest(uid=uid, sid=request.cookies.get('session', ''), method=request.method, ip=ip,
                                 path=request.full_path, agent=request.user_agent.string, data=str(data))
     db.session.add(request_to_log)
     db.session.commit()
