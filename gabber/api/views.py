@@ -286,3 +286,24 @@ def add_member():
     db.session.commit()
 
     return jsonify({'success': True}), 200
+
+
+@api.route('log/event', methods=['POST'])
+def log_event():
+    """
+    Logs a user event, such as a click, to the database to support interaction analytics.
+
+    Args:
+        json:
+            type (int): Refers to the type of the event named within the database. For a full list, see: log/events
+            content (json): Contains data that uniquely identifies the given event, such as region ID.
+
+    Returns:
+        json: 'success' if the event was logged to the database correctly or 'error' and related message.
+
+    """
+    from gabber.utils import logging
+    req = request.get_json()
+    # TODO: validation.
+    logging.log_audio_interview_events(req.get('type', None), req.get('content', None))
+    return jsonify({'success': True}), 200

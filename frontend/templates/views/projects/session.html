@@ -151,11 +151,17 @@
     wavesurfer.on('play', function () {
         $('#play').hide();
         $('#pause').show();
+        POSTLogEvent(0, {positioninseconds: wavesurfer.getCurrentTime()})
     });
 
     wavesurfer.on('pause', function () {
         $('#play').show();
         $('#pause').hide();
+        POSTLogEvent(1, {positioninseconds: wavesurfer.getCurrentTime()})
+    });
+
+    wavesurfer.on('seek', function (position) {
+        POSTLogEvent(2, {positioninseconds: wavesurfer.getCurrentTime()});
     });
 
     // When audio is loaded, decoded and draw waveform. Fires before waveform is drawn.
@@ -205,11 +211,13 @@
     });
 
     wavesurfer.on('region-click', function (region, e) {
+        POSTLogEvent(3, {regionid: region.id});
         // Play on click, loop on shift click
         e.shiftKey ? region.playLoop() : region.play();
     });
 
-    wavesurfer.on('region-dblclick', function () {
+    wavesurfer.on('region-dblclick', function (region, e) {
+        POSTLogEvent(4, {regionid: region.id});
         wavesurfer.playPause();
     });
 
@@ -279,6 +287,17 @@
         // $('[data-id=' + item.id + ']').append('<i class="material-icons tiny right">bookmark_border</i>');
     }
 
+    function POSTLogEvent(event_type, content)
+    {
+        $.ajax({
+            type     : 'POST',
+            url      : "{{ url_for('api.log_event', _external=True) }}",
+            data     : JSON.stringify({type: event_type, content: content}),
+            contentType: "application/json",
+            dataType: 'json'
+        });
+    }
+
     function POSTConnection(codes, justification)
     {
         // Update local prior to pushing to server
@@ -298,7 +317,6 @@
         // they would never be draw, and likewise, this is called afterwards. Therefore,
         // they would not be redraw again.
         // Perform action here as, for now, we do not want to wait for a response.
-        console.log (numOfConnectionsByUser);
         if (numOfConnectionsByUser == 0) {
             numOfConnectionsByUser = 1;
             $('#Instructions').hide();
@@ -352,6 +370,7 @@
 
         $( "#createConnection" ).bind( "click", function() {
             toggleConnectionForm();
+            POSTLogEvent(5, {positioninseconds: wavesurfer.getCurrentTime()});
             // Allows user to focus on creating connection.
             wavesurfer.pause();
 
@@ -365,6 +384,15 @@
         });
 
         $( ".showReplies" ).bind( "click", function() {
+            var parent_comment_id = $(this).closest(".child").data("commentid");
+            var connection_id = $(this).closest(".child").data("parentid");
+
+            if (parent_comment_id) {
+                POSTLogEvent(6, {commentid : $(this).data("responseid")});
+            }
+            else {
+                POSTLogEvent(7, {connectionid : $(this).data("responseid")});
+            }
             wavesurfer.pause();
             // ResponseID is the ID of the comment or connection a response is being made to.
             children = $('*[data-parentid="' + $(this).data("responseid") + '"]');
@@ -383,6 +411,13 @@
             $("#commentForm").data("pidr", parent_comment_id ? parent_comment_id : 0);
             $("#commentForm").data("cidr", parent_comment_id ? connection_id : $(this).data("responseid"));
 
+            if (parent_comment_id) {
+                POSTLogEvent(8, {commentid: parent_comment_id});
+            }
+            else {
+                POSTLogEvent(9, {connectionid: $(this).data("responseid")});
+            }
+
             if ($('#commentForm').is(":visible")) {
                 $('#commentForm').hide();
             }
@@ -398,6 +433,14 @@
             comment = $('#CommentFormContent').val();
             pid = $("#commentForm").data("pidr");
             cid = $("#commentForm").data("cidr");
+
+            if (pid) {
+                POSTLogEvent(10, {commentid: pid});
+            }
+            else {
+                POSTLogEvent(11, {connectionid: cid});
+            }
+
             // TODO: refactor to helper
             $.ajax({
                 type     : 'POST',
@@ -418,16 +461,27 @@
 
         $( ".closeCommentForm" ).bind( "click", function() {
             $('#commentForm').hide();
+            comment_id = $("#commentForm").data("pidr");
+            connection_id = $("#commentForm").data("cidr");
+
+            if (comment_id) {
+                POSTLogEvent(12, {commentid: comment_id});
+            }
+            else {
+                POSTLogEvent(13, {connectionid: connection_id});
+            }
             wavesurfer.play();
         });
 
         $( ".closeForm" ).bind( "click", function() {
+            POSTLogEvent(14, {positioninseconds: wavesurfer.getCurrentTime()});
             toggleConnectionForm();
             wavesurfer.play();
             wavesurfer.regions.list[regionToCreate.id].remove();
         });
 
         $('#makeConnection').submit(function(event) {
+            POSTLogEvent(15, {positioninseconds: wavesurfer.getCurrentTime()});
             // Store all IDs of the selected codes.
             selectedCodes = [];
             $('.selected').show().each(function () {

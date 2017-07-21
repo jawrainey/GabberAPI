@@ -25,6 +25,55 @@ class LogRequest(db.Model):
     agent = db.Column(db.String(192))
     data = db.Column(db.String(19200))
 
+# Should be a normalised database; it's only used for lookup.
+EVENTS = {
+    0: {'type': 'audio-play', 'description': ""},
+    1: {'type': 'audio-pause', 'description': ""},
+    2: {'type': 'audio-seek', 'description': ""},
+    3: {'type': 'audio-region-clicked', 'description': ""},
+    4: {'type': 'audio-region-dbclicked', 'description': ""},
+    5: {'type': 'click-create-connection', 'description': ""},
+    6: {'type': 'click-show-replies-comment', 'description': ""},
+    7: {'type': 'click-show-replies-connection', 'description': ""},
+    8: {'type': 'click-write-comment-on-comment', 'description': ""},
+    9: {'type': 'click-write-comment-on-connection', 'description': ""},
+    10: {'type': 'click-save-comment', 'description': ""},
+    11: {'type': 'click-save-connection', 'description': ""},
+    12: {'type': 'click-close-reply-to-comment', 'description': ""},
+    13: {'type': 'click-close-reply-to-connection', 'description': ""},
+    14: {'type': 'click-close-new-connection', 'description': ""},
+    15: {'type': 'click-create-connection', 'description': ""}
+}
+
+
+class AudioEvent(db.Model):
+    """
+    Stores the events twigged by user interactions with audio interviews.
+    For now, this is a small collection (see: EVENTS above) for interaction validation.
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, default=db.func.now())
+
+    uid = db.Column(db.Integer)  # Could be FK
+    sid = db.Column(db.String(768))
+    type = db.Column(db.Integer)  # Should be associated with an events table.
+    path = db.Column(db.String(192))
+    data = db.Column(db.String(19200))
+
+
+def log_audio_interview_events(event_type, content):
+    """
+    Logs an event from the /interview/ page based on interactions with the audio.
+
+    :param event_type: An ID of the event type from events table
+    :param content: The associated content that uniquely identifies the event.
+    """
+    request_to_log = AudioEvent(uid=current_user.id, type=int(event_type),
+                                sid=request.cookies.get('session', ''),
+                                path=request.path, data=str(content))
+    db.session.add(request_to_log)
+    db.session.commit()
+
 
 def log_request():
     """
