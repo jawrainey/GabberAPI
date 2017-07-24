@@ -305,5 +305,5 @@ def log_event():
     from gabber.utils import logging
     req = request.get_json()
     # TODO: validation.
-    logging.log_audio_interview_events(req.get('type', None), req.get('content', None))
+    logging.log_audio_interview_events(req.get('type', None), req.get('content', None), req.get('path', None))
     return jsonify({'success': True}), 200

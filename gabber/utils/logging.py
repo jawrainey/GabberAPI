@@ -61,16 +61,17 @@ class AudioEvent(db.Model):
     data = db.Column(db.String(19200))
 
 
-def log_audio_interview_events(event_type, content):
+def log_audio_interview_events(event_type, content, uri_path):
     """
     Logs an event from the /interview/ page based on interactions with the audio.
 
     :param event_type: An ID of the event type from events table
     :param content: The associated content that uniquely identifies the event.
+    :param uri_path: The URL where this request was sent from; is unique for each interview.
     """
     request_to_log = AudioEvent(uid=current_user.id, type=int(event_type),
                                 sid=request.cookies.get('session', ''),
-                                path=request.path, data=str(content))
+                                path=uri_path, data=str(content))
     db.session.add(request_to_log)
     db.session.commit()
 
