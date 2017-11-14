@@ -104,16 +104,12 @@ class Project(db.Model):
 
         Returns: dict of dicts containing the project title and associated prompts formatted for API consumption.
         """
-        from flask import request
-        from gabber import app
-        # Only required as the server is behind a proxy @OpenLab
-        uri = (request.url_root[0:(len(request.url_root)-1)] +
-               app.static_url_path + '/img/' + str(self.id) + '/')
-
+        # TODO: do we really only want active prompts?
         return {
             'theme': self.title,
-            'prompts': [{'imageName': uri + prompt.image_path, 'prompt': prompt.text_prompt}
-                        for prompt in self.prompts if prompt.is_active]
+            'timestamp': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
+            'prompts': [p.serialize() for p in self.prompts if p.is_active],
+            'codebook': [c.text for c in self.codebook.first().codes.all()] if self.codebook.first() else []
         }
 
 
@@ -142,6 +138,23 @@ class ProjectPrompt(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
+    def serialize(self):
+        """
+        A serialized version of a prompt to use within views
+
+        returns
+            dict: a serialization of a prompt
+        """
+        from flask import request
+        from gabber import app
+        # Only required as the server is behind a proxy @OpenLab
+        uri = (request.url_root[0:(len(request.url_root)-1)] +
+               app.static_url_path + '/img/' + str(self.id) + '/')
+
+        return {
+            'imageName': uri + self.image_path,
+            'prompt': self.text_prompt
+        }
 
 class Interview(db.Model):
     """
@@ -233,12 +246,20 @@ class Connection(db.Model):
             'content': u''.join(self.justification).encode('utf-8').strip(),
             'start': self.start_interval,
             'end': self.end_interval,
+            'length': self.end_interval - self.start_interval,
             'timestamp': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
             'days_since': abs((self.created_on - datetime.datetime.now()).days),
             'creator': str(User.query.filter_by(id=self.user_id).first().fullname),
             'creator_id': User.query.filter_by(id=self.user_id).first().id,
-            'codes': [{'code': str(i.text), 'id': i.id} for i in self.codes],
-            'comments': [i.serialize() for i in self.comments]
+            'tags': [str(i.text) for i in self.codes],
+            'comments': [i.serialize() for i in self.comments],
+            'interview': {
+                'id': self.interview_id,
+                'topic': ProjectPrompt.query.get(self.interview.prompt_id).text_prompt,
+                # TODO: why is this hard-coded?
+                'url': "http://gabber.audio" + "/protected/" + Interview.query.get(self.interview_id).audio,
+                'uri': "http://gabber.audio/project/session/interview/" + str(self.interview_id) + "?r=" + str(self.id)
+            }
         }
 
 
@@ -348,3 +369,60 @@ class Code(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(64))
     codebook_id = db.Column(db.Integer, db.ForeignKey('codebook.id'))
+
+
+class Playlists(db.Model):
+    """
+    The name and creator of a playlist.
+    TODO: for simplicity this does not consider a collaborative playlist
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(140))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    regions = db.relationship('PlaylistRegions', cascade="all,delete", backref="playlist", lazy='dynamic')
+
+    def serialize(self):
+        """
+        A serialized version of a playlist, including all associated regions
+
+        :return: a serialization (dict) of the playlist region
+        """
+        return {
+            'id': self.id,
+            'title': self.name,
+            'uid': self.user_id,
+            'regions': [r.serialize() for r in self.regions]
+        }
+
+
+class PlaylistRegions(db.Model):
+    """
+    The regions chosen by a user for a specific playlist
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    note = db.Column(db.String)
+    playlist_id = db.Column(db.Integer, db.ForeignKey('playlists.id'))
+    # TODO: previously named regions connections
+    region_id = db.Column(db.Integer, db.ForeignKey('connection.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    def __init__(self, uid, pid, rid):
+        self.user_id = uid
+        self.playlist_id = pid
+        self.region_id = rid
+
+    def serialize(self):
+        """
+        A serialized version of a region for a playlist
+
+        :return: a serialization (dict) of the playlist region
+        """
+        region = Connection.query.get(self.region_id).serialize()
+        # Assign the true region ID rather than the ID of this model object
+        region['id'] = self.region_id
+        region['note'] = self.note
+        region['region_id'] = self.region_id
+        region['playlist_region_id'] = self.id
+        region['playlist_id'] = self.playlist_id
+        region['user_id'] = self.user_id
+        return region

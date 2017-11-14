@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail
 from flask_migrate import Migrate
+from flask_restful import Api
 import os
 
 # Required when deploying to dokku @OpenLab
@@ -37,10 +38,35 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', '')
 app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_USERNAME']
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
+# Prevents suggestions for URLs by Flask being produced
+app.config['ERROR_404_HELP'] = False
 
+restful_api = Api(app)
 db = SQLAlchemy(app)
 mail = Mail(app)
 migrate = Migrate(app, db)
+
+# The existing API is confusing because methods are separate ...
+from gabber.api.playlists import Projects, UserPlaylists, RegionsListForPlaylist, RegionsListByProject, RegionNote
+
+restful_api.add_resource(Projects,             '/api/project/<int:pid>')
+restful_api.add_resource(RegionsListByProject, '/api/project/<int:project_id>/regions/')
+
+restful_api.add_resource(
+    UserPlaylists,
+    '/api/users/<int:user_id>/playlists/<int:playlist_id>',
+    '/api/users/<int:user_id>/playlists'  # POST [create a new playlist]
+)
+
+restful_api.add_resource(
+    RegionsListForPlaylist,
+    '/api/users/<int:uid>/playlists/<int:pid>/regions'
+)
+
+restful_api.add_resource(
+    RegionNote,
+    '/api/users/<int:uid>/playlists/<int:pid>/region/<int:rid>/note'
+)
 
 from gabber.main.views import main
 app.register_blueprint(main, url_prefix=PROXY_PATH)
@@ -76,5 +102,8 @@ def after_request(response):
     """
     Log every request that has been made to the server.
     """
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
     logging.log_request()
     return response
