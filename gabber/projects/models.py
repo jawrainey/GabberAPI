@@ -255,9 +255,9 @@ class Connection(db.Model):
             'comments': [i.serialize() for i in self.comments],
             'interview': {
                 'id': self.interview_id,
-                'topic': ProjectPrompt.query.get(self.interview.prompt_id).text_prompt,
+                'topic': str(ProjectPrompt.query.get(self.interview.prompt_id).text_prompt),
                 # TODO: why is this hard-coded?
-                'url': "http://gabber.audio" + "/protected/" + Interview.query.get(self.interview_id).audio,
+                'url': str("http://gabber.audio" + "/protected/" + Interview.query.get(self.interview_id).audio),
                 'uri': "http://gabber.audio/project/session/interview/" + str(self.interview_id) + "?r=" + str(self.id)
             }
         }

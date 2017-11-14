@@ -104,8 +104,12 @@ class UserPlaylists(Resource):
         :param playlist_id: are we interested in a specific project?
         :return: A list of serialized Playlist objects or an individual Playlist
         """
-        if user_id in [p.user_id for p in PlaylistModel.query.all()] and not playlist_id:
+        known_user_playlist = [p.user_id for p in PlaylistModel.query.all()]
+        if user_id in known_user_playlist and not playlist_id:
             return [pl.serialize() for pl in PlaylistModel.query.filter_by(user_id=user_id).all()]
+        elif not playlist_id and user_id not in known_user_playlist:
+            # i.e. this user does not have any playlists ... and is trying to get them all
+            return [], 200
         abort_if_user_or_playlist_doesnt_exist(user_id, playlist_id)
         return PlaylistModel.query.filter_by(id=playlist_id, user_id=user_id).first().serialize(), 200
 
