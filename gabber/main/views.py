@@ -10,6 +10,11 @@ def index():
     return render_template('views/main/index.html')
 
 
+@main.route('regions/', methods=['GET'])
+def regions():
+    return render_template('views/playlist/index.html')
+
+
 @main.route('tos/', methods=['GET'])
 def tos():
     return render_template('views/main/tos.html')
