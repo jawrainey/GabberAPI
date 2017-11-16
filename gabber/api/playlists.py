@@ -43,7 +43,7 @@ class Projects(Resource):
         """
         # TODO: READ meta-data for a project [title, creation date, codes, topics, members]
         if pid not in [p.id for p in Project.query.all()]:
-            return {'error': "The project with ID {} does not exist.".format(pid)}, 404
+            return {'message': "The project with ID {} does not exist.".format(pid)}, 404
         return Project.query.get(pid).project_as_json(), 200
 
 
@@ -79,9 +79,9 @@ class UserPlaylists(Resource):
         :return: 201 if a playlist was successfully created, otherwise an error.
         """
         if not user_id:
-            return {'error': 'no user ID provided'}, 404
+            return {'message': 'no user ID provided'}, 404
         if user_id not in [user.id for user in User.query.all()]:
-            return {'error': 'The provided does not exist'}, 404
+            return {'message': 'The provided does not exist'}, 404
 
         # i.e. we want to only use this method when no parameters are provided
         parser = reqparse.RequestParser()
@@ -200,9 +200,9 @@ class RegionNote(Resource):
         :return: The ID of a region to create a note for
         """
         if not uid:
-            return {'error': 'no user ID provided'}, 404
+            return {'message': 'no user ID provided'}, 404
         if uid not in [user.id for user in User.query.all()]:
-            return {'error': 'The provided does not exist'}, 404
+            return {'message': 'The provided does not exist'}, 404
 
         # i.e. we want to only use this method when no parameters are provided
         if uid and pid and rid:
