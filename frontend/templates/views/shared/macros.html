@@ -60,11 +60,13 @@
                   <label for="upload-{{ prompt_id }}">
                     <img id="promptImg-{{ prompt_id }}" src="{{ image_url }}" />
                   </label>
+                  <span class="error promptImageError">Error: a prompt image is required</span>
                 </div>
                 <div class="card-content">
                   <div class="input-field col s12">
                     <textarea class="materialize-textarea center-align" maxlength="64"
-                        placeholder="Enter a short prompt to guide the interview" id="promptText-{{ prompt_id }}" name="promptText-{{ prompt_id }}">{{ prompt_text }}</textarea>
+                        placeholder="Enter a short prompt to guide the conversation" id="promptText-{{ prompt_id }}" name="promptText-{{ prompt_id }}">{{ prompt_text }}</textarea>
+                    <span class="error">Error: a short prompt to guide the conversation is required</span>
                   </div>
                 </div>
               </div>

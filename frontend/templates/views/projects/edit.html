@@ -11,14 +11,26 @@
   .card .card-image { background: #4696BB; height: 150px; }
   .card-image input { height: 100%; width: 100%; display: none; }
   .card .card-image, .card .card-image img, .card .card-image input { cursor: pointer; }
+
+  .error{
+	display: none;
+	margin-left: 10px;
+  }
+
+  .error_show {
+	margin-left: 25px;
+    color: #FFFFFF;
+  }
+
   </style>
 {%- endblock %}
 {% block content %}
-        <form method="POST" enctype="multipart/form-data">
+        <form id="projectCreationForm" method="POST" enctype="multipart/form-data">
 
           <div class="input-field col s12 m9">
             <input name="title" type="text" id="title" value="{{ project.title if project }}">
-            <label for="title">The title of your project</label>
+            <label for="title" id="titleLabel">The title of your project</label>
+            <span class="error">A title for your project is required</span>
           </div>
 
           <div class="valign-wrapper col s12 m3">
@@ -35,7 +47,8 @@
           <div class="col s12">
             <div class="input-field">
               <textarea required name="description" id="description" class="materialize-textarea">{{ project.description if project }}</textarea>
-              <label for="description">The description of your project</label>
+              <label for="description" id="descriptionLabel">The description of your project</label>
+              <span class="error">A description of your project is required</span>
             </div>
           </div>
 
@@ -80,9 +93,83 @@
     $(function() {
         var generated_pids = [];
 
+        $('#title').on('input', function() {
+
+            var input=$(this);
+
+	        if(input.val()){
+	            $('#titleLabel')[0].innerText = "The title of your project";
+	            input.removeClass("invalid").addClass("valid");
+	        }
+	        else {
+	            $('#titleLabel')[0].innerText = "Error: please enter a title of your project";
+	            input.removeClass("valid").addClass("invalid");
+	        }
+        });
+
+        $('#description').on('input', function() {
+
+            var input=$(this);
+
+	        if(input.val()){
+	            $('#descriptionLabel')[0].innerText = "The short description of your project";
+	            input.removeClass("invalid").addClass("valid");
+	        }
+	        else {
+	            $('#descriptionLabel')[0].innerText = "Error: please enter a short description of your project";
+	            input.removeClass("valid").addClass("invalid");
+	        }
+        });
+
         $(".submit").on("click", function() {
-            // By-passes form validation
-            document.forms[0].submit();
+
+            var form_data=$("#projectCreationForm").serializeArray();
+
+            var error_free = true;
+
+            for (var input in form_data) {
+
+                var element = $("#" + form_data[input]['name']);
+                var valid = element.hasClass("valid");
+                var error_element = $("span", element.parent());
+
+                // This is a prompt, so we must validate it here as the IDs are random
+                if (element[0].id.split("-")[0] === "promptText") {
+                    if(element.val()){
+	                    element[0].placeholder = "The short description of your project";
+	                    element.removeClass("invalid").addClass("valid");
+	                }
+	                else {
+	                    element[0].placeholder = "Error: please text for your prompt";
+	                    element.removeClass("valid").addClass("invalid");
+	                    error_free = false;
+	                }
+
+	                // Now, each prompt must have an image ...
+                    var card = $(".card-image", element.parent().parent().parent());
+                    var img_src = card.find('img')[0].src;
+                    var _error = card.find('.error');
+                    // e.g. an image has been uploaded as it's converted to a data stream; default src is root domain
+                    if (img_src.split(":")[0] === "data") {
+                        _error.removeClass("error_show").addClass("error");
+                    }
+                    else {
+
+                        _error.removeClass("error").addClass("error_show");
+                        error_free = false;
+                    }
+                }
+                if (!valid) {
+                    element.trigger("input");
+                    error_free = false;
+                }
+            }
+            if (!error_free) {
+                event.preventDefault();
+            }
+            else{
+                document.forms[0].submit();
+            }
         });
 
         $(".add-prompt").on("click", function() {
