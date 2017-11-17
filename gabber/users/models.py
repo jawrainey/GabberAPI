@@ -66,7 +66,7 @@ class User(UserMixin, db.Model):
         :return: A list of projects THIS USER is a member of
         """
         from gabber.projects.models import Project
-        return [Project.query.get(pid) for pid in [i.project_id for i in self.member_of]]
+        return [Project.query.get(pid) for pid in [i.project_id for i in self.member_of] if Project.query.get(pid)]
 
 
 class Anonymous(AnonymousUserMixin, User):
