@@ -199,6 +199,8 @@ def edit(slug=None):
         project.title = _form.get('title', '')
         project.description = _form.get('description', '')
         project.type = 1 if _form.get('ispublic') else 0
+        from slugify import slugify
+        project.slug = slugify(project.title)
 
         _form.pop('title')
         _form.pop('description')
