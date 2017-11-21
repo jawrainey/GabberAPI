@@ -15,14 +15,14 @@ def regions():
     return render_template('views/playlist/index.html')
 
 
-@main.route('tos/', methods=['GET'])
-def tos():
-    return render_template('views/main/tos.html')
-
-
 @main.route('privacy/', methods=['GET'])
 def privacy():
     return render_template('views/main/privacy.html')
+
+
+@main.route('terms/', methods=['GET'])
+def terms():
+    return render_template('views/main/terms.html')
 
 
 @main.route('about/', methods=['GET'])
