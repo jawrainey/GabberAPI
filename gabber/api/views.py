@@ -69,20 +69,14 @@ def upload():
     if participants:
         # Note scope: as an error will be thrown otherwise, we use this below.
         participants = json.loads(participants)
-
-        for p in participants:
-            # Has this registered user been previously involved in a Gabber conversation?
-            known_participant = Participant.query.filter_by(email=p['Email']).first()
-            if known_participant and p["Email"]:
-                known_participant.consent.extend([InterviewConsent(type='ALL')])
-                _participants.append(known_participant)
-            else:
-                participant = Participant(name=p['Name'], email=p['Email'], gender=p['Gender'], age=p['Age'])
-                # A registered user was involved in this uploaded conversation, but they have not
-                if p['Email'] in [i[0] for i in db.session.query(User.username).all()]:
-                    participant.name = User.query.filter_by(username=p['Email']).first().fullname
-                participant.consent.extend([InterviewConsent(type='ALL')])
-                _participants.append(participant)
+        for index, p in enumerate(participants):
+            # HACK: The first item in the list (should, fingers-crossed) be the speaker.
+            if index == 0: p['Name'] = User.query.filter_by(username=p['Email']).first().fullname
+            # We do not care if the participant is registered because any email could currently,
+            # any email could be input to fake attribution of an interview.
+            _participant = Participant(name=p['Name'], email=p['Email'], gender=p['Gender'], age=p['Age'])
+            _participant.consent.extend([InterviewConsent(type='ALL')])
+            _participants.append(_participant)
     else:
         return jsonify({'error': 'No participants were interviewed.'}), 400
 
