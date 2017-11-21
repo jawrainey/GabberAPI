@@ -22,6 +22,17 @@
     color: #FFFFFF;
   }
 
+  .chips .input {
+      width: 40% !important;
+  }
+
+  .chips.invalid {
+    border-bottom: 1px solid #F44336;
+    box-shadow: 0 1px 0 0 #F44336;
+  }
+
+  .hidden { display: none; }
+
   </style>
 {%- endblock %}
 {% block content %}
@@ -35,9 +46,9 @@
 
           <div class="valign-wrapper col s12 m3">
             <h5 class="switch">
-              <label>
+              <label id="ispublicLabel">
                 Private
-                <input {% if project and project.type == 1 %}checked {% endif %} type="checkbox" name="ispublic">
+                <input {% if project and project.type == 1 %}checked {% endif %} type="checkbox" name="ispublic" id="ispublic">
                 <span class="lever"></span>
                 Public
               </label>
@@ -50,6 +61,11 @@
               <label for="description" id="descriptionLabel">The description of your project</label>
               <span class="error">A description of your project is required</span>
             </div>
+          </div>
+
+          <div class="col s12">
+              <h5>Create a codebook to structure the audio annotation process</h5>
+              <div class="chips chips-initial input-field"></div>
           </div>
 
           <div id="promptContainer" class="col s12">
@@ -93,6 +109,14 @@
     $(function() {
         var generated_pids = [];
 
+        $('.chips').material_chip();
+
+        $('.chips-initial').material_chip({
+            data: {{ codebook|tojson }},
+            placeholder: 'Add another',
+            secondaryPlaceholder: 'Press enter to add a code'
+        });
+
         $('#title').on('input', function() {
 
             var input=$(this);
@@ -122,21 +146,34 @@
         });
 
         $(".submit").on("click", function() {
-
             var form_data=$("#projectCreationForm").serializeArray();
 
             var error_free = true;
 
             for (var input in form_data) {
-
                 var element = $("#" + form_data[input]['name']);
+                // Very much procedural code: trigger item such that the valid class is set
+                // The reason for this is because we only want to validate prompts and codes below,
+                // also, when the form is submitted it only completes if all elements are valid.
+                if (element.selector.includes("title")) {
+                    $('#title').trigger('input');
+                }
+                if (element.selector.includes("description")) {
+                    $('#description').trigger('input');
+                }
+
+                // Remove the Public/Private toggle from the form_data to validate
+                if (element.selector === "#ispublic") {
+                    form_data.splice(input, 1);
+                    continue;
+                }
+
                 var valid = element.hasClass("valid");
-                var error_element = $("span", element.parent());
 
                 // This is a prompt, so we must validate it here as the IDs are random
                 if (element[0].id.split("-")[0] === "promptText") {
                     if(element.val()){
-	                    element[0].placeholder = "The short description of your project";
+	                    element[0].placeholder = "The description of your project";
 	                    element.removeClass("invalid").addClass("valid");
 	                }
 	                else {
@@ -154,7 +191,6 @@
                         _error.removeClass("error_show").addClass("error");
                     }
                     else {
-
                         _error.removeClass("error").addClass("error_show");
                         error_free = false;
                     }
@@ -164,11 +200,24 @@
                     error_free = false;
                 }
             }
+
+            var codebook = $('.chips').data().chips;
+
+            if (codebook.length <= 0) {
+                $('.chips').addClass("invalid").removeClass("valid");
+                $('.chips > .input')[0].placeholder = "Error: please enter a list of codes";
+                error_free = false;
+            }
+            else {
+                $('.chips').removeClass("invalid").addClass("valid");
+                $('.chips > .input')[0].placeholder = "Add another";
+            }
+
             if (!error_free) {
                 event.preventDefault();
             }
-            else{
-                document.forms[0].submit();
+            else {
+                $('#projectCreationForm').append($('<textarea class="hidden" name="codebook"/>').text(JSON.stringify(codebook))).submit();
             }
         });
 
@@ -181,6 +230,8 @@
             prompt = prompt.replace(/new/g, gpid);
             // Problem: the ID is not necessary?
             $("#promptContainer").append(prompt);
+            // Brings the prompt into focus by jumping to the bottom
+            window.scrollTo(0,document.body.scrollHeight);
         });
 
         $("#promptContainer").on("click", ".actions .upload", function() {

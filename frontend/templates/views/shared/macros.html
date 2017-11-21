@@ -57,7 +57,7 @@
                   <a class="btn-floating delete" data-prompt-id="{{ prompt_id }}"><i class="material-icons">delete</i></a>
                 </div>
                 <div class="card-image">
-                  <input type="file" name="upload-{{ prompt_id }}" id="upload-{{ prompt_id }}" onchange="readURL(this)">
+                  <input class="valid" type="file" name="upload-{{ prompt_id }}" id="upload-{{ prompt_id }}" onchange="readURL(this)">
                   <label for="upload-{{ prompt_id }}">
                     <img id="promptImg-{{ prompt_id }}" src="{{ image_url }}" />
                   </label>

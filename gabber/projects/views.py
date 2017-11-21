@@ -1,4 +1,4 @@
-from gabber.projects.models import Interview, Membership, Project, ProjectPrompt, Roles
+from gabber.projects.models import Interview, Membership, Project, ProjectPrompt, Roles, Codebook, Code
 from gabber.users.models import User
 from flask import Blueprint, current_app, render_template, url_for, redirect, request, flash, abort
 from flask_login import current_user, login_required
@@ -124,7 +124,7 @@ def create():
     """
     Renders the create view and form to the user.
     """
-    return render_template('views/projects/edit.html')
+    return render_template('views/projects/edit.html', codebook=[])
 
 
 @project.route('create', methods=['POST'])
@@ -160,6 +160,23 @@ def create_post():
     # Add and flush now to gain access to the project id when creating prompts below
     db.session.add(nproject)
     db.session.flush()
+
+    import json
+    codebook = json.loads(_form.get('codebook', []))
+
+    if codebook:
+        db_codebook = Codebook(project_id=nproject.id)
+        nproject.codebook.append(db_codebook)
+        db.session.add(db_codebook)
+        db.session.commit()
+
+        for c in codebook:
+            code = Code(text=c['tag'], codebook_id=db_codebook.id)
+            db.session.add(code)
+            db_codebook.codes.append(code)
+            db.session.commit()
+
+        _form.pop('codebook')
 
     for textfield, field_value in _form.items():
         prompt = ProjectPrompt(creator=current_user.id, text_prompt=field_value, project_id=nproject.id)
@@ -202,9 +219,35 @@ def edit(slug=None):
         from slugify import slugify
         project.slug = slugify(project.title)
 
+        import json
+        codebook = json.loads(_form.get('codebook', []))
+
+        if codebook:
+            pj_codebook = Codebook.query.filter_by(project_id=project.id).first()
+            pj_codes = pj_codebook.codes.all()
+            # Create newly added codes for the codebook
+            for item in codebook:
+                _id = item.get('id', None)
+                if not _id:
+                    code = Code(text=item.get('tag', None), codebook_id=pj_codebook.id)
+                    db.session.add(code)
+                    pj_codebook.codes.append(code)
+                    db.session.commit()
+
+            # Remove codes that were removes by the user:
+            user_codes = set([c['id'] for c in codebook if c.get('id', None)])
+            known_codes = set([c.id for c in pj_codes])
+            removed_tags = known_codes - user_codes
+            if removed_tags:
+                for tag_id in removed_tags:
+                    code = Code.query.filter_by(id=tag_id).first()
+                    db.session.delete(code)
+                    db.session.commit()
+
         _form.pop('title')
         _form.pop('description')
         _form.pop('ispublic', None)
+        _form.pop('codebook')
 
         for fieldname, prompt_text in _form.items():
             for file_id, uploaded_file in request.files.items():
@@ -234,7 +277,14 @@ def edit(slug=None):
         db.session.commit()
         flash('The prompts for your project have been updated if any changes were made.')
         return redirect(url_for('main.projects'))
-    return render_template('views/projects/edit.html', project=project)
+
+    _cb = Codebook.query.filter_by(project_id=project.id).first()
+
+    if _cb:
+        codebook = [{'id': c.id, 'tag': c.text} for c in Codebook.query.filter_by(project_id=project.id).first().codes.all()]
+    else:
+        codebook = []
+    return render_template('views/projects/edit.html', project=project, codebook=codebook)
 
 
 def __upload_prompt_image(filetosave, projectid, promptid):
