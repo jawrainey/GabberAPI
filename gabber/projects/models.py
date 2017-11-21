@@ -149,7 +149,7 @@ class ProjectPrompt(db.Model):
         from gabber import app
         # Only required as the server is behind a proxy @OpenLab
         uri = (request.url_root[0:(len(request.url_root)-1)] +
-               app.static_url_path + '/img/' + str(self.id) + '/')
+               app.static_url_path + '/img/' + str(self.project_id) + '/')
 
         return {
             'imageName': uri + self.image_path,
