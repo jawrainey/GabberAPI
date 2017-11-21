@@ -257,8 +257,8 @@ class Connection(db.Model):
                 'id': self.interview_id,
                 'topic': str(ProjectPrompt.query.get(self.interview.prompt_id).text_prompt),
                 # TODO: why is this hard-coded?
-                'url': str("http://gabber.audio" + "/protected/" + Interview.query.get(self.interview_id).audio),
-                'uri': "http://gabber.audio/project/session/interview/" + str(self.interview_id) + "?r=" + str(self.id)
+                'url': str("https://gabber.audio" + "/protected/" + Interview.query.get(self.interview_id).audio),
+                'uri': "https://gabber.audio/project/session/interview/" + str(self.interview_id) + "?r=" + str(self.id)
             }
         }
 
