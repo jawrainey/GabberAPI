@@ -22,6 +22,7 @@
             </div>
             <div class="card-action">
             {%- if current_user.role_for_project(project.id) == 'admin' %}
+            <a href="{{ url_for('main.regions') }}#/{{ project.id }}">Annotations</a>
              <a class="activator">Add member</a>
              <a href="{{ url_for('project.edit', slug=project.slug) }}">Edit</a>
             {%- elif not current_user.is_project_member(project.id) -%}
