@@ -31,6 +31,10 @@
   #connections > ul > li { list-style-type: circle; }
   #commentForm { margin-top: 1.68em; }
   .child { margin-left: 1rem; }
+  .downloader {
+      float: right;
+      display: inline;
+  }
   </style>
 {%- endblock %}
 {% from "views/shared/macros.html" import render_connection %}
@@ -44,6 +48,7 @@
         </div>
 
         <h5><b>{{ interview.prompt_text().capitalize() }}</b></h5>
+        <span class="downloader"><a href="{{ url_for('consent.protected', filename=interview.audio, _external=True) }}" download><i class="material-icons">file_download</i></a></span>
         <p><i>{% for p in participants %} {{ p['name'] }}{% if not loop.last %},{% endif %}{% endfor %}</i></p>
 
         <div id="waveform"></div>
