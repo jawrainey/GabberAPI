@@ -93,7 +93,7 @@
                     <time datetime="{{ connection.timestamp }}">{{ connection.days_since }} days ago</time>
                   </div>
                   <div class="connection-body">
-                    <p><b>{% for code in connection.codes %}{{ code['code'] }}{% if not loop.last %}, {% endif %}{% endfor %}</b></p>
+                    <p><b>{% for code in connection.tags %}{{ code }}{% if not loop.last %}, {% endif %}{% endfor %}</b></p>
                     <p class="black-text">{{connection.content.decode('utf8', 'ignore')}}</p>
                     <div class="options">
                       <a href="javascript:void(0)"><i data-responseid="{{ connection.id }}" class="material-icons writeReply">reply</i></a>
