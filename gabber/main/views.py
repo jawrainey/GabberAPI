@@ -10,8 +10,10 @@ def index():
     return render_template('views/main/index.html')
 
 
+@main.route('regions/#/<int:pid>', methods=['GET'])
+@main.route('regions/#/me/playlist/<int:pid>', methods=['GET'])
 @main.route('regions/', methods=['GET'])
-def regions():
+def regions(pid=None):
     return render_template('views/playlist/index.html')
 
 
