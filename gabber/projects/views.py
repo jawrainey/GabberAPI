@@ -152,14 +152,14 @@ def create_post():
     _form.pop('description')
     _form.pop('ispublic', None)
 
+    # Add and flush now to gain access to the project id when creating prompts below
+    db.session.add(nproject)
+    db.session.flush()
+
     # Associate the current user as a member of the project.
     admin_role = Roles.query.filter_by(name='admin').first().id
     membership = Membership(uid=current_user.id, pid=nproject.id, rid=admin_role)
     nproject.members.append(membership)
-
-    # Add and flush now to gain access to the project id when creating prompts below
-    db.session.add(nproject)
-    db.session.flush()
 
     import json
     codebook = json.loads(_form.get('codebook', []))
@@ -168,13 +168,13 @@ def create_post():
         db_codebook = Codebook(project_id=nproject.id)
         nproject.codebook.append(db_codebook)
         db.session.add(db_codebook)
-        db.session.commit()
+        db.session.flush()
 
         for c in codebook:
             code = Code(text=c['tag'], codebook_id=db_codebook.id)
             db.session.add(code)
             db_codebook.codes.append(code)
-            db.session.commit()
+            db.session.flush()
 
         _form.pop('codebook')
 
