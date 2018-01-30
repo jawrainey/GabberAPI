@@ -272,6 +272,8 @@ def edit(slug=None):
                         # Upload and associated the new image (if there is one) with the new prompt.
                         new_prompt.image_path = str(new_prompt.id) + '.jpg'
                         __upload_prompt_image(uploaded_file, project.id, new_prompt.id)
+                    else:
+                        new_prompt.image_path = "default.jpg"
                     # Associate this newly created prompt with this specific project
                     project.prompts.append(new_prompt)
         db.session.commit()

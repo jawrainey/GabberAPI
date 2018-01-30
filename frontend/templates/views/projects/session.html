@@ -39,6 +39,7 @@
 {%- endblock %}
 {% from "views/shared/macros.html" import render_connection %}
 {% block content %}
+        {% if interviews | length > 1 %}
         <div class="collection with-header right" id="interviews">
           <p class="collection-header"><b>Other interviews in this session</b></p>
           {%- for interview in interviews %}
@@ -46,6 +47,7 @@
             <b>{{ loop.index }}.</b> {{ interview.prompt_text().title() }}
           </a>{% endfor %}
         </div>
+        {% endif %}
 
         <h5><b>{{ interview.prompt_text().capitalize() }}</b></h5>
         <span class="downloader"><a href="{{ url_for('consent.protected', filename=interview.audio, _external=True) }}" download><i class="material-icons">file_download</i></a></span>
@@ -59,12 +61,12 @@
             <a class="btn waves-effect" id="play"><i class="material-icons">play_arrow</i></a>
             <a class="btn waves-effect" id="pause" style="display:none;"><i class="material-icons">pause</i></a>
           </span>
-          <a class="btn waves-effect" id="createConnection">Create connection</a>
+          <a class="btn waves-effect" id="createConnection">Create annotation</a>
         </div>
 
         <div class="col s12 m6" id="connections">
           <div id="ConnectionsMade" style="display:none;">
-          <h5>Connections made</h5>
+          <h5>All annotations created</h5>
             {%- for connection in connections %}
           <div class="commentContainer">
           {{ render_connection(connection) }}
@@ -171,12 +173,10 @@
 
     // When audio is loaded, decoded and draw waveform. Fires before waveform is drawn.
     wavesurfer.on('ready', function () {
-        if (numOfConnectionsByUser > 0) {
-            connections.forEach(function (i) {
-                addRegion(i, false, false);
-            });
-        }
-        else {
+        connections.forEach(function (i) {
+            addRegion(i, false, false);
+        });
+        if (numOfConnectionsByUser <= 0) {
             Materialize.toast('To view connections for this interview from other people, please create ONE connection.', 4500);
         }
 
@@ -322,11 +322,8 @@
         // they would never be draw, and likewise, this is called afterwards. Therefore,
         // they would not be redraw again.
         // Perform action here as, for now, we do not want to wait for a response.
-        if (numOfConnectionsByUser == 0) {
-            numOfConnectionsByUser = 1;
-            $('#Instructions').hide();
-            $('#ConnectionsMade').show();
-        }
+        $('#Instructions').hide();
+        $('#ConnectionsMade').show();
 
         $.ajax({
             type     : 'POST',
@@ -371,7 +368,7 @@
 
     $(document).ready(function() {
         // Only show the instructions if the user HAS NOT created a connection on this audio.
-        if (numOfConnectionsByUser == 0) { $('#Instructions').show(); } else { $('#ConnectionsMade').show(); }
+        $('#ConnectionsMade').show();
 
         $( "#createConnection" ).bind( "click", function() {
             toggleConnectionForm();

@@ -175,29 +175,26 @@
                     if(element.val()){
 	                    element[0].placeholder = "The description of your project";
 	                    element.removeClass("invalid").addClass("valid");
+	                    error_free = true;
 	                }
 	                else {
-	                    element[0].placeholder = "Error: please text for your prompt";
+                        element[0].placeholder = "Error: please add text for your prompt";
 	                    element.removeClass("valid").addClass("invalid");
 	                    error_free = false;
 	                }
 
 	                // Now, each prompt must have an image ...
-                    var card = $(".card-image", element.parent().parent().parent());
-                    var img_src = card.find('img')[0].src;
-                    var _error = card.find('.error');
-                    // e.g. an image has been uploaded as it's converted to a data stream; default src is root domain
-                    if (img_src.split(":")[0] === "data") {
-                        _error.removeClass("error_show").addClass("error");
-                    }
-                    else {
-                        _error.removeClass("error").addClass("error_show");
-                        error_free = false;
-                    }
-                }
-                if (!valid) {
-                    element.trigger("input");
-                    error_free = false;
+                    {#var card = $(".card-image", element.parent().parent().parent());#}
+                    {#var img_src = card.find('img')[0].src;#}
+                    {#var _error = card.find('.error');#}
+                    {#// e.g. an image has been uploaded as it's converted to a data stream; default src is root domain#}
+                    {#if (img_src.split(":")[0] === "data") {#}
+                    {#    _error.removeClass("error_show").addClass("error");#}
+                    {#}#}
+                    {#else {#}
+                    {#    _error.removeClass("error").addClass("error_show");#}
+                    {#    error_free = false;#}
+                    {#}#}
                 }
             }
 
