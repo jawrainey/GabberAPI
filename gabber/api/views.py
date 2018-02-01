@@ -26,7 +26,7 @@ def register():
     if not username or not password or not fullname:
         return jsonify({'error': 'All fields are required.'}), 400
 
-    if username in [user.username for user in db.session.query(User.username)]:
+    if username in [user.username for user in db.session.query(User.email)]:
         return jsonify({'error': 'An account with that email exists.'}), 400
 
     db.session.add(User(username, password, fullname))
@@ -42,7 +42,7 @@ def login():
     if not username or not password:
         return jsonify({'error': 'All fields are required.'}), 400
 
-    known_users = [user.username for user in db.session.query(User.username)]
+    known_users = [user.username for user in db.session.query(User.email)]
     if username and username in known_users:
         user = User.query.filter_by(username=username).first()
         if user and user.is_correct_password(password):
@@ -252,7 +252,7 @@ def add_member():
     email = req.get('email', None)
 
     # The user must exist before it can become a project member
-    if email and email not in [user.username for user in db.session.query(User.username)]:
+    if email and email not in [user.username for user in db.session.query(User.email)]:
         return jsonify({'error': 'This email (%s) is not linked to a registered account.' % email}), 400
 
     # The user must be an admin of this particular project

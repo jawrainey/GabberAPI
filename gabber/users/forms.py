@@ -18,7 +18,7 @@ class SignupForm(FlaskForm):
         Length(min=6, max=40)])
 
     def validate_email(self, field):
-        if User.query.filter_by(username=field.data).first():
+        if User.query.filter_by(email=field.data).first():
             login = "<a href=" + url_for('users.login') + ">login</a>"
             recover = "<a href=" + url_for('users.forgot') + ">recover</a>"
             output = Markup("This email is already registered. Want to " + login + ' or ' + recover + ' your password?')
@@ -38,7 +38,7 @@ class LoginForm(FlaskForm):
         if not FlaskForm.validate(self):
             return False
 
-        user = User.query.filter_by(username=self.email.data.lower()).first()
+        user = User.query.filter_by(email=self.email.data.lower()).first()
 
         if not user:
             self.email.errors.append('Unknown email provided.')

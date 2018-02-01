@@ -12,7 +12,7 @@ class User(UserMixin, db.Model):
         many-to-many: a user be associated with (has created) many comments
     """
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True)
+    email = db.Column(db.String(64), unique=True)
     password = db.Column(db.String(192))
     fullname = db.Column(db.String(64))
 
@@ -23,8 +23,8 @@ class User(UserMixin, db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
-    def __init__(self, username, password, fullname):
-        self.username = username
+    def __init__(self, email, password, fullname):
+        self.email = email
         self.password = bcrypt.generate_password_hash(password)
         self.fullname = fullname
 
