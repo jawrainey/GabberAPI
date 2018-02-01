@@ -1,7 +1,6 @@
 from gabber import app, db
 from gabber.users.models import User
-from gabber.projects.models import Interview, Project, ProjectPrompt, Participant, ComplexNeeds
-from gabber.consent.models import InterviewConsent
+from gabber.projects.models import InterviewSession, Project, ProjectPrompt, Connection
 from flask import jsonify, request, Blueprint
 import json
 import os
@@ -49,85 +48,6 @@ def login():
             return jsonify({'success': 'We did it!'}), 200
         return jsonify({'error': 'Incorrect password provided.'}), 400
     return jsonify({'error': 'Username and password do not match.'}), 400
-
-
-@api.route('upload', methods=['POST'])
-def upload():
-    """
-    Allows a client to upload an audio interview with associated meta-data,
-    including details of participants in a JSON encoded file.
-    """
-    # TODO: return better errors for specific missing data.
-    if not request.files or not request.form:
-        return jsonify({'error': 'Required data has not been sent.'}), 400
-
-    #TODO: this is a string that we expect to be in JSON serialised.
-    participants = request.form.get('participants', None)
-    # All participants involved in this Gabber as Participant objects
-    _participants = []
-
-    if participants:
-        # Note scope: as an error will be thrown otherwise, we use this below.
-        participants = json.loads(participants)
-        for index, p in enumerate(participants):
-            # HACK: The first item in the list (should, fingers-crossed) be the speaker.
-            if index == 0: p['Name'] = User.query.filter_by(username=p['Email']).first().fullname
-            # We do not care if the participant is registered because any email could currently,
-            # any email could be input to fake attribution of an interview.
-            _participant = Participant(name=p['Name'], email=p['Email'], gender=p['Gender'], age=p['Age'])
-            _participant.consent.extend([InterviewConsent(type='ALL')])
-            _participants.append(_participant)
-    else:
-        return jsonify({'error': 'No participants were interviewed.'}), 400
-
-    # Only allow those who have been made members of projects (i.e. by admins
-    # of those projects) to upload datafiles to that project.
-    # Current approach is to lookup prompt based on text rather than ID ... oh my.
-    interviewer_id = User.query.filter_by(username=participants[0]['Email']).first().id
-    interview_prompt = ProjectPrompt.query.filter(
-        ProjectPrompt.text_prompt.like(request.form.get('promptText', None))).first()
-    members = Project.query.filter_by(id=interview_prompt.project_id).first().members
-
-    if interviewer_id not in [m.id for m in members]:
-        return jsonify({'error': 'You do not have authorization to upload to this project'}), 401
-
-    #TODO: validate: check mime type, use magic_python.
-    interviewFile = request.files['experience']
-    filename = interviewFile.filename.split(".")[0] + ".mp4"
-    interviewFile.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-    interview = Interview(
-        audio=filename,
-        location=request.form.get('location', None),
-        creator=interviewer_id,
-        session_id=request.form.get('sessionID'),
-        prompt_id=interview_prompt.id
-    )
-
-    # TODO: how to abstract this per project basis? Currently only for FF deployment.
-    # Only attempt to add a participant the needs exist.
-    # Checking for string as an empty dict as we have not yet converted this to JSON.
-    if [i for i in participants if i['Needs'] and i['Needs'] != '{}']:
-        iid = db.session.query(Interview).order_by(Interview.id.desc()).first().id + 1
-        # First item is excluded as we want to keep in sync with parts above.
-        for index, participant in enumerate(participants[1:]):
-            # Do not update as we want to track how the participants needs
-            # have changed between interview sessions
-            cn = [ComplexNeeds(type=key, timeline=value['timeline'],
-                               month=value['month'], year=value['year'],
-                               interview_id=iid,
-                               participant_id=_participants[index+1].id)
-                  for key, value in json.loads(participant['Needs']).items()]
-            _participants[index+1].complexneeds.extend(cn)
-
-    # Populating relationship fields outside constructor due to extending lists.
-    interview.consents.extend([i.consent.first() for i in _participants])
-    interview.participants.extend(_participants)
-
-    db.session.add(interview)
-    db.session.commit()
-
-    return jsonify({'success': 'We did it!'}), 200
 
 
 @api.route('prompt/delete/', methods=['POST'])

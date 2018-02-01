@@ -1,7 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for, \
-    send_from_directory, session
-from gabber.projects.models import Participant, ProjectPrompt, Interview
-from gabber.consent.models import InterviewConsent
+from flask import Blueprint, render_template, request, redirect, url_for, send_from_directory, session
+from gabber.projects.models import ProjectPrompt, InterviewSession
+from gabber.users.models import User
 from gabber.consent import helper
 from gabber import db
 import json
@@ -13,12 +12,13 @@ consent = Blueprint('consent', __name__)
 def validate_consent(token):
     # TODO: user can re-approve their interview until expiration time met.
     token = helper.confirm_consent(token)
+    # TODO: is the token-audio and token-email enough to identify a session?
     # The participant who is associated with this particular interview
-    interviewConsent = InterviewConsent.query.join(Participant)\
-        .filter(InterviewConsent.interview_id ==
-                Interview.query.filter_by(audio=token['audio']).first().id,
-                Participant.email == token['email']).first()
-    interviewConsent.type = request.form['consent']
+    usr = User.query.filter_by(email=token['email']).first()
+    # TODO: could simplify this via a join
+    _session = InterviewSession.query.filter_by(recording_url=token['audio'])
+    interview_consent = _session.participants.filter_by(user_id=usr.id).first()
+    interview_consent.consent_type = request.form['consent']
     db.session.commit()
     # TODO: snowball && inform user of change?
     return redirect(url_for('main.projects'))
@@ -41,7 +41,7 @@ def display_consent(token):
                   else url_for('consent.protected', filename='default.png'))
     }]
 
-    prompt_id = Interview.query.filter_by(
+    prompt_id = InterviewSession.query.filter_by(
         audio=consent['audio']).first().prompt_id
     prompt = ProjectPrompt.query.filter_by(id=prompt_id).first()
 

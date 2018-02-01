@@ -48,7 +48,7 @@
             <h5 class="switch">
               <label id="ispublicLabel">
                 Private
-                <input {% if project and project.type == 1 %}checked {% endif %} type="checkbox" name="ispublic" id="ispublic">
+                <input {% if project and project.isProjectPublic == 1 %}checked {% endif %} type="checkbox" name="ispublic" id="ispublic">
                 <span class="lever"></span>
                 Public
               </label>
@@ -72,7 +72,7 @@
             <h5>The prompts associated with your project</h5>
             {%- if project -%}
               {% for prompt in project.active_prompts() -%}
-                {{ render_prompt(prompt.id, prompt.text_prompt.lower(),
+                {{ render_prompt(prompt.id, (prompt.text_prompt.lower() if prompt.text_prompt else ""),
                 url_for('static', filename='img/' + project.id|string + "/" + prompt.image_path)) }}
               {%- endfor -%}
             {%- endif %}

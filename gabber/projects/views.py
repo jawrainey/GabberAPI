@@ -1,4 +1,4 @@
-from gabber.projects.models import Interview, Membership, Project, ProjectPrompt, Roles, Codebook, Code
+from gabber.projects.models import InterviewSession, Membership, Project, ProjectPrompt, Roles, Codebook, Code
 from gabber.users.models import User
 from flask import Blueprint, current_app, render_template, url_for, redirect, request, flash, abort
 from flask_login import current_user, login_required
@@ -25,8 +25,8 @@ def membership_required(func):
         slug = kwargs.get('slug', None)
         _project = None
 
-        if iid and iid in [i[0] for i in db.session.query(Interview.id).all()]:
-            _project = Interview.query.get(iid).project()
+        if iid and iid in [i[0] for i in db.session.query(InterviewSession.id).all()]:
+            _project = InterviewSession.query.get(iid).project()
         elif slug and slug in [str(i[0]) for i in db.session.query(Project.slug).all()]:
             _project = Project.query.filter_by(slug=slug).first()
         else:
@@ -34,7 +34,7 @@ def membership_required(func):
 
         _is_member = current_user.is_authenticated and current_user.member_of.filter_by(project_id=_project.id).first()
 
-        if _project and _project.type or _is_member:
+        if _project and _project.isProjectPublic or _is_member:
             return func(*args, **kwargs)
         return current_app.login_manager.unauthorized()
     return verified_membership
@@ -54,7 +54,6 @@ def join(slug=None):
         return redirect(url_for('users.signup'))
 
     project = Project.query.filter_by(slug=slug).first()
-    cid = current_user.get_id()
 
     if project.type:
         user_role = Roles.query.filter_by(name='user').first().id
@@ -70,51 +69,30 @@ def join(slug=None):
 @project.route('sessions/<path:slug>/', methods=['GET', 'POST'])
 @membership_required
 def sessions(slug=None):
-    interviews = Interview.query.join(ProjectPrompt).join(Project).filter(Project.slug == slug).all()
+    pid = Project.query.filter_by(slug=slug).first().id
+    interviews = InterviewSession.query.filter_by(project_id=pid).all()
 
-    from collections import defaultdict
-
-    groups = defaultdict(list)
-
-    for interview in interviews:
-        if interview.session_id:
-            groups[interview.session_id].append(interview)
-
-    sessions = [{'creator': User.query.filter_by(id=interviews[0].creator).first().fullname if User.query.filter_by(id=interviews[0].creator).first() else 'Unknown',
-                 'creation_date': interviews[0].created_on,
-                 'participants': interviews[0].participants.all(),
-                 'participants_names': [i.name for i in interviews[0].participants.all() if i],
-                 'interviews': interviews,
-                 'first_interview_id': interviews[0].id}
-                for sid, interviews in groups.items()]
-
-    # Only show interviews where this user was a participant when the user is a client (i.e. user).
-    if current_user.role_for_project(Project.query.filter(slug == slug).first().id) == 'user':
-        sessions = [s for s in sessions if not current_user.username not in [str(i.email) for i in s['participants']]]
-
-    sessions.sort(key=lambda item: item['creation_date'], reverse=True)
-
-    return render_template('views/projects/sessions.html', sessions=sessions,
+    return render_template('views/projects/sessions.html', sessions=interviews,
                            project_name=Project.query.filter_by(slug=slug).first().title)
 
 
-@project.route('session/interview/<int:interview_id>', methods=['GET', 'POST'])
+@project.route('session/interview/<string:interview_id>', methods=['GET', 'POST'])
 @membership_required
 def session(interview_id=None):
-    if interview_id not in [i[0] for i in db.session.query(Interview.id).all()]:
+    if interview_id not in [i[0] for i in db.session.query(InterviewSession.id).all()]:
         flash('The interview you tried to view does not exist.')
         return redirect(url_for('main.projects'))
 
-    interview = Interview.query.filter_by(id=interview_id).first()
+    interview = InterviewSession.query.get(interview_id)
     connections = [i.serialize() for i in interview.connections.all()]
     user_create_a_connection = len([i for i in connections if i['creator_id'] == current_user.get_id()])
+    structural_annotation = [i.serialize() for i in interview.prompts.all()]
 
     return render_template('views/projects/session.html',
                            interview=interview,
-                           interviews=Interview.query.filter_by(
-                               session_id=Interview.query.filter_by(id=interview_id).first().session_id).all(),
                            participants=interview.participants.all(),
-                           connections=connections,
+                           conno=structural_annotation,    # These are the structural prompts
+                           connections=connections,        # Whereas these are user annotations
                            user_create_a_connection=user_create_a_connection)
 
 
@@ -215,7 +193,7 @@ def edit(slug=None):
 
         project.title = _form.get('title', '')
         project.description = _form.get('description', '')
-        project.type = 1 if _form.get('ispublic') else 0
+        project.isProjectPublic = 1 if _form.get('ispublic') else 0
         from slugify import slugify
         project.slug = slugify(project.title)
 

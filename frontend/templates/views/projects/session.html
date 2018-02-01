@@ -19,8 +19,6 @@
   .connection-header { background-color: #f6f8fa; border-bottom: 1px solid #d1d5da; }
   .connection-body > p:first-of-type { margin: 0; }
   .author { color: #586069; }
-  #interviews { position: absolute; right: 0; width: 150px; z-index: 0; }
-  #interviews > i { position: absolute; font-weight: 600; left: 0; z-index: 1012018; cursor: pointer; }
   .collection.with-header .collection-item { padding-left: 20px; margin-bottom: 0; }
   #connections > h5 { font-weight: 700; }
   .chip.selected { background-color: #4696BB; color: white; }
@@ -39,19 +37,9 @@
 {%- endblock %}
 {% from "views/shared/macros.html" import render_connection %}
 {% block content %}
-        {% if interviews | length > 1 %}
-        <div class="collection with-header right" id="interviews">
-          <p class="collection-header"><b>Other interviews in this session</b></p>
-          {%- for interview in interviews %}
-          <a href="{{ url_for('project.session', interview_id=interview.id) }}" class="collection-item truncate">
-            <b>{{ loop.index }}.</b> {{ interview.prompt_text().title() }}
-          </a>{% endfor %}
-        </div>
-        {% endif %}
-
-        <h5><b>{{ interview.prompt_text().capitalize() }}</b></h5>
-        <span class="downloader"><a href="{{ url_for('consent.protected', filename=interview.audio, _external=True) }}" download><i class="material-icons">file_download</i></a></span>
-        <p><i>{% for p in participants %} {{ p['name'] }}{% if not loop.last %},{% endif %}{% endfor %}</i></p>
+{#        <h5><b>{{ interview.prompts.all()[0] }}</b></h5>#}
+        <span class="downloader"><a href="{{ url_for('consent.protected', filename=interview.recording_url, _external=True) }}" download><i class="material-icons">file_download</i></a></span>
+        <p><i>{% for p in participants %} {{ p.fullname() }}{% if not loop.last %},{% endif %}{% endfor %}</i></p>
 
         <div id="waveform"></div>
         <div id="waveform-timeline"></div>
@@ -139,10 +127,10 @@
   <script>
     // Variables rendered here for future js refactoring as it
     // is not possible to render jinja2 variables inside JS files.
-    var connections = {{ connections | safe }};
-    var audioURL = "{{ url_for('consent.protected', filename=interview.audio, _external=True) }}";
+    var connections = {{ conno | safe }};
+    var audioURL = "{{ url_for('consent.protected', filename=interview.recording_url, _external=True) }}";
     var currentUserFullName = "{{ current_user.fullname }}";
-    var currentInterviewID = {{ interview.id }};
+    var currentInterviewID = "{{ interview.id }}";
     var createConnectionURL = "{{ url_for('api.create_connection', _external=True) }}";
     var createCommentURL = "{{ url_for('api.create_comment_on_connection', _external=True) }}";
     var numOfConnectionsByUser = {{ user_create_a_connection }};

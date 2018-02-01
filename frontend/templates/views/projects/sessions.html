@@ -3,17 +3,14 @@
         <h1 class="text-center">{{ project_name }} sessions</h1>
         <div class="collection">
          {%- for session in sessions %}
-          <a href="{{ url_for('project.session', interview_id=session['first_interview_id']) }}" class="collection-item">
-          {{ session['participants_names']|length }} participants (
-              {% if session['participants_names']|length == 1 %}
-                  {{ session['participants_names'][0] }}
-              {% elif session['participants_names']|length == 2 %}
-                  {{ session['participants_names'][0] }} &amp; {{ session['participants_names'][1] }}
-              {% elif session['participants_names']|length >= 2 %}
-                  {{ session['participants_names'][0] }}, {{ session['participants_names'][1] }} &amp; others
-              {% endif %}
-          ) discussing <b>{{ session['interviews'] | length }}</b> topics on {{ session['creation_date'].strftime("%b %d, %Y") }},
-          Created by <b>{{ session['creator'] }}</b>
+          <a href="{{ url_for('project.session', interview_id=session.id) }}" class="collection-item">
+          {{ session.participants.all()|length }} participants (
+
+          {% for part in session.participants.all() %}
+            {{ part.fullname() }}
+          {%- endfor %}
+          ) discussing <b>{{ session.prompts.all() | length }}</b> topics on {{ session.created_on.strftime("%b %d, %Y") }},
+          Created by <b>{{ session.creator().fullname }}</b>
           </a>
           {%- endfor %}
         </div>

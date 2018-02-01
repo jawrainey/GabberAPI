@@ -51,9 +51,11 @@ def consented(filename):
     Returns:
         bool: True if all participants provided full consent, otherwise False.
     """
-    from gabber.projects.models import Interview
-    interview = Interview.query.filter(Interview.audio == filename).first()
-    if interview and 'none' not in [c.type.lower() for c in interview.consents.all()]:
+    # TODO: for now all recordings will be made public until the following changes are made
+    return True
+    from gabber.projects.models import InterviewSession
+    interview = InterviewSession.query.filter(InterviewSession.recording_url == filename).first()
+    if interview and 0 not in [c.type.lower() for c in interview.consents.all()]:
         return True
     return False
 

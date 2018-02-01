@@ -1,11 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+???
+"""
 from gabber import db
-
-
-participants = db.Table(
-    'participants',
-    db.Column('participant_id', db.Integer, db.ForeignKey('participant.id')),
-    db.Column('interview_id', db.Integer, db.ForeignKey('interview.id')))
-
 
 codes_for_connections = db.Table(
     'codes_for_connections',
@@ -71,9 +68,9 @@ class Project(db.Model):
 
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
     # Is the project public or private? True (1) is public.
-    type = db.Column(db.SmallInteger, default=1)
+    isProjectPublic = db.Column(db.Boolean, default=1)
     # Should consent (via email) be enabled for this project?
-    consent = db.Column(db.SmallInteger, default=0)
+    isConsentEnabled = db.Column(db.Boolean, default=0)
 
     codebook = db.relationship('Codebook', backref='project', lazy='dynamic')
     prompts = db.relationship('ProjectPrompt', backref='project', lazy='dynamic')
@@ -88,7 +85,7 @@ class Project(db.Model):
         self.slug = slugify(title)
         self.description = description
         self.creator = creator
-        self.type = visibility
+        self.isProjectPublic = visibility
 
     def active_prompts(self):
         """
@@ -106,7 +103,13 @@ class Project(db.Model):
         """
         # TODO: do we really only want active prompts?
         return {
-            'theme': self.title,
+            'id': self.id,
+            'title': self.title,
+            'slug': self.slug,
+            'description': self.description,
+            'creator': self.creator,
+            'isPublic': self.isProjectPublic,
+            'HasConsent': self.isConsentEnabled,
             'timestamp': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
             'prompts': [p.serialize() for p in self.prompts if p.is_active],
             'codebook': [c.text for c in self.codebook.first().codes.all()] if self.codebook.first() else []
@@ -123,17 +126,14 @@ class ProjectPrompt(db.Model):
     Relationships:
         one-to-many: a projectPrompt can be used by many interviews
     """
-    __tablename__ = 'projectprompt'
-
     id = db.Column(db.Integer, primary_key=True)
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
     text_prompt = db.Column(db.String(64))
-    image_path = db.Column(db.String(64))
+    image_path = db.Column(db.String(64), default="default.jpg")
     # Used as a 'soft-delete' to preserve prompt-content for viewing
     is_active = db.Column(db.SmallInteger, default=1)
 
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
-    interviews = db.relationship('Interview', backref='interviews', lazy='dynamic')
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
@@ -152,56 +152,125 @@ class ProjectPrompt(db.Model):
                app.static_url_path + '/img/' + str(self.project_id) + '/')
 
         return {
-            'imageName': uri + self.image_path,
-            'prompt': self.text_prompt
+            'id': self.id,
+            'text': self.text_prompt,
+            'imageURL': uri + str("" if not None else self.image_path),
+            'creatorID': self.creator,
+            'projectID': self.project_id
         }
 
-class Interview(db.Model):
+
+class InterviewSession(db.Model):
     """
-    An interview between participants for a given ProjectPrompt
+    An interview session between participants for a set of prompts
 
     Relationships:
-        one-to-many: an interview can have many connections
         one-to-many: an interview must be consented by many participants
-        many-to-many: an interview can have many participants
+        one-to-many: many participants can be involved in one interview
+        one-to-many: an interview can have many connections
     """
-    id = db.Column(db.Integer, primary_key=True)
-    audio = db.Column(db.String(260))
-    image = db.Column(db.String(260))
-    location = db.Column(db.String(10))
-    session_id = db.Column(db.String(260))
-    creator = db.Column(db.Integer, db.ForeignKey('user.id'))
-    prompt_id = db.Column(db.Integer, db.ForeignKey('projectprompt.id'))
+    id = db.Column(db.String(260), primary_key=True)
+    recording_url = db.Column(db.String(260))
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     created_on = db.Column(db.DateTime, default=db.func.now())
 
+    prompts = db.relationship('InterviewPrompts', backref='interview', lazy='dynamic')
+    participants = db.relationship('InterviewParticipants', backref='interview', lazy='dynamic')
     connections = db.relationship('Connection', backref='interview', lazy='dynamic')
-    participants = db.relationship('Participant', secondary=participants,
-                                   backref=db.backref('interviews', lazy='dynamic'),
-                                   lazy='dynamic')
-    consents = db.relationship('InterviewConsent', backref='interview', lazy='dynamic')
+
+    def creator(self):
+        """
+        ??
+
+        :returns ??
+        """
+        from gabber.users.models import User
+        return User.query.get(self.creator_id)
 
     def project(self):
         """
-        There's no relationship between Projects<->Interviews as there is through the ProjectPrompt.
+        The project associated with this interview
 
         :returns The project associated with this interview.
         """
-        return ProjectPrompt.query.filter_by(id=self.prompt_id).first().project
-
-    def prompt_text(self):
-        """
-        returns the text of the prompt used for this Interview
-        """
-        return ProjectPrompt.query.filter_by(id=self.prompt_id).first().text_prompt
+        return Project.query.get(self.project_id)
 
     def codebook(self):
         """
         returns all codes associated with this project
         """
-        pid = ProjectPrompt.query.filter_by(id=self.prompt_id).first().project_id
-        # A hack to support backwards compatibility with projects that don't have a codebook.
-        cb = Project.query.filter_by(id=pid).first().codebook.first()
+        cb = self.project().codebook.first()
         return [{'text': str(i.text), 'id': i.id} for i in cb.codes.all()] if cb else []
+
+
+class InterviewPrompts(db.Model):
+    """
+    These are the annotations created during the capture of an interview, which differ
+    from an annotation below as they are used for structural representation ontop of the recording.
+
+    Backref:
+        Can refer to associated interview with 'interview'
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    prompt_id = db.Column(db.Integer, db.ForeignKey('project_prompt.id'))
+    interview_id = db.Column(db.String(260), db.ForeignKey('interview_session.id'))
+    # Where in the structural annotation starts and ends
+    start_interval = db.Column(db.Integer)
+    end_interval = db.Column(db.Integer, default=0)
+    # TODO: fix this: we want to update from app
+    #created_on = db.Column(db.DateTime, default=db.func.now())
+
+    def serialize(self):
+        """
+        A serialized version of a connection to use within views
+
+        returns
+            dict: a serialization of a connection
+        """
+        from gabber.users.models import User
+        import datetime
+        return {
+            'id': str(self.id).encode('utf-8'),
+            'start': self.start_interval,
+            'end': self.end_interval,
+            'length': self.end_interval - self.start_interval,
+            'timestamp': 10,
+            'days_since': 10,
+            'interview': {
+                'id': self.interview_id.encode('utf-8'),
+                'topic': ProjectPrompt.query.get(self.prompt_id).text_prompt.encode('utf-8'),
+                # TODO: why is this hard-coded?
+                'url': str("https://gabber.audio" + "/protected/" + InterviewSession.query.get(self.interview_id).recording_url),
+                'uri': "https://gabber.audio/project/session/interview/" + str(self.interview_id) + "?r=" + str(self.id)
+            }
+        }
+
+
+class InterviewParticipants(db.Model):
+    """
+    The individual who was part of an interview
+
+    Backref:
+        Can refer to associated interview with 'interview'
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    interview_id = db.Column(db.String(260), db.ForeignKey('interview_session.id'))
+    # 0: private, 1: public, 2: delete
+    consent_type = db.Column(db.Integer, default=0)
+    # 0: interviewee, 1: interviewer
+    # Although this could be inferred through interview.creator, this simplifies queries
+    role = db.Column(db.Boolean, default=0)
+
+    def fullname(self):
+        """
+        The project associated with this interview
+
+        :returns The project associated with this interview.
+        """
+        from gabber.users.models import User
+        return User.query.get(self.user_id).fullname
 
 
 class Connection(db.Model):
@@ -227,7 +296,7 @@ class Connection(db.Model):
     comments = db.relationship('ConnectionComments', backref='connection', lazy='dynamic')
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    interview_id = db.Column(db.Integer, db.ForeignKey('interview.id'))
+    interview_id = db.Column(db.Integer, db.ForeignKey('interview_session.id'))
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
@@ -249,15 +318,14 @@ class Connection(db.Model):
             'length': self.end_interval - self.start_interval,
             'timestamp': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
             'days_since': abs((self.created_on - datetime.datetime.now()).days),
-            'creator': str(User.query.filter_by(id=self.user_id).first().fullname),
+            'creator': u''.join(User.query.filter_by(id=self.user_id).first().fullname).encode('utf-8').strip(),
             'creator_id': User.query.filter_by(id=self.user_id).first().id,
             'tags': [str(i.text) for i in self.codes],
             'comments': [i.serialize() for i in self.comments],
             'interview': {
                 'id': self.interview_id,
-                'topic': str(ProjectPrompt.query.get(self.interview.prompt_id).text_prompt),
                 # TODO: why is this hard-coded?
-                'url': str("https://gabber.audio" + "/protected/" + Interview.query.get(self.interview_id).audio),
+                'url': str("https://gabber.audio" + "/protected/" + InterviewSession.query.get(self.interview_id).recording_url),
                 'uri': "https://gabber.audio/project/session/interview/" + str(self.interview_id) + "?r=" + str(self.id)
             }
         }
@@ -299,45 +367,6 @@ class ConnectionComments(db.Model):
             'creator': str(User.query.filter_by(id=self.user_id).first().fullname),
             'children': [i.serialize() for i in self.children.order_by(db.desc(ConnectionComments.created_on)).all()],
         }
-
-
-class Participant(db.Model):
-    """
-    The individual who was part of an interview
-
-    Relationships:
-        one-to-many: a participant can have many complex needs.
-        one-to-many: a participant can provide consent for many interviews
-
-    Backref:
-        Can refer to associated interviews with 'interviews'
-    """
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64))
-    email = db.Column(db.String(64))
-    age = db.Column(db.Integer)
-    gender = db.Column(db.Integer)
-    complexneeds = db.relationship('ComplexNeeds', backref="participant", lazy='dynamic')
-    consent = db.relationship('InterviewConsent', backref='participant', lazy='dynamic')
-
-
-class ComplexNeeds(db.Model):
-    """
-    This is specific to the FF deployment
-
-    Backrefs:
-        Can refer to its participant with 'participant'
-        Can refer to its interview with 'interview'
-    """
-    __tablename__ = 'complexneeds'
-
-    id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String)
-    timeline = db.Column(db.String)
-    month = db.Column(db.String)
-    year = db.Column(db.String)
-    participant_id = db.Column(db.Integer, db.ForeignKey('participant.id'))
-    interview_id = db.Column(db.Integer, db.ForeignKey('interview.id'))
 
 
 class Codebook(db.Model):

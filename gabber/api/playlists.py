@@ -8,7 +8,7 @@ TODO: clean user-input and authentication
 from gabber import db
 from flask_restful import abort, Resource, reqparse
 from gabber.users.models import User
-from gabber.projects.models import Connection, Project, ProjectPrompt, PlaylistRegions, Interview
+from gabber.projects.models import Connection, Project, ProjectPrompt, PlaylistRegions, InterviewSession
 from gabber.projects.models import Playlists as PlaylistModel
 
 
@@ -60,7 +60,7 @@ class RegionsListByProject(Resource):
         :param project_id: the ID of a specific project
         :return: A list of regions for a given project
         """
-        connections = Connection.query.join(Interview, ProjectPrompt, Project).filter(Project.id == project_id).all()
+        connections = Connection.query.join(InterviewSession, ProjectPrompt, Project).filter(Project.id == project_id).all()
         return [c.serialize() for c in connections], 200
 
 

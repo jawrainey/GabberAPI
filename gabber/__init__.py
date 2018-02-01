@@ -47,7 +47,8 @@ mail = Mail(app)
 migrate = Migrate(app, db)
 
 # The existing API is confusing because methods are separate ...
-from gabber.api.playlists import Projects, UserPlaylists, RegionsListForPlaylist, RegionsListByProject, RegionNote
+from gabber.api.playlists import Projects, UserPlaylists, \
+    RegionsListForPlaylist, RegionsListByProject, RegionNote
 
 restful_api.add_resource(Projects,             '/api/project/<int:pid>')
 restful_api.add_resource(RegionsListByProject, '/api/project/<int:project_id>/regions/')
@@ -67,6 +68,12 @@ restful_api.add_resource(
     RegionNote,
     '/api/users/<int:uid>/playlists/<int:pid>/region/<int:rid>/note'
 )
+
+from gabber.api.interview import InterviewSessions
+
+restful_api.add_resource(InterviewSessions,
+                         '/api/interview/',
+                         '/api/interview/<string:uid>/')
 
 from gabber.main.views import main
 app.register_blueprint(main, url_prefix=PROXY_PATH)

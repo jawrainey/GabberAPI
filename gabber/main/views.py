@@ -34,7 +34,7 @@ def about():
 
 @main.route('projects/', methods=['GET'])
 def projects():
-    public_projects = Project.query.filter_by(type=1).all()
+    public_projects = Project.query.filter_by(isProjectPublic=1).all()
     user_projects = []
     if current_user.is_authenticated:
         # Projects the user is a member of (whether private & public)
