@@ -89,6 +89,7 @@ def session(interview_id=None):
     structural_annotation = [i.serialize() for i in interview.prompts.all()]
 
     return render_template('views/projects/session.html',
+                           recording_url=interview.generate_signed_url_for_recording(),
                            interview=interview,
                            participants=interview.participants.all(),
                            conno=structural_annotation,    # These are the structural prompts

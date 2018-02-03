@@ -54,7 +54,7 @@ def consented(filename):
     # TODO: for now all recordings will be made public until the following changes are made
     return True
     from gabber.projects.models import InterviewSession
-    interview = InterviewSession.query.filter(InterviewSession.recording_url == filename).first()
+    interview = InterviewSession.query.filter(id == filename).first()
     if interview and 0 not in [c.type.lower() for c in interview.consents.all()]:
         return True
     return False

@@ -169,8 +169,8 @@ class InterviewSession(db.Model):
         one-to-many: many participants can be involved in one interview
         one-to-many: an interview can have many connections
     """
+    # The ID is also used as the RecordingFilename when storing the file;
     id = db.Column(db.String(260), primary_key=True)
-    recording_url = db.Column(db.String(260))
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     created_on = db.Column(db.DateTime, default=db.func.now())
@@ -178,6 +178,17 @@ class InterviewSession(db.Model):
     prompts = db.relationship('InterviewPrompts', backref='interview', lazy='dynamic')
     participants = db.relationship('InterviewParticipants', backref='interview', lazy='dynamic')
     connections = db.relationship('Connection', backref='interview', lazy='dynamic')
+
+    def generate_signed_url_for_recording(self):
+        """
+        Generates a timed (two-hour) URL to access the recording of this interview session
+
+        :return: signed URL for the audio recording of the interview
+        """
+        from gabber.utils import amazon
+        # TODO: generate URL based on project type and consent process,
+        # e.g. something similar to consent.helper.consented
+        return amazon.signed_url(str(self.project_id) + "/" + str(self.id))
 
     def creator(self):
         """
@@ -241,7 +252,7 @@ class InterviewPrompts(db.Model):
                 'id': self.interview_id.encode('utf-8'),
                 'topic': ProjectPrompt.query.get(self.prompt_id).text_prompt.encode('utf-8'),
                 # TODO: why is this hard-coded?
-                'url': str("https://gabber.audio" + "/protected/" + InterviewSession.query.get(self.interview_id).recording_url),
+                'url': str("https://gabber.audio" + "/protected/" + self.interview_id),
                 'uri': "https://gabber.audio/project/session/interview/" + str(self.interview_id) + "?r=" + str(self.id)
             }
         }

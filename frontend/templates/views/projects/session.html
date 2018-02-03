@@ -37,10 +37,13 @@
 {%- endblock %}
 {% from "views/shared/macros.html" import render_connection %}
 {% block content %}
-{#        <h5><b>{{ interview.prompts.all()[0] }}</b></h5>#}
-        <span class="downloader"><a href="{{ url_for('consent.protected', filename=interview.recording_url, _external=True) }}" download><i class="material-icons">file_download</i></a></span>
-        <p><i>{% for p in participants %} {{ p.fullname() }}{% if not loop.last %},{% endif %}{% endfor %}</i></p>
-
+        <h5><b>Project:</b>{{ interview.project().title }}</h5>
+        <span class="downloader"><a href="{{ recording_url | safe }}" download><i class="material-icons">file_download</i></a></span>
+        <p>
+            <b>Participants:</b>{% for p in participants %} {{ p.fullname() }}{% if not loop.last %},{% endif %}{% endfor %}
+        |
+            <b>{{ interview.prompts.all() | length }}</b> prompts covered
+        </p>
         <div id="waveform"></div>
         <div id="waveform-timeline"></div>
 
@@ -54,7 +57,7 @@
 
         <div class="col s12 m6" id="connections">
           <div id="ConnectionsMade" style="display:none;">
-          <h5>All annotations created</h5>
+          <h5>Annotations</h5>
             {%- for connection in connections %}
           <div class="commentContainer">
           {{ render_connection(connection) }}
@@ -128,7 +131,7 @@
     // Variables rendered here for future js refactoring as it
     // is not possible to render jinja2 variables inside JS files.
     var connections = {{ conno | safe }};
-    var audioURL = "{{ url_for('consent.protected', filename=interview.recording_url, _external=True) }}";
+    var audioURL = "{{ recording_url | safe }}";
     var currentUserFullName = "{{ current_user.fullname }}";
     var currentInterviewID = "{{ interview.id }}";
     var createConnectionURL = "{{ url_for('api.create_connection', _external=True) }}";
