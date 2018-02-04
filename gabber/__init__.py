@@ -29,7 +29,6 @@ app.config['SECRET_KEY'] = 'supersecretpasswordfromtheotherside'
 app.config['UPLOAD_FOLDER'] = xp
 app.config['SALT'] = 'supersecretsaltfromtheotherside'
 app.config['PROXY_PATH'] = PROXY_PATH
-app.config['IMG_FOLDER'] = os.path.join(app.static_folder, 'img/')
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465

@@ -166,8 +166,8 @@ def create_post():
         for imagefield, uploaded_file in request.files.items():
             # Each prompt has a text and image with the same field ID
             if (textfield.split("-")[1] == imagefield.split("-")[1]) and uploaded_file:
-                __upload_prompt_image(uploaded_file, nproject.id, prompt.id)
-                prompt.image_path = str(prompt.id) + '.jpg'
+                image_name = __upload_prompt_image(uploaded_file, nproject.id, prompt.id)
+                prompt.image_path = image_name
                 nproject.prompts.append(prompt)
     db.session.commit()
     flash('The project was created successfully!')
@@ -248,9 +248,9 @@ def edit(slug=None):
                     db.session.flush()
                     # Only update the prompt image if the file has changed
                     if uploaded_file.filename:
+                        image_name = __upload_prompt_image(uploaded_file, project.id, new_prompt.id)
                         # Upload and associated the new image (if there is one) with the new prompt.
-                        new_prompt.image_path = str(new_prompt.id) + '.jpg'
-                        __upload_prompt_image(uploaded_file, project.id, new_prompt.id)
+                        new_prompt.image_path = image_name
                     else:
                         new_prompt.image_path = "default.jpg"
                     # Associate this newly created prompt with this specific project
@@ -269,8 +269,9 @@ def edit(slug=None):
 
 
 def __upload_prompt_image(filetosave, projectid, promptid):
-    # Each project has a unique folder that must exist
-    folder = os.path.join(app.config['IMG_FOLDER'] + str(projectid))
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-    filetosave.save(os.path.join(folder, str(promptid) + '.jpg'))
+    from uuid import uuid4
+    from gabber.utils import amazon
+    file_nom = str(uuid4().hex) + "-" + str(promptid) + ".jpg"
+    s3_folder = str(projectid) + "/prompt-images/" + file_nom
+    amazon.upload(filetosave, s3_folder)
+    return file_nom

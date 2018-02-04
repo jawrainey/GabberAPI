@@ -73,7 +73,7 @@
             {%- if project -%}
               {% for prompt in project.active_prompts() -%}
                 {{ render_prompt(prompt.id, (prompt.text_prompt.lower() if prompt.text_prompt else ""),
-                url_for('static', filename='img/' + project.id|string + "/" + prompt.image_path)) }}
+                prompt.prompt_image_url()) }}
               {%- endfor -%}
             {%- endif %}
           </div>

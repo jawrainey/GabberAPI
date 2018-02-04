@@ -128,6 +128,7 @@ class ProjectPrompt(db.Model):
     """
     id = db.Column(db.Integer, primary_key=True)
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
+    # TODO: these should both be renamed
     text_prompt = db.Column(db.String(64))
     image_path = db.Column(db.String(64), default="default.jpg")
     # Used as a 'soft-delete' to preserve prompt-content for viewing
@@ -138,6 +139,20 @@ class ProjectPrompt(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
+    def prompt_image_url(self):
+        """
+        Generates a timed (two-hour) URL to access the recording of this interview session
+
+        :return: signed URL for the audio recording of the interview
+        """
+        # TODO: this could be simplified as images for projects could be public?
+        # Arguably not, as topics may be sensitive so revealing that information is not good.
+        from gabber.utils import amazon
+        if 'default' in self.image_path:
+            return 'https://gabber.audio/static/default.jpg'
+        else:
+            return amazon.signed_url(str(self.project_id) + "/prompt-images/" + self.image_path)
+
     def serialize(self):
         """
         A serialized version of a prompt to use within views
@@ -145,16 +160,10 @@ class ProjectPrompt(db.Model):
         returns
             dict: a serialization of a prompt
         """
-        from flask import request
-        from gabber import app
-        # Only required as the server is behind a proxy @OpenLab
-        uri = (request.url_root[0:(len(request.url_root)-1)] +
-               app.static_url_path + '/img/' + str(self.project_id) + '/')
-
         return {
             'id': self.id,
             'text': self.text_prompt,
-            'imageURL': uri + str("" if not None else self.image_path),
+            'imageURL': self.prompt_image_url(),
             'creatorID': self.creator,
             'projectID': self.project_id
         }
