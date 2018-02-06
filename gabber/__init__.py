@@ -81,9 +81,10 @@ restful_api.add_resource(InterviewSessions,
 from gabber.api.projects import AllProjects
 restful_api.add_resource(AllProjects, '/api/projects/')
 
-from gabber.api.auth import UserRegistration, UserLogin
-restful_api.add_resource(UserRegistration, '/api/register')
-restful_api.add_resource(UserLogin, '/api/login')
+from gabber.api.auth import TokenRefresh, UserRegistration, UserLogin
+restful_api.add_resource(TokenRefresh, '/api/auth/token/refresh/')
+restful_api.add_resource(UserRegistration, '/api/auth/register/')
+restful_api.add_resource(UserLogin, '/api/auth/login/')
 
 from gabber.main.views import main
 app.register_blueprint(main, url_prefix=PROXY_PATH)
