@@ -5,6 +5,7 @@ from flask_bcrypt import Bcrypt
 from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_restful import Api
+from flask_jwt_extended import JWTManager
 import os
 
 # Required when deploying to dokku @OpenLab
@@ -40,6 +41,9 @@ app.config['MAIL_USE_SSL'] = True
 # Prevents suggestions for URLs by Flask being produced
 app.config['ERROR_404_HELP'] = False
 
+app.config['JWT_SECRET_KEY'] = 'super-super-secret'
+jwt = JWTManager(app)
+
 restful_api = Api(app)
 db = SQLAlchemy(app)
 mail = Mail(app)
@@ -73,6 +77,13 @@ from gabber.api.interview import InterviewSessions
 restful_api.add_resource(InterviewSessions,
                          '/api/interview/',
                          '/api/interview/<string:uid>/')
+
+from gabber.api.projects import AllProjects
+restful_api.add_resource(AllProjects, '/api/projects/')
+
+from gabber.api.auth import UserRegistration, UserLogin
+restful_api.add_resource(UserRegistration, '/api/register')
+restful_api.add_resource(UserLogin, '/api/login')
 
 from gabber.main.views import main
 app.register_blueprint(main, url_prefix=PROXY_PATH)

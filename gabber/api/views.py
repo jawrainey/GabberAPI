@@ -1,53 +1,11 @@
-from gabber import app, db
+from gabber import db
 from gabber.users.models import User
-from gabber.projects.models import InterviewSession, Project, ProjectPrompt, Connection
+from gabber.projects.models import ProjectPrompt
 from flask import jsonify, request, Blueprint
 import json
-import os
 from flask_login import login_required
 
-
 api = Blueprint('api', __name__)
-
-
-@api.route('projects', methods=['GET'])
-def projects():
-    # TODO: filter based on user credentials.
-    return jsonify([p.project_as_json() for p in Project.query.all()]), 200
-
-
-@api.route('register', methods=['POST'])
-def register():
-    username = request.form.get('email', None)
-    password = request.form.get('password', None)
-    fullname = request.form.get('fullname', None)
-
-    if not username or not password or not fullname:
-        return jsonify({'error': 'All fields are required.'}), 400
-
-    if username in [user.username for user in db.session.query(User.email)]:
-        return jsonify({'error': 'An account with that email exists.'}), 400
-
-    db.session.add(User(username, password, fullname))
-    db.session.commit()
-    return jsonify({'success': 'A user has been created successfully'}), 200
-
-
-@api.route('auth', methods=['POST'])
-def login():
-    username = request.form.get('username', None)
-    password = request.form.get('password', None)
-
-    if not username or not password:
-        return jsonify({'error': 'All fields are required.'}), 400
-
-    known_users = [user.username for user in db.session.query(User.email)]
-    if username and username in known_users:
-        user = User.query.filter_by(username=username).first()
-        if user and user.is_correct_password(password):
-            return jsonify({'success': 'We did it!'}), 200
-        return jsonify({'error': 'Incorrect password provided.'}), 400
-    return jsonify({'error': 'Username and password do not match.'}), 400
 
 
 @api.route('prompt/delete/', methods=['POST'])
