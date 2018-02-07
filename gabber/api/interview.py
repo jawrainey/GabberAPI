@@ -3,10 +3,12 @@
 REST Actions for an InterviewSession
 """
 from gabber import db
-from flask_restful import Resource, reqparse
-from gabber.projects.models import InterviewSession, InterviewParticipants, InterviewPrompts
+from flask_restful import abort, Resource, reqparse
+from gabber.projects.models import InterviewSession, InterviewParticipants, InterviewPrompts, Project
+from gabber.users.models import User
 import json
 from uuid import uuid4
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
 class InterviewSessions(Resource):
@@ -25,6 +27,7 @@ class InterviewSessions(Resource):
         # TODO: validation: is the SID valid?
         return InterviewSession.query.get(sid).json(), 200
 
+    @jwt_required
     def post(self):
         """
         Creates a new interview session
@@ -51,6 +54,13 @@ class InterviewSessions(Resource):
 
         # TODO: we need to validate arguments, i.e. does that project/creator exist?
         args = parser.parse_args()
+
+        # TODO: if it is public, then anyone can upload as long as they are a registered user, which JWT proves.
+        # Note: users would not have got to this stage through the mobile app anyway
+        usr = User.query.filter_by(email=get_jwt_identity()).first()
+        if usr and not usr.is_project_member(args['projectID']):
+            abort(401, message="You are not a member of the project you are trying to upload an interview to")
+
         # TODO: what if an error occurs in there? ABORT CAPTAIN
         self.__upload_interview_recording(args['recording'], interview_session_id, args['projectID'])
 

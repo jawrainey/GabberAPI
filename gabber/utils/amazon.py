@@ -43,8 +43,5 @@ def upload(the_file, path):
     s3.upload_fileobj(
         the_file,
         S3_BUCKET,
-        path,
-        ExtraArgs={
-            "ContentType": the_file.content_type
-        }
+        path
     )

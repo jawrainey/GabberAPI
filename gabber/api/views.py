@@ -130,7 +130,7 @@ def add_member():
     email = req.get('email', None)
 
     # The user must exist before it can become a project member
-    if email and email not in [user.username for user in db.session.query(User.email)]:
+    if email and email not in [user.email for user in db.session.query(User.email)]:
         return jsonify({'error': 'This email (%s) is not linked to a registered account.' % email}), 400
 
     # The user must be an admin of this particular project
@@ -143,7 +143,7 @@ def add_member():
     if not project:
         return jsonify({'error': 'No project exists with that ID'}), 400
 
-    id_of_member_to_add = User.query.filter_by(username=email).first().id
+    id_of_member_to_add = User.query.filter_by(email=email).first().id
 
     # A user cannot be a member of the project more than once
     if id_of_member_to_add and id_of_member_to_add in [m.user_id for m in project.members]:

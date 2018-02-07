@@ -24,6 +24,7 @@ class AllProjects(Resource):
         current_user = get_jwt_identity()
         user_projects = User.query.filter_by(email=current_user).first().projects()
         public_projects = Project.query.filter_by(isProjectPublic=1).all()
+        return [p.project_as_json() for p in list(set(public_projects) - set(user_projects))] + [p.project_as_json() for p in user_projects]
         return {
             'private': [p.project_as_json() for p in user_projects],
             # Do not show the same projects in the public section if you are a member of that project
