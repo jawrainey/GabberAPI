@@ -109,3 +109,11 @@
                 </div>
                 {% endfor %}
 {%- endmacro %}
+
+{%- macro render_structural_annotation(index, connection) %}
+                <div class="r-{{ connection['id'] }} card-panel no-padding" style="display: none;">
+                  <div class="connection-body">
+                    <p class="black-text">{{ index }} - {{ connection['interview']['topic'] }}</p>
+                  </div>
+                </div>
+{%- endmacro %}

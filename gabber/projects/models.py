@@ -343,9 +343,9 @@ class Connection(db.Model):
             'tags': [str(i.text) for i in self.codes],
             'comments': [i.serialize() for i in self.comments],
             'interview': {
-                'id': self.interview_id,
+                'id': str(self.interview_id),
                 # TODO: why is this hard-coded?
-                'url': str("https://gabber.audio" + "/protected/" + InterviewSession.query.get(self.interview_id).recording_url),
+                'url': str(InterviewSession.query.get(self.interview_id).generate_signed_url_for_recording()),
                 'uri': "https://gabber.audio/project/session/interview/" + str(self.interview_id) + "?r=" + str(self.id)
             }
         }

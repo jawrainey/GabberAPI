@@ -36,6 +36,7 @@
   </style>
 {%- endblock %}
 {% from "views/shared/macros.html" import render_connection %}
+{% from "views/shared/macros.html" import render_structural_annotation %}
 {% block content %}
         <h5><b>Project:</b>{{ interview.project().title }}</h5>
         <span class="downloader"><a href="{{ recording_url | safe }}" download><i class="material-icons">file_download</i></a></span>
@@ -58,6 +59,12 @@
         <div class="col s12 m6" id="connections">
           <div id="ConnectionsMade" style="display:none;">
           <h5>Annotations</h5>
+            {%- for struc_conn in conno %}
+          <div class="commentContainer">
+          {{ render_structural_annotation(loop.index, struc_conn) }}
+          </div>
+            {% endfor -%}
+
             {%- for connection in connections %}
           <div class="commentContainer">
           {{ render_connection(connection) }}
@@ -130,7 +137,8 @@
   <script>
     // Variables rendered here for future js refactoring as it
     // is not possible to render jinja2 variables inside JS files.
-    var connections = {{ conno | safe }};
+    var structuralConnections = {{ conno | safe }};
+    var connections = {{ connections | safe }};
     var audioURL = "{{ recording_url | safe }}";
     var currentUserFullName = "{{ current_user.fullname }}";
     var currentInterviewID = "{{ interview.id }}";
@@ -167,6 +175,10 @@
         connections.forEach(function (i) {
             addRegion(i, false, false);
         });
+        structuralConnections.forEach(function (i) {
+            addRegion(i, false, false);
+        });
+
         if (numOfConnectionsByUser <= 0) {
             Materialize.toast('To view connections for this interview from other people, please create ONE connection.', 4500);
         }
