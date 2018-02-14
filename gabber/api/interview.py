@@ -58,7 +58,8 @@ class InterviewSessions(Resource):
         # TODO: if it is public, then anyone can upload as long as they are a registered user, which JWT proves.
         # Note: users would not have got to this stage through the mobile app anyway
         usr = User.query.filter_by(email=get_jwt_identity()).first()
-        if usr and not usr.is_project_member(args['projectID']):
+        isPublicProject = Project.query.get(args['projectID']).isProjectPublic
+        if usr and not usr.is_project_member(args['projectID']) and not isPublicProject:
             abort(401, message="You are not a member of the project you are trying to upload an interview to")
 
         # TODO: what if an error occurs in there? ABORT CAPTAIN
@@ -109,6 +110,7 @@ class InterviewSessions(Resource):
             known_user = User.query.filter_by(email=p['Email']).first()
             # e.g. someone interviewed a person who is not a Gabber user
             if not known_user:
+                # TODO: what if the email is empty?
                 known_user = User(fullname=p['Name'], email=p['Email'], password="hi")
                 # TODO: should they be made a member of the project once participated?
                 db.session.add(known_user)
