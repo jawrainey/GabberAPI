@@ -53,15 +53,15 @@ def join(slug=None):
         flash("To join a project you must first register.")
         return redirect(url_for('users.signup'))
 
-    project = Project.query.filter_by(slug=slug).first()
+    _project = Project.query.filter_by(slug=slug).first()
 
-    if project.type:
+    if _project.isProjectPublic:
         user_role = Roles.query.filter_by(name='user').first().id
-        membership = Membership(uid=current_user.id, pid=project.id, rid=user_role)
-        project.members.append(membership)
-        db.session.add(project)
+        membership = Membership(uid=current_user.id, pid=_project.id, rid=user_role)
+        _project.members.append(membership)
+        db.session.add(_project)
         db.session.commit()
-        message = "You are now part of the %s project!" % str(project.title)
+        message = "You are now part of the %s project!" % str(_project.title)
     flash(message)
     return redirect(url_for('main.projects'))
 
