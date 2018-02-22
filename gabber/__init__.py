@@ -8,42 +8,20 @@ from flask_restful import Api
 from flask_jwt_extended import JWTManager
 import os
 
-# Required when deploying to dokku @OpenLab
-PROXY_PATH = os.getenv('PROXY_PATH', '/')
 # Share static path behind proxy across all blueprints
-
 templates = os.path.join(os.pardir, 'frontend/templates')
 static_path = os.path.join(os.pardir, 'frontend/static')
-static_url_path = os.path.join(PROXY_PATH, 'static')
-app = Flask(__name__, template_folder=templates, static_url_path=static_url_path, static_folder=static_path)
-bcrypt = Bcrypt(app)
-login_manager = LoginManager(app)
+app = Flask(__name__, template_folder=templates, static_folder=static_path)
 
-root = os.path.dirname(os.path.abspath(__file__))
-xp = os.path.join(root, 'protected')
-if not os.path.exists(xp):
-    os.makedirs(xp)
-
-dbp = os.path.join(xp, 'dati.db')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + dbp
-app.config['SECRET_KEY'] = 'supersecretpasswordfromtheotherside'
-app.config['UPLOAD_FOLDER'] = xp
-app.config['SALT'] = 'supersecretsaltfromtheotherside'
-app.config['PROXY_PATH'] = PROXY_PATH
-
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 465
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', '')
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD', '')
-app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_USERNAME']
-app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USE_SSL'] = True
-# Prevents suggestions for URLs by Flask being produced
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', '')
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET', '')
+app.config['SECRET_KEY'] = os.environ.get('SECRET', '')
+app.config['SALT'] = os.environ.get('SALT', '')
 app.config['ERROR_404_HELP'] = False
 
-app.config['JWT_SECRET_KEY'] = 'super-super-secret'
+bcrypt = Bcrypt(app)
+login_manager = LoginManager(app)
 jwt = JWTManager(app)
-
 restful_api = Api(app)
 db = SQLAlchemy(app)
 mail = Mail(app)
@@ -87,24 +65,24 @@ restful_api.add_resource(UserRegistration, '/api/auth/register/')
 restful_api.add_resource(UserLogin, '/api/auth/login/')
 
 from gabber.main.views import main
-app.register_blueprint(main, url_prefix=PROXY_PATH)
+app.register_blueprint(main, url_prefix='/')
 from gabber.api.views import api
-app.register_blueprint(api, url_prefix=os.path.join(PROXY_PATH, 'api/'))
+app.register_blueprint(api, url_prefix='/api/')
 from gabber.users.views import users
-app.register_blueprint(users, url_prefix=PROXY_PATH)
+app.register_blueprint(users, url_prefix='/')
 from gabber.projects.views import project
-app.register_blueprint(project, url_prefix=os.path.join(PROXY_PATH, 'project/'))
+app.register_blueprint(project, url_prefix='/project/')
 from gabber.consent.views import consent
-app.register_blueprint(consent, url_prefix=PROXY_PATH)
+app.register_blueprint(consent, url_prefix='/')
+
+from gabber.utils import logging
 
 # Model meta-data required to create db correctly
-if not os.path.exists(dbp):
-    db.create_all()
+db.create_all()
 
 from gabber.users.models import Anonymous
 login_manager.anonymous_user = Anonymous
 
-from gabber.utils import logging
 
 @app.errorhandler(Exception)
 def exceptions(error):

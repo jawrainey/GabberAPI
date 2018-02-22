@@ -316,7 +316,7 @@ class Connection(db.Model):
     comments = db.relationship('ConnectionComments', backref='connection', lazy='dynamic')
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    interview_id = db.Column(db.Integer, db.ForeignKey('interview_session.id'))
+    interview_id = db.Column(db.String(260), db.ForeignKey('interview_session.id'))
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
@@ -402,8 +402,8 @@ class Codebook(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     # Used to differentiate and support multiple codebooks for the same project
-    name = db.Column(db.String)
     codes = db.relationship('Code', backref="codebook", lazy='dynamic')
+    name = db.Column(db.String(40))
 
 
 class Code(db.Model):
@@ -449,7 +449,7 @@ class PlaylistRegions(db.Model):
     The regions chosen by a user for a specific playlist
     """
     id = db.Column(db.Integer, primary_key=True)
-    note = db.Column(db.String)
+    note = db.Column(db.String(560))
     playlist_id = db.Column(db.Integer, db.ForeignKey('playlists.id'))
     # TODO: previously named regions connections
     region_id = db.Column(db.Integer, db.ForeignKey('connection.id'))
