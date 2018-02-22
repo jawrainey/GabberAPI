@@ -157,7 +157,7 @@ def create_post():
 
         _form.pop('codebook')
 
-    for textfield, field_value in _form.items():
+    for textfield, field_value in [i for i in _form.items() if i[0].split("-")[0] == 'promptText']:
         prompt = ProjectPrompt(creator=current_user.id, text_prompt=field_value, project_id=nproject.id)
         # Flushing again as we need to use the prompt-id to create the image.
         db.session.add(prompt)
