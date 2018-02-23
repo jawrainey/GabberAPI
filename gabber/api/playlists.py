@@ -60,7 +60,7 @@ class RegionsListByProject(Resource):
         :param project_id: the ID of a specific project
         :return: A list of regions for a given project
         """
-        connections = Connection.query.join(InterviewSession, ProjectPrompt, Project).filter(Project.id == project_id).all()
+        connections = Connection.query.filter(Project.id == project_id).all()
         return [c.serialize() for c in connections], 200
 
 
