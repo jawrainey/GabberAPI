@@ -44,7 +44,7 @@ class InterviewSessions(Resource):
         parser.add_argument('projectID', required=True,
                             help="A project ID for the interview is required, i.e. what's it about?")
         parser.add_argument('creatorID', required=True,
-                            help="A creator ID for the interview is required, i.e. who created it?")
+                            help="A creator ID (i.e. email) of the interviewer is required, i.e. who created it?")
         parser.add_argument('participants', required=True,
                             help="A dictionary of participants in the interview is required, i.e. who took part?")
         parser.add_argument('prompts', required=True,
@@ -66,9 +66,8 @@ class InterviewSessions(Resource):
         self.__upload_interview_recording(args['recording'], interview_session_id, args['projectID'])
 
         interview_session = InterviewSession(
-            # TODO: we send the UUID generated on the client, so why not use it?
             id=interview_session_id,
-            creator_id=args['creatorID'],
+            creator_id=User.query.filter_by(email=args['creatorID']).first().id,
             project_id=args['projectID']
         )
 
