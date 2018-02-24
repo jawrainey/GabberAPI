@@ -1,20 +1,32 @@
 {% extends "views/shared/layout.html" %}
 {% from "views/shared/macros.html" import render_projects %}
 {% block title %}Projects{% endblock %}
+{% block scripts %}
+  <style>
+    .projectTitle {
+      width: 80% !important;
+      display: inline-block;
+    }
+
+    .createProject {
+      margin: 1.78rem 0 1.424rem 0;
+      display: inline-block;
+    }
+  </style>
+{%- endblock %}
+
 {% block content %}
     {%- if user_projects %}
-        <h2 class="col s12 m12">Your Projects</h2>
+        <h2 class="col s12 m12 projectTitle">Your Projects</h2>
+        {% if current_user.is_authenticated %}
+          <a href="{{ url_for('project.create', _external=True) }}" class="btn-large createProject">Create Project</a>
+        {%- endif %}
     {{- render_projects(user_projects, current_user) -}}
     {% endif %}
     {%- if public_projects %}
         <h4 class="col s12 m12">Public projects</h4>
         {{- render_projects(public_projects, current_user) -}}
     {% endif %}
-        {% if current_user.is_authenticated %}
-        <div class="fixed-action-btn">
-          <a href="{{ url_for('project.create', _external=True) }}" class="btn-floating btn-large"><i class="material-icons">add</i></a>
-        </div>
-        {%- endif %}
 {%- endblock %}
 {%- block fscripts %}
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
