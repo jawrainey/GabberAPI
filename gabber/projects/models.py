@@ -270,7 +270,7 @@ class InterviewPrompts(db.Model):
             'start': self.start_interval,
             'end': self.end_interval,
             'length': self.end_interval - self.start_interval,
-            'creator': creator.fullname,
+            'creator': str(creator.fullname),
             'creator_id': creator.id,
             'tags': [],
             'interview': {
