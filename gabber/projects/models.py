@@ -87,6 +87,24 @@ class Project(db.Model):
         self.creator = creator
         self.isProjectPublic = visibility
 
+    @staticmethod
+    def __flatten(_):
+        import itertools
+        return list(itertools.chain.from_iterable(_))
+
+    def interview_sessions(self):
+        return InterviewSession.query.filter_by(project_id=self.id).all()
+
+    def user_regions_for_interview_sessions(self):
+        # All the User Generated Regions for all interview sessions in this project
+        uga_per_session = [i.connections.all() for i in self.interview_sessions()]
+        return [i.serialize() for i in self.__flatten(uga_per_session)]
+
+    def structural_regions_for_interview_sessions(self):
+        # All the Regions for Structural Prompts for all interview sessions in this project
+        prompts_per_session = [i.prompts.all() for i in self.interview_sessions()]
+        return [i.serialize() for i in self.__flatten(prompts_per_session)]
+
     def active_prompts(self):
         """
         Obtains the prompts for this project that are active
@@ -101,7 +119,6 @@ class Project(db.Model):
 
         Returns: dict of dicts containing the project title and associated prompts formatted for API consumption.
         """
-        # TODO: do we really only want active prompts?
         return {
             'id': self.id,
             'title': self.title,
@@ -238,8 +255,6 @@ class InterviewPrompts(db.Model):
     # Where in the structural annotation starts and ends
     start_interval = db.Column(db.Integer)
     end_interval = db.Column(db.Integer, default=0)
-    # TODO: fix this: we want to update from app
-    #created_on = db.Column(db.DateTime, default=db.func.now())
 
     def serialize(self):
         """
@@ -248,21 +263,21 @@ class InterviewPrompts(db.Model):
         returns
             dict: a serialization of a connection
         """
-        from gabber.users.models import User
-        import datetime
+        from flask import url_for
+        creator = InterviewSession.query.get(self.interview_id).creator()
         return {
             'id': str(self.id).encode('utf-8'),
             'start': self.start_interval,
             'end': self.end_interval,
             'length': self.end_interval - self.start_interval,
-            'timestamp': 10,
-            'days_since': 10,
+            'creator': creator.fullname,
+            'creator_id': creator.id,
+            'tags': [],
             'interview': {
-                'id': self.interview_id.encode('utf-8'),
+                'id': str(self.interview_id),
                 'topic': ProjectPrompt.query.get(self.prompt_id).text_prompt.encode('utf-8'),
-                # TODO: why is this hard-coded?
-                'url': str("https://gabber.audio" + "/protected/" + self.interview_id),
-                'uri': "https://gabber.audio/project/session/interview/" + str(self.interview_id) + "?r=" + str(self.id)
+                'url': str(InterviewSession.query.get(self.interview_id).generate_signed_url_for_recording()),
+                'uri': url_for('project.session', interview_id=str(self.interview_id), _external=True) + "?r=" + str(self.id)
             }
         }
 
@@ -304,6 +319,7 @@ class Connection(db.Model):
         Can refer to its creator with 'user'
         Can refer to its parent interview with 'interview'
     """
+    # TODO: this should be renamed to UserAnnotation as connection is outdated
     id = db.Column(db.Integer, primary_key=True)
     # Although many are chosen, a general justification by the user must be provided.
     justification = db.Column(db.String(1120))
@@ -321,6 +337,17 @@ class Connection(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
+    def structural_prompt_if_overlapped(self):
+        """
+        User Annotations are applied on-top of the audio, and each part of the audio
+        is associated with a topic being discussed.
+
+        :return: the topic being discussed where this annotation was created.
+        """
+        for topic in InterviewPrompts.query.filter_by(interview_id=self.interview_id).all():
+            if topic.start_interval <= self.start_interval <= topic.end_interval:
+                return ProjectPrompt.query.get(topic.prompt_id).text_prompt
+
     def serialize(self):
         """
         A serialized version of a connection to use within views
@@ -329,6 +356,7 @@ class Connection(db.Model):
             dict: a serialization of a connection
         """
         from gabber.users.models import User
+        from flask import url_for
         import datetime
         return {
             'id': self.id,
@@ -344,9 +372,9 @@ class Connection(db.Model):
             'comments': [i.serialize() for i in self.comments],
             'interview': {
                 'id': str(self.interview_id),
-                # TODO: why is this hard-coded?
+                'topic': str(self.structural_prompt_if_overlapped()),
                 'url': str(InterviewSession.query.get(self.interview_id).generate_signed_url_for_recording()),
-                'uri': "https://gabber.audio/project/session/interview/" + str(self.interview_id) + "?r=" + str(self.id)
+                'uri': url_for('project.session', interview_id=str(self.interview_id), _external=True) + "?r=" + str(self.id)
             }
         }
 

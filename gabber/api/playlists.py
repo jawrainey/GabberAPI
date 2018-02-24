@@ -60,8 +60,14 @@ class RegionsListByProject(Resource):
         :param project_id: the ID of a specific project
         :return: A list of regions for a given project
         """
-        connections = Connection.query.filter(Project.id == project_id).all()
-        return [c.serialize() for c in connections], 200
+        project = Project.query.get(project_id)
+        # There are UserGenerated annotations
+        user_regions = Project.query.get(project_id).user_regions_for_interview_sessions()
+        # These are annotations applied during capture of the conversation
+        structural_regions = project.structural_regions_for_interview_sessions()
+        # TODO: ideally we should join and return both, but there is no way to differentiate
+        # between these both at the moment, hence the UI is not happy; this will require several changes.
+        return user_regions, 200
 
 
 class UserPlaylists(Resource):
