@@ -6,6 +6,7 @@ from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
+import datetime
 import os
 
 # Share static path behind proxy across all blueprints
@@ -18,6 +19,8 @@ app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET', '')
 app.config['SECRET_KEY'] = os.environ.get('SECRET', '')
 app.config['SALT'] = os.environ.get('SALT', '')
 app.config['ERROR_404_HELP'] = False
+# This is a temporary as there is limited time to implement refresh tokens, etc
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=60*24*499)
 
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
