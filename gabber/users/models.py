@@ -60,12 +60,26 @@ class User(UserMixin, db.Model):
 
     def projects(self):
         """
-        Determines the projects this user is a member of.
+        The available projects for this user.
 
-        :return: A list of projects THIS USER is a member of
+        :return: A list of public and private projects for this user
         """
         from gabber.projects.models import Project
-        return [Project.query.get(pid) for pid in [i.project_id for i in self.member_of] if Project.query.get(pid)]
+
+        is_member = []
+        not_member_and_public = []
+
+        memberships = [i.project_id for i in self.member_of]
+        for project in Project.query.order_by(Project.id.desc()).all():
+            if project.id in memberships:
+                is_member.append(project.project_as_json())
+            if project.id not in memberships and project.isProjectPublic:
+                not_member_and_public.append(project.project_as_json())
+
+        return {
+            'personal': is_member,
+            'public': not_member_and_public
+        }
 
 
 class Anonymous(AnonymousUserMixin, User):

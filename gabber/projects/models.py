@@ -92,6 +92,25 @@ class Project(db.Model):
         import itertools
         return list(itertools.chain.from_iterable(_))
 
+    def members_json(self):
+        """
+        Used on the frontend to determine if a given user can view actions for a given project.
+
+        :return:
+        """
+        return [
+            {
+                'id': m.user_id,
+                'name': m.user.fullname,
+                'role': Roles.query.get(m.role_id).name
+            }
+            for m in self.members
+        ]
+
+    def creator_name(self):
+        from gabber.users.models import User
+        return User.query.get(self.creator).fullname
+
     def interview_sessions(self):
         return InterviewSession.query.filter_by(project_id=self.id).all()
 
@@ -124,12 +143,15 @@ class Project(db.Model):
             'title': self.title,
             'slug': self.slug,
             'description': self.description,
-            'creator': self.creator,
+            'creatorName': self.creator_name(),
+            'members': self.members_json(),
             'isPublic': self.isProjectPublic,
             'HasConsent': self.isConsentEnabled,
             'timestamp': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
+            'topics': [p.serialize()['text'] for p in self.prompts if p.is_active],
             'prompts': [p.serialize() for p in self.prompts if p.is_active],
-            'codebook': [c.text for c in self.codebook.first().codes.all()] if self.codebook.first() else []
+            'codebook': [c.text for c in self.codebook.first().codes.all()] if self.codebook.first() else [],
+            'sessions': [i.serialize() for i in self.interview_sessions()]
         }
 
 
@@ -240,6 +262,27 @@ class InterviewSession(db.Model):
         cb = self.project().codebook.first()
         return [{'text': str(i.text), 'id': i.id} for i in cb.codes.all()] if cb else []
 
+    def serialize(self):
+        """
+        A serialized version of an InterviewSession to use within API
+
+        returns
+            dict: a serialization of an InterviewSession
+        """
+        import datetime
+        return {
+            'id': self.id,
+            'creator': self.creator().fullname,
+            'topics': [i.topic() for i in self.prompts.all()],
+            'participants': [i.fullname() for i in self.participants.all()],
+            'date': self.created_on.strftime("%d-%b-%Y"),
+            'location': "TODO: update once GPS added",
+            'meta': {
+                "numAnnotations": len(self.connections.all()),
+                'recordingLength': str(datetime.timedelta(seconds=self.prompts.all()[-1].end_interval))
+            }
+        }
+
 
 class InterviewPrompts(db.Model):
     """
@@ -255,6 +298,9 @@ class InterviewPrompts(db.Model):
     # Where in the structural annotation starts and ends
     start_interval = db.Column(db.Integer)
     end_interval = db.Column(db.Integer, default=0)
+
+    def topic(self):
+        return ProjectPrompt.query.get(self.prompt_id).text_prompt.encode('utf-8')
 
     def serialize(self):
         """

@@ -59,8 +59,11 @@ restful_api.add_resource(InterviewSessions,
                          '/api/interview/',
                          '/api/interview/<string:uid>/')
 
-from gabber.api.projects import AllProjects
+from gabber.api.projects import AllProjects, AllPublicProjects, JoinPublicProject, ProjectSessions
 restful_api.add_resource(AllProjects, '/api/projects/')
+restful_api.add_resource(AllPublicProjects, '/api/projects/public/')
+restful_api.add_resource(JoinPublicProject, '/api/project/join/')
+restful_api.add_resource(ProjectSessions, '/api/project/<string:slug>/sessions/')
 
 from gabber.api.auth import TokenRefresh, UserRegistration, UserLogin
 restful_api.add_resource(TokenRefresh, '/api/auth/token/refresh/')

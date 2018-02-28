@@ -1,11 +1,19 @@
 from gabber import db
 from gabber.users.models import User
-from gabber.projects.models import ProjectPrompt
+from gabber.projects.models import Project, ProjectPrompt, InterviewSession
 from flask import jsonify, request, Blueprint
 import json
 from flask_login import login_required
 
 api = Blueprint('api', __name__)
+
+
+
+@api.route('projectBySlug/<string:slug>/', methods=['GET'])
+def project_by_slug(slug):
+    if slug not in [p.slug for p in Project.query.all()]:
+        return jsonify({'error': 'The provided project slug does not match to a project'}), 404
+    return jsonify({'data': Project.query.filter_by(slug=slug).first().project_as_json()}), 200
 
 
 @api.route('prompt/delete/', methods=['POST'])
