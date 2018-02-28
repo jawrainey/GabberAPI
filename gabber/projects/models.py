@@ -146,8 +146,8 @@ class ProjectPrompt(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
     # TODO: these should both be renamed
-    text_prompt = db.Column(db.String(64))
-    image_path = db.Column(db.String(64), default="default.jpg")
+    text_prompt = db.Column(db.String(260))
+    image_path = db.Column(db.String(260), default="default.jpg")
     # Used as a 'soft-delete' to preserve prompt-content for viewing
     is_active = db.Column(db.SmallInteger, default=1)
 
