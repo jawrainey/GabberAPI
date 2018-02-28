@@ -42,15 +42,23 @@ class UserRegistration(Resource):
         :return: a dictionary containing JWT access/refresh tokens
         """
         parser = reqparse.RequestParser()
+        parser.add_argument('fullname', required=True, help="The full name of a user is required when registering.")
         parser.add_argument('email', required=True, help="An email address is required (i.e. the username).")
         parser.add_argument('password', required=True, help="A password is required to register an account.")
-        parser.add_argument('fullname', required=True, help="The full name of a user is required when registering.")
         args = parser.parse_args()
+
+        if not args['fullname']:
+            abort(400, message='A fullname is required to register')
+        if not args['email']:
+            abort(400, message='An email address is required to register')
+        if not args['password']:
+            abort(400, message='A password is required to register')
+
         # TODO: rigorously validate user input?
         email = args['email']
 
         if email in [user.email for user in db.session.query(User.email)]:
-            return abort(400, message='An account with that email exists.')
+            abort(400, message='An account with that email exists.')
 
         db.session.add(User(email, args['password'], args['fullname']))
         db.session.commit()
