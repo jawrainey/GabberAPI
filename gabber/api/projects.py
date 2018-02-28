@@ -4,10 +4,61 @@ Content for all projects that a JWT authenticated user has access to
 """
 from gabber import db
 from gabber.users.models import User
-from gabber.projects.models import Membership, Project, Roles, InterviewSession
+from gabber.projects.models import Membership, Project, ProjectPrompt, Roles, InterviewSession
 from flask_restful import Resource, abort, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from slugify import slugify
+
+
+def abort_if_empty(item):
+    if not item or len(item) <= 0:
+        abort(404, message='The X you have provided is empty')
+
+
+class CreateProject(Resource):
+    @jwt_required
+    def post(self):
+        """
+        Create a project given a set of arguments
+
+        Mapped to: /api/project/create/
+        """
+        parser = reqparse.RequestParser()
+        parser.add_argument('title', required=True, help="A title is required to create a project")
+        parser.add_argument('description', required=True, help="A description is required to create a project")
+        parser.add_argument('privacy', required=True, help="Privacy must be provided: either `public` or `private`")
+        parser.add_argument('topics', required=True, help="A set of topics as a list must be provided", action='append')
+        args = parser.parse_args()
+
+        title = args['title']
+        abort_if_empty(title)
+        if Project.query.filter_by(slug=slugify(title)).first():
+            abort(409, message='A project with that name already exists. Bad times.')
+
+        privacy = args['privacy']
+        abort_if_empty(privacy)
+        if privacy not in ['public', 'private']:
+            abort(404, message='Privacy must be provided: either `public` or `private`')
+
+        description = args['description']
+        abort_if_empty(description)
+
+        topics = args['topics']
+        abort_if_empty(topics)
+
+        usr = User.query.filter_by(email=get_jwt_identity()).first()
+        project = Project(
+            title=title,
+            description=description,
+            creator=User.query.filter_by(email=usr.email).first().id,
+            visibility=1 if privacy == 'public' else 0)
+
+        admin_role = Roles.query.filter_by(name='admin').first().id
+        membership = Membership(uid=usr.id, pid=project.id, rid=admin_role)
+        project.members.append(membership)
+        project.prompts.extend([ProjectPrompt(creator=usr.id, text_prompt=t) for t in topics])
+        db.session.add(project)
+        db.session.commit()
 
 
 class ProjectSessions(Resource):

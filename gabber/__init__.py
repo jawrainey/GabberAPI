@@ -59,8 +59,10 @@ restful_api.add_resource(InterviewSessions,
                          '/api/interview/',
                          '/api/interview/<string:uid>/')
 
-from gabber.api.projects import AllProjects, AllPublicProjects, JoinPublicProject, ProjectSessions
+from gabber.api.projects import AllProjects, AllPublicProjects, JoinPublicProject, \
+    ProjectSessions, CreateProject
 restful_api.add_resource(AllProjects, '/api/projects/')
+restful_api.add_resource(CreateProject, '/api/project/create/')
 restful_api.add_resource(AllPublicProjects, '/api/projects/public/')
 restful_api.add_resource(JoinPublicProject, '/api/project/join/')
 restful_api.add_resource(ProjectSessions, '/api/project/<string:slug>/sessions/')
