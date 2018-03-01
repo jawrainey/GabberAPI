@@ -148,7 +148,7 @@ class Project(db.Model):
             'isPublic': self.isProjectPublic,
             'HasConsent': self.isConsentEnabled,
             'timestamp': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
-            'topics': [p.serialize()['text'] for p in self.prompts if p.is_active],
+            'topics': [p.serialize() for p in self.prompts if p.is_active],
             'prompts': [p.serialize() for p in self.prompts if p.is_active],
             'codebook': [c.text for c in self.codebook.first().codes.all()] if self.codebook.first() else [],
             'sessions': [i.serialize() for i in self.interview_sessions()]
