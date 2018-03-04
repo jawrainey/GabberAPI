@@ -5,6 +5,9 @@ from gabber.projects.models import InterviewSession, InterviewParticipants, Inte
 from gabber.users.models import User
 from uuid import uuid4
 import gabber.api.helpers as helpers
+from marshmallow import ValidationError
+from gabber.api.schemas.create_session import ParticipantScheme, RecordingAnnotationSchema
+from gabber.api.schemas.helpers import is_not_empty
 import json
 
 
@@ -44,6 +47,9 @@ class ProjectSessions(Resource):
         helpers.abort_if_unknown_project(project)
         helpers.abort_if_not_a_member_and_private(user, project)
 
+        # The request is a multi-form request from the mobile device, and hence data needs
+        # to be validated through RequestParser and converted to JSON before serializing.
+
         from werkzeug.datastructures import FileStorage
         parser = reqparse.RequestParser()
         parser.add_argument('recording', location='files', type=FileStorage, required=True,
@@ -56,21 +62,38 @@ class ProjectSessions(Resource):
         parser.add_argument('prompts', required=True,
                             help="A dictionary of prompts that were selected during the interview is required")
 
-        interview_session_id = uuid4().hex
-        # TODO: we need to validate arguments: this is were marshmallow will triumph
         args = parser.parse_args()
+
+        try:
+            _prompts = json.loads(args['prompts'])
+            is_not_empty(_prompts, message="The list of prompts should not be empty")
+            prompts = RecordingAnnotationSchema(many=True).load(_prompts)
+        except ValueError:
+            return {'errors': ['The content for the prompts argument is invalid JSON.']}, 404
+        except ValidationError as err:
+            return {"errors": err.messages}, 400
+
+        try:
+            _participants = json.loads(args['participants'])
+            is_not_empty(_participants, message="The PARTICIPANTS list does not contain any attributes")
+            participants = ParticipantScheme(many=True).load(_participants)
+        except ValueError:
+            return {'errors': ['The content for the participants argument is invalid JSON.']}, 404
+        except ValidationError as err:
+            return {"errors": err.messages}, 400
+
+        interview_session_id = uuid4().hex
 
         # Note: if an invalid email is provided (or one not known to the db) then creator is None
         creator = User.query.filter_by(email=args['creatorEmail']).first()
         creator_id = creator.id if creator else user.id
 
         interview_session = InterviewSession(id=interview_session_id, creator_id=creator_id, project_id=pid)
-        # TODO: what if an error occurs during uploading?
-        self.__upload_interview_recording(args['recording'], interview_session_id, pid)
 
-        # TODO: Likewise, what if errors occur when in here? Currently do not handle these
-        interview_session.participants.extend(self.__add_participants(args['participants'], interview_session_id))
-        interview_session.prompts.extend(self.__add_structural_prompts(args['prompts'], interview_session_id))
+        # TODO: what if an error occurs during uploading to S3?
+        self.__upload_interview_recording(args['recording'], interview_session_id, pid)
+        interview_session.participants.extend(self.__add_participants(participants, interview_session_id))
+        interview_session.prompts.extend(self.__add_structural_prompts(prompts, interview_session_id))
 
         db.session.add(interview_session)
         db.session.commit()
@@ -105,16 +128,15 @@ class ProjectSessions(Resource):
         from gabber.users.models import User
         _participants_to_add = []
 
-        for p in json.loads(participants):
+        for p in participants:
             known_user = User.query.filter_by(email=p['Email']).first()
             # e.g. someone interviewed a person who is not a Gabber user
             if not known_user:
-                # TODO: what if the email is empty?
-                known_user = User(fullname=p['Name'], email=p['Email'], password="hi")
-                # TODO: should they be made a member of the project once participated?
+                known_user = User(fullname=p['Name'], email=p['Email'], password=uuid4().hex)
+                # TODO: should they be made a member of the project once participated? -> YES
                 db.session.add(known_user)
                 db.session.commit()
-            # TODO: if the new user was created, send a welcome email with a password reset.
+                # TODO: if the new user was created, send a welcome email with a password reset.
             # TODO: ask the user to verify that they were involved in this Gabber and to provide consent.
             new_participant = InterviewParticipants(
                 user_id=known_user.id,
@@ -129,7 +151,6 @@ class ProjectSessions(Resource):
         :param prompts: The prompts, including the ID (what was discussed), and Start/End of the region annotated.
         :return: A list of InterviewPrompts that were used in a specific interview session.
         """
-        prompts = json.loads(prompts)
         return [
             InterviewPrompts(
                 prompt_id=p['PromptID'],

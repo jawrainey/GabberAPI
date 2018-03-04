@@ -10,3 +10,6 @@ flask-restful==0.3.6
 boto3==1.5
 flask_jwt_extended==3.0.0
 pymysql==0.7.2
+marshmallow==3.0.0b7
+flask-marshmallow==0.8.0
+marshmallow-sqlalchemy==0.13.2

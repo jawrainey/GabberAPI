@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail
 from flask_migrate import Migrate
@@ -27,6 +28,7 @@ login_manager = LoginManager(app)
 jwt = JWTManager(app)
 restful_api = Api(app)
 db = SQLAlchemy(app)
+ma = Marshmallow(app)
 mail = Mail(app)
 migrate = Migrate(app, db)
 
