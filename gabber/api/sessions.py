@@ -1,5 +1,5 @@
 from gabber import db
-from flask_restful import Resource, reqparse
+from flask_restful import Resource, reqparse, abort
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from gabber.projects.models import InterviewSession, InterviewParticipants, InterviewPrompts, Project
 from gabber.users.models import User
@@ -64,23 +64,8 @@ class ProjectSessions(Resource):
 
         args = parser.parse_args()
 
-        try:
-            _prompts = json.loads(args['prompts'])
-            is_not_empty(_prompts, message="The list of prompts should not be empty")
-            prompts = RecordingAnnotationSchema(many=True).load(_prompts)
-        except ValueError:
-            return {'errors': ['The content for the prompts argument is invalid JSON.']}, 404
-        except ValidationError as err:
-            return {"errors": err.messages}, 400
-
-        try:
-            _participants = json.loads(args['participants'])
-            is_not_empty(_participants, message="The PARTICIPANTS list does not contain any attributes")
-            participants = ParticipantScheme(many=True).load(_participants)
-        except ValueError:
-            return {'errors': ['The content for the participants argument is invalid JSON.']}, 404
-        except ValidationError as err:
-            return {"errors": err.messages}, 400
+        prompts = self.validate_and_serialize(args['prompts'], 'prompts', RecordingAnnotationSchema(many=True))
+        participants = self.validate_and_serialize(args['participants'], 'participants', ParticipantScheme(many=True))
 
         interview_session_id = uuid4().hex
 
@@ -98,6 +83,18 @@ class ProjectSessions(Resource):
         db.session.add(interview_session)
         db.session.commit()
         return interview_session.serialize(), 201
+
+    @staticmethod
+    def validate_and_serialize(data, message, scheme):
+        try:
+            json_data = json.loads(data)
+            # Checking for empty lists is required due to bug in marshmallow
+            is_not_empty(json_data, message="The %s list should not be empty" % message)
+            return scheme.load(json_data)
+        except ValueError:
+            abort(404, message={'errors': ['The content for the %s argument is invalid JSON.' % message]})
+        except ValidationError as err:
+            abort(404, message={'errors': err.messages})
 
     @staticmethod
     def __upload_interview_recording(recording, session_id, project_id):
