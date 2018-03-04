@@ -30,12 +30,31 @@ db = SQLAlchemy(app)
 mail = Mail(app)
 migrate = Migrate(app, db)
 
-# The existing API is confusing because methods are separate ...
-from gabber.api.playlists import Projects, UserPlaylists, \
-    RegionsListForPlaylist, RegionsListByProject, RegionNote
+from gabber.api.projects import Projects
+from gabber.api.project import Project
+from gabber.api.membership import ProjectMembership
+from gabber.api.sessions import ProjectSessions
+from gabber.api.session import ProjectSession
 
-restful_api.add_resource(Projects,             '/api/project/<int:pid>')
-restful_api.add_resource(RegionsListByProject, '/api/project/<int:project_id>/regions/')
+restful_api.add_resource(Projects, '/api/projects/')
+restful_api.add_resource(Project, '/api/projects/<int:pid>/')
+restful_api.add_resource(ProjectMembership, '/api/projects/<int:pid>/membership/')
+restful_api.add_resource(ProjectSessions, '/api/projects/<int:pid>/sessions/')
+restful_api.add_resource(ProjectSession, '/api/projects/<int:pid>/sessions/<string:sid>/')
+
+from gabber.api.auth import TokenRefresh, UserRegistration, UserLogin
+restful_api.add_resource(TokenRefresh, '/api/auth/token/refresh/')
+restful_api.add_resource(UserRegistration, '/api/auth/register/')
+restful_api.add_resource(UserLogin, '/api/auth/login/')
+
+# The existing API is confusing because methods are separate ...
+from gabber.api.playlists import UserPlaylists, RegionsListForPlaylist, RegionsListByProject, RegionNote
+
+restful_api.add_resource(
+    RegionsListByProject,
+    '/api/project/<int:project_id>/regions/',
+    '/api/projects/<int:pid>/sessions/<string:sid>/annotation/'
+)
 
 restful_api.add_resource(
     UserPlaylists,
@@ -52,26 +71,6 @@ restful_api.add_resource(
     RegionNote,
     '/api/users/<int:uid>/playlists/<int:pid>/region/<int:rid>/note'
 )
-
-from gabber.api.interview import InterviewSessions
-
-restful_api.add_resource(InterviewSessions,
-                         '/api/interview/',
-                         '/api/interview/<string:uid>/')
-
-from gabber.api.projects import AllProjects, AllPublicProjects, JoinPublicProject, \
-    ProjectSessions, CreateProject, EditProject
-restful_api.add_resource(AllProjects, '/api/projects/')
-restful_api.add_resource(CreateProject, '/api/project/create/')
-restful_api.add_resource(EditProject, '/api/project/edit/')
-restful_api.add_resource(AllPublicProjects, '/api/projects/public/')
-restful_api.add_resource(JoinPublicProject, '/api/project/join/')
-restful_api.add_resource(ProjectSessions, '/api/project/<string:slug>/sessions/')
-
-from gabber.api.auth import TokenRefresh, UserRegistration, UserLogin
-restful_api.add_resource(TokenRefresh, '/api/auth/token/refresh/')
-restful_api.add_resource(UserRegistration, '/api/auth/register/')
-restful_api.add_resource(UserLogin, '/api/auth/login/')
 
 from gabber.main.views import main
 app.register_blueprint(main, url_prefix='/')

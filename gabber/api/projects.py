@@ -1,215 +1,118 @@
 # -*- coding: utf-8 -*-
 """
-Content for all projects that a JWT authenticated user has access to
+Content for all projects that a user has access to
 """
-from gabber import db
-from gabber.users.models import User
-from gabber.projects.models import Membership, Project, ProjectPrompt, Roles, InterviewSession
 from flask_restful import Resource, abort, reqparse
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
+from gabber.api.helpers import abort_if_empty
+from gabber.users.models import User
+from gabber.projects.models import Membership, Project as ProjectModel, ProjectPrompt, Roles
+import gabber.api.helpers as helpers
 from slugify import slugify
-import json
+from gabber import db
 
 
-def abort_if_empty(item):
-    if not item or len(item) <= 0:
-        abort(404, message='The X you have provided is empty')
+class Projects(Resource):
+    """
+    All public AND private projects for an authenticated user
 
+    Mapped to: /api/projects/
+    """
+    @staticmethod
+    @jwt_optional
+    def get():
+        """
+        The projects for an authenticated user; if unauthenticated, then only public projects are shown
 
-class CreateProject(Resource):
+        :return: A dictionary of public (i.e. available to all users) and private (user specific) projects.
+        """
+        current_user = get_jwt_identity()
+
+        if current_user:
+            # TODO: check if user is known to the database
+            user = User.query.filter_by(email=current_user).first()
+            helpers.abort_if_unknown_user(user)
+            projects = user.projects()
+        else:
+            projects = ProjectModel.all_public_projects()
+        return projects
+
     @jwt_required
     def post(self):
         """
-        Create a project given a set of arguments
+        CREATE a project where sessions can be created
 
-        Mapped to: /api/project/create/
+            {
+                "title": "The title of your neat project",
+                "description": "Describe your project in at most 230 words",
+                "privacy": "public",
+                "topics": ["Topics must be less than 280 words", "Otherwise"]
+            }
+
+        Note:
+            1) privacy options are: `public` and `private`"
+            2) Anyone can create a project as long as they are logged in ...
+
+        :return:
         """
+        current_user = get_jwt_identity()
+        usr = User.query.filter_by(email=current_user).first()
+        helpers.abort_if_unknown_user(usr)
+
         parser = reqparse.RequestParser()
-        parser.add_argument('title', required=True, help="A title is required to create a project")
-        parser.add_argument('description', required=True, help="A description is required to create a project")
-        parser.add_argument('privacy', required=True, help="Privacy must be provided: either `public` or `private`")
-        parser.add_argument('topics', required=True, help="A set of topics as a list must be provided", action='append')
+        parser.add_argument(
+            'title',
+            required=True,
+            help='A title is required to create a project'
+        )
+        parser.add_argument(
+            'description',
+            required=True,
+            help='A description is required to create a project'
+        )
+        parser.add_argument(
+            'privacy',
+            required=True,
+            help='Privacy must be provided: either `public` or `private`'
+        )
+        parser.add_argument(
+            'topics',
+            required=True,
+            help='A set of topics as a list must be provided',
+            action='append'
+        )
+
         args = parser.parse_args()
 
-        title = args['title']
-        abort_if_empty(title)
-        if Project.query.filter_by(slug=slugify(title)).first():
+        # TODO: so much validation needs done here, including topics (for list of strings) and
+        # if the project does not exist; this validation would be similar to UPDATE project
+        # and hence sharing this between Scheme from mashmallow would simplify the logic
+
+        title = abort_if_empty(args['title'])
+        if ProjectModel.query.filter_by(slug=slugify(title)).first():
             abort(409, message='A project with that name already exists. Bad times.')
 
-        privacy = args['privacy']
-        abort_if_empty(privacy)
+        privacy = abort_if_empty(args['privacy'])
         if privacy not in ['public', 'private']:
-            abort(404, message='Privacy must be provided: either `public` or `private`')
+            abort(404, message='The privacy option you provided is invalid. Correct options are cd `public` or `private`')
 
-        description = args['description']
-        abort_if_empty(description)
+        # TODO: validation the length of the description?
+        description = abort_if_empty(args['description'])
+        topics = abort_if_empty(args['topics'])
 
-        topics = args['topics']
-        abort_if_empty(topics)
-
-        usr = User.query.filter_by(email=get_jwt_identity()).first()
-        project = Project(
+        project = ProjectModel(
             title=title,
             description=description,
-            creator=User.query.filter_by(email=usr.email).first().id,
+            creator=usr.id,
             visibility=1 if privacy == 'public' else 0)
 
         admin_role = Roles.query.filter_by(name='admin').first().id
         membership = Membership(uid=usr.id, pid=project.id, rid=admin_role)
         project.members.append(membership)
+
+        # TODO: validate the length of topic text?
         project.prompts.extend([ProjectPrompt(creator=usr.id, text_prompt=t) for t in topics])
         db.session.add(project)
         db.session.commit()
 
-
-class EditProject(Resource):
-    @jwt_required
-    def post(self):
-        """
-        ??
-
-        Mapped to: /api/project/edit/
-        """
-        parser = reqparse.RequestParser()
-        parser.add_argument('projectID', required=False, help="")
-        parser.add_argument('title', required=False, help="")
-        parser.add_argument('description', required=False, help="")
-        parser.add_argument('privacy', required=False, help="")
-        parser.add_argument('topicsCreated', required=False, help="Expected a JSON object that contains a list of "
-                                                                  "strings containing the topics and related text")
-        parser.add_argument('topicsEdited', required=False, help="Expected a JSON object that contains a list of "
-                                                                 "objects of existing topics that have been edited")
-        parser.add_argument('topicsRemoved', required=False,
-                            help="Expecting a JSON object that contains a list of IDs of existing topics to remove")
-        args = parser.parse_args()
-
-        # TODO: validation; does the user have rights to view this? E.g. only staff or admins can edit
-        pid = args['projectID']
-        title = args['title']
-        description = args['description']
-        privacy = args['privacy']
-        project = Project.query.get(pid)
-
-        if title:
-            project.title = title
-            project.slug = slugify(title)
-        if description:
-            project.description = description
-        if privacy:
-            project.visibility = 1 if privacy == 'public' else 0
-
-        user = User.query.filter_by(email=get_jwt_identity()).first()
-
-        topics_to_create = args['topicsCreated']
-        topics_to_update = args['topicsEdited']
-        topics_to_delete = args['topicsRemoved']
-
-        known_topics = [p.id for p in project.prompts.all()]
-
-        if topics_to_create:
-            # TODO: validate text to prevent hackzors
-            project.prompts.extend([ProjectPrompt(creator=user.id, text_prompt=t['text'])
-                                    for t in json.loads(topics_to_create)])
-
-        if topics_to_update:
-            for topic in json.loads(topics_to_update):
-                if int(topic['id']) in known_topics:
-                    ProjectPrompt.query.filter_by(id=topic['id']).update({'text_prompt': topic['text']})
-                else:
-                    abort(400, message='You have tried to update a topic that does not exist.')
-
-        if topics_to_delete:
-            for topicID in json.loads(topics_to_delete):
-                if int(topicID) in known_topics:
-                    # do we need to add this for it to have an affect?
-                    ProjectPrompt.query.filter_by(id=topicID).update({'is_active': 0})
-                else:
-                    abort(400, message='You have tried to delete a topic that does not exist.')
-
-        db.session.add(project)
-        db.session.commit()
-        return {'project': project.project_as_json()}
-
-
-class ProjectSessions(Resource):
-    def get(self, slug):
-        """
-        All the interview sessions for a given project
-
-        :param slug: the project title slugified
-        :return: A list of
-        """
-        if slug not in [p.slug for p in Project.query.all()]:
-            abort(404, message='The provided project slug does not match to a project')
-
-        user = User.query.filter_by(email=get_jwt_identity()).first()
-        project = Project.query.filter_by(slug=slug).first()
-        # If the project is private and the user is not a member
-        if user.id not in [p.user_id for p in project.members] and not project.isProjectPublic:
-            abort(404, message='You are not a member of this project')
-        interview_sessions = InterviewSession.query.filter_by(project_id=project.id).all()
-        return [i.serialize() for i in interview_sessions], 200
-
-
-class JoinPublicProject(Resource):
-    @jwt_required
-    def post(self):
-        """
-        Joins a public project for a given user (determined through JWT token)
-
-        Mapped to: /api/project/join/
-
-        :return: 200 if all is well, otherwise error
-        """
-        parser = reqparse.RequestParser()
-        parser.add_argument('slug', required=True, help="A slug of the project to join is required")
-        args = parser.parse_args()
-        slug = slugify(args['slug'])
-
-        if not Project.query.filter_by(slug=slug):
-            abort(404, message='A project for that slug was not found')
-
-        current_user = get_jwt_identity()
-        usr = User.query.filter_by(email=current_user).first()
-        _project = Project.query.filter_by(slug=slug).first()
-
-        if _project.isProjectPublic:
-            user_role = Roles.query.filter_by(name='user').first().id
-            membership = Membership(uid=usr.id, pid=_project.id, rid=user_role)
-            _project.members.append(membership)
-            db.session.add(_project)
-            db.session.commit()
-        return "", 200
-
-
-class AllPublicProjects(Resource):
-    """
-    All public AND private projects for an authenticated user
-    """
-    def get(self):
-        """
-        All public projects; no JWT required
-
-        Mapped to: /api/projects/public
-
-        :return: A dictionary of public (i.e. available to all users) projects.
-        """
-        projects = Project.query.filter_by(isProjectPublic=1).order_by(Project.id.desc()).all()
-        return [i.project_as_json() for i in projects]
-
-
-class AllProjects(Resource):
-    """
-    All public AND private projects for an authenticated user
-    """
-    @jwt_required
-    def get(self):
-        """
-        The public/private projects for a JWT authenticated user.
-
-        Mapped to: /api/projects/
-
-        :return: A dictionary of public (i.e. available to all users) and private (user specific) projects.
-        """
-        current_user = get_jwt_identity()
-        return User.query.filter_by(email=current_user).first().projects()
+        return project.serialize(), 201

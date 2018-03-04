@@ -1,10 +1,8 @@
 from gabber.projects.models import InterviewSession, Membership, Project, ProjectPrompt, Roles, Codebook, Code
-from gabber.users.models import User
 from flask import Blueprint, current_app, render_template, url_for, redirect, request, flash, abort
 from flask_login import current_user, login_required
 from functools import wraps
-from gabber import app, db
-import os
+from gabber import db
 
 project = Blueprint('project', __name__)
 

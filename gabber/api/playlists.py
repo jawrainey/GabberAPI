@@ -8,7 +8,7 @@ TODO: clean user-input and authentication
 from gabber import db
 from flask_restful import abort, Resource, reqparse
 from gabber.users.models import User
-from gabber.projects.models import Connection, Project, ProjectPrompt, PlaylistRegions, InterviewSession
+from gabber.projects.models import Project, PlaylistRegions
 from gabber.projects.models import Playlists as PlaylistModel
 
 
@@ -26,25 +26,6 @@ def abort_if_user_or_playlist_doesnt_exist(user_id, playlist_id):
 
     if PlaylistModel.query.get(playlist_id).serialize()['uid'] != user_id:
         abort(404, message="This playlist ({}) is not associated with this user ({})".format(playlist_id, user_id))
-
-
-class Projects(Resource):
-    """
-    Meta-data associated with a project obtained via its ID.
-    """
-    def get(self, pid):
-        """
-        The meta-data associated with a project, such as title, creation-date, codebook, and prompts.
-
-        Mapped to: /api/project/<int:pid>
-
-        :param pid: The ID of a project of interest
-        :return: a dictionary of meta-data associated with a given project
-        """
-        # TODO: READ meta-data for a project [title, creation date, codes, topics, members]
-        if pid not in [p.id for p in Project.query.all()]:
-            return {'message': "The project with ID {} does not exist.".format(pid)}, 404
-        return Project.query.get(pid).project_as_json(), 200
 
 
 class RegionsListByProject(Resource):

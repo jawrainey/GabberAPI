@@ -70,11 +70,12 @@ class User(UserMixin, db.Model):
         not_member_and_public = []
 
         memberships = [i.project_id for i in self.member_of]
+
         for project in Project.query.order_by(Project.id.desc()).all():
             if project.id in memberships:
-                is_member.append(project.project_as_json())
+                is_member.append(project.serialize())
             if project.id not in memberships and project.isProjectPublic:
-                not_member_and_public.append(project.project_as_json())
+                not_member_and_public.append(project.serialize())
 
         return {
             'personal': is_member,

@@ -92,6 +92,13 @@ class Project(db.Model):
         import itertools
         return list(itertools.chain.from_iterable(_))
 
+    @staticmethod
+    def all_public_projects():
+        return {
+            'public': [i.serialize() for i in Project.query.filter_by(isProjectPublic=1).all()],
+            'personal': []
+        }
+
     def members_json(self):
         """
         Used on the frontend to determine if a given user can view actions for a given project.
@@ -132,7 +139,7 @@ class Project(db.Model):
         """
         return [prompt for prompt in self.prompts if prompt.is_active]
 
-    def project_as_json(self):
+    def serialize(self):
         """
         Create a JSON containing the project title and project prompts (text and images) for use in API.
 
@@ -146,12 +153,10 @@ class Project(db.Model):
             'creatorName': self.creator_name(),
             'members': self.members_json(),
             'isPublic': self.isProjectPublic,
-            'HasConsent': self.isConsentEnabled,
+            'hasConsent': self.isConsentEnabled,
             'timestamp': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
-            'topics': [p.serialize() for p in self.prompts if p.is_active],
             'prompts': [p.serialize() for p in self.prompts if p.is_active],
-            'codebook': [c.text for c in self.codebook.first().codes.all()] if self.codebook.first() else [],
-            'sessions': [i.serialize() for i in self.interview_sessions()]
+            'topics': [p.serialize() for p in self.prompts if p.is_active]
         }
 
 
@@ -172,6 +177,7 @@ class ProjectPrompt(db.Model):
     image_path = db.Column(db.String(260), default="default.jpg")
     # Used as a 'soft-delete' to preserve prompt-content for viewing
     is_active = db.Column(db.SmallInteger, default=1)
+    # order = db.Column(db.Integer)
 
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
 
