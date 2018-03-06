@@ -113,7 +113,7 @@ fullname varies across countries, where some consider middle name, etc.
 
 **Description** 
 
-- returns a dictionary of personal/public projects for a user. If the user is unauthenticated, then the private list is empty.
+- A dictionary of personal/public projects for a user. If the user is unauthenticated, then the private list is empty.
 
 **Returns**
 
@@ -193,7 +193,7 @@ fullname varies across countries, where some consider middle name, etc.
 
 **Description** 
 
-- creates a new project
+- Creates a new project
 
 **Arguments**
 
@@ -255,11 +255,20 @@ The same format as `/projects/`, but for the individual project the user just cr
 
 **Errors**:
 
-- `PROJECTS_PRIVACY_REQUIRED`: ??
-- `PROJECTS_INVALID_PRIVACY`: ??
-- `PROJECTS_TITLE_REQUIRED`: ??
-- `PROJECTS_TITLE_EXISTS`: ??
-- `PROJECTS_TOPICS_REQUIRED`: ??
+- `PROJECTS_TITLE_EXISTS`: A project with that title already exists.
+- `PROJECTS_TITLE_REQUIRED`: The value for the title parameter is required.
+- `PROJECTS_TITLE_IS_NOT_STRING`: The value for the title parameter must be a string.
+- `PROJECTS_DESCRIPTION_REQUIRED`: The value for the description parameter is required.
+- `PROJECTS_DESCRIPTION_IS_NOT_STRING`: The value for the description parameter must be a string.
+- `PROJECTS_PRIVACY_REQUIRED`: The value for the privacy parameter is required.
+- `PROJECTS_PRIVACY_INVALID`: The value for the privacy parameter is invalid, which must be private or public.
+- `PROJECTS_PRIVACY_IS_NOT_STRING`: The value for the privacy parameter must be a string.
+- `PROJECTS_TOPICS_REQUIRED`: The value for the title parameter is required.
+- `PROJECTS_TOPIC_MUST_BE_LIST`: The topics parameter must be of type list.
+- `PROJECTS_TOPIC_IS_NOT_STRING`: The value for the privacy parameter must be a string.
+- `PROJECTS_TOPIC_IS_EMPTY`: A topic provided is empty.
+- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database. 
+- `GENERAL_INVALID_JSON`: The request made contains invalid JSON
 
 ---
 
@@ -273,7 +282,7 @@ and only members of a project can view private projects
   
 **Description** 
 
-- Returns a single project if the JWT authenticated user is a member of the project, otherwise None.
+- Returns a project if it is public. If it is private, data is only returned if the JWT user is a member.
 
 **Returns** 
     
@@ -327,7 +336,9 @@ and only members of a project can view private projects
 
 **Errors** 
 
-- `TODO`
+- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database. 
+- `PROJECT_DOES_NOT_EXIST`: The project you tried to view does not exist.
+- `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
 
 ---
 
@@ -402,7 +413,9 @@ A list of sessions that have been recorded for a particular project.
 
 #### Endpoint: /api/projects/<int:pid>/sessions/`[GET]`
 
-**Description** all sessions for a given project
+**Description** 
+
+- A list of all sessions for a given project
 
 **Returns** 
 
@@ -454,21 +467,36 @@ A list of sessions that have been recorded for a particular project.
 
 **Errors** 
 
-- `TODO`: ??
+- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database. 
+- `PROJECT_DOES_NOT_EXIST`: The project you tried to view does not exist.
+- `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
+- `SESSION_UNKNOWN`: The session you tried to view does not exist.
 
 ---
 
 #### Endpoint: /api/projects/<int:pid>/sessions/`[POST]`
 
-**Description** Creates a new session for a given project
+#### MOBILE SUPPORT: LEGACY
 
-**Arguments** ??
+**Description** 
 
-**Returns** ??
+- Creates a new session for a given project. **Note:** this is currently only used  on the mobile device, 
+and is a `application/x-www-form-urlencoded` as it expects a `file` and `metadata` from a form.
 
-**Errors** 
-  
-- `TODO`: ??
+**Arguments** 
+
+- `recording`: An audio recording from the Gabber session
+- `creatorEmail`: The email address of the creator of the project; if not provided it is inferred from JWT.
+- `participants`: A dictionary of participants that were involved in the session [serialized here](https://github.com/jawrainey/GabberServer/blob/master/gabber/api/schemas/create_session.py#L39-L54), 
+which should be of the format: `{Name: Jay, Email: blah@jay.me, Role: 0 or 1}`. These should be uppercase and `Role` is a boolean
+that represents if the participant was the creator of the interview.
+- `prompts`: A dictionary of topics annotated during the discussion [serialized here](https://github.com/jawrainey/GabberServer/blob/master/gabber/api/schemas/create_session.py#L15-L36),
+which should be of the format: `{Start: 0, End: 10, PromptID: 21}`.
+
+**Note:** 
+
+- The keys from the `prompts` and `particiapnts` are uppercase.
+- The errors and response returned from this request differ from other endpoints as they use an old return response.
 
 ---
 
@@ -478,7 +506,9 @@ A specific session from the set of sessions for a project
 
 #### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/`[GET]`
 
-**Description** an individual Gabber recorded session for a project
+**Description** 
+
+- An individual Gabber recorded session for a project
 
 **Returns**
 
@@ -530,7 +560,10 @@ A specific session from the set of sessions for a project
 
 **Errors** 
   
-- `TODO`: ??
+- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database. 
+- `PROJECT_DOES_NOT_EXIST`: The project you tried to view does not exist.
+- `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
+- `SESSION_UNKNOWN`: The session you tried to view does not exist.
 
 ---
 
