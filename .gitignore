@@ -5,6 +5,7 @@ dati.db
 *.swp
 *.swo
 *.DS_Store
+*.env
 .ropeproject/
 .idea/
 /experiences

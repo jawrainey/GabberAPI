@@ -15,10 +15,10 @@ templates = os.path.join(os.pardir, 'frontend/templates')
 static_path = os.path.join(os.pardir, 'frontend/static')
 app = Flask(__name__, template_folder=templates, static_folder=static_path)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', '')
-app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET', '')
-app.config['SECRET_KEY'] = os.environ.get('SECRET', '')
-app.config['SALT'] = os.environ.get('SALT', '')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'mysql+pymysql://user:secret@localhost/gabber?charset=utf8mb4')
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET', 'top_secret')
+app.config['SECRET_KEY'] = os.environ.get('SECRET', 'really_secret')
+app.config['SALT'] = os.environ.get('SALT', 'no_really_this_is_secret')
 app.config['ERROR_404_HELP'] = False
 # This is a temporary as there is limited time to implement refresh tokens, etc
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=60*24*499)
@@ -110,7 +110,8 @@ def after_request(response):
     """
     Log every request that has been made to the server.
     """
-    response.headers.add('Access-Control-Allow-Origin', '*')
+    webHost = os.environ.get('WEB_HOST', 'http://localhost:8080')
+    response.headers.add('Access-Control-Allow-Origin', webHost)
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
     logging.log_request()
