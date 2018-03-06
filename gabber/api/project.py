@@ -9,6 +9,8 @@ from flask_restful import Resource, abort, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity, jwt_optional
 import gabber.api.helpers as helpers
 from slugify import slugify
+from gabber.utils.general import custom_response
+from gabber.api.schemas.project import ProjectModelSchema
 
 
 class Project(Resource):
@@ -25,16 +27,17 @@ class Project(Resource):
         """
         helpers.abort_on_unknown_project_id(pid)
         project = ProjectModel.query.get(pid)
+        schema = ProjectModelSchema()
 
         if project.isProjectPublic:
-            return project.serialize()
+            return custom_response(200, schema.dump(project))
 
         current_user = get_jwt_identity()
         if current_user:
             user = User.query.filter_by(email=current_user).first()
             helpers.abort_if_unknown_user(user)
             helpers.abort_if_not_a_member_and_private(user, project)
-            return project.serialize()
+            return custom_response(200, schema.dump(project))
 
     @jwt_required
     def put(self, pid):
@@ -85,9 +88,9 @@ class Project(Resource):
 
         args = parser.parse_args()
         # TODO: will be clean when marshalling
-        title = helpers.abort_if_empty(args['title'])
-        description = helpers.abort_if_empty(args['description'])
-        privacy = helpers.abort_if_empty(args['privacy'])
+        title = args['title']
+        description = args['description']
+        privacy = args['privacy']
 
         project = ProjectModel.query.get(pid)
 

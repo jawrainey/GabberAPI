@@ -1,21 +1,23 @@
 from gabber import db
 from flask_restful import Resource, reqparse, abort
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, jwt_optional
 from gabber.projects.models import InterviewSession, InterviewParticipants, InterviewPrompts, Project
 from gabber.users.models import User
 from uuid import uuid4
 import gabber.api.helpers as helpers
 from marshmallow import ValidationError
 from gabber.api.schemas.create_session import ParticipantScheme, RecordingAnnotationSchema
+from gabber.api.schemas.session import RecordingSessionSchema
 from gabber.api.schemas.helpers import is_not_empty
 import json
+from gabber.utils.general import custom_response
 
 
 class ProjectSessions(Resource):
     """
     Mapped to: /api/project/<int:id>/sessions/
     """
-    @jwt_required
+    @jwt_optional
     def get(self, pid):
         """
         VIEW all the Gabber sessions for a given project
@@ -23,20 +25,27 @@ class ProjectSessions(Resource):
         :param pid: the project id
         :return: A list of serialized sessions if sessions exist, otherwise an empty list
         """
-        user = User.query.filter_by(email=get_jwt_identity()).first()
-        helpers.abort_if_unknown_user(user)
         project = Project.query.get(pid)
         helpers.abort_if_unknown_project(project)
+
+        if project.isProjectPublic:
+            sessions = InterviewSession.query.filter_by(project_id=pid).all()
+            return custom_response(200, data=RecordingSessionSchema(many=True).dump(sessions))
+
+        current_user = get_jwt_identity()
+        user = User.query.filter_by(email=current_user).first()
+        helpers.abort_if_unknown_user(user)
         helpers.abort_if_not_a_member_and_private(user, project)
-        interview_sessions = InterviewSession.query.filter_by(project_id=pid).all()
-        return [i.serialize() for i in interview_sessions]
+
+        if current_user:
+            sessions = InterviewSession.query.filter_by(project_id=pid).all()
+            return custom_response(200, data=RecordingSessionSchema(many=True).dump(sessions))
 
     @jwt_required
     def post(self, pid):
         """
         CREATES a new session: only members of projects can upload to private projects.
         Anyone can upload to public projects as long as they are logged in via JWT;
-
 
         :param pid: the project to CREATE a new session for
         :return: the session serialized
@@ -47,7 +56,7 @@ class ProjectSessions(Resource):
         helpers.abort_if_unknown_project(project)
         helpers.abort_if_not_a_member_and_private(user, project)
 
-        # The request is a multi-form request from the mobile device, and hence data needs
+        # TODO:NOTE The request is a multi-form request from the mobile device, and hence data needs
         # to be validated through RequestParser and converted to JSON before serializing.
 
         from werkzeug.datastructures import FileStorage

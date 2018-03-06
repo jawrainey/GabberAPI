@@ -73,9 +73,9 @@ class User(UserMixin, db.Model):
 
         for project in Project.query.order_by(Project.id.desc()).all():
             if project.id in memberships:
-                is_member.append(project.serialize())
+                is_member.append(project)
             if project.id not in memberships and project.isProjectPublic:
-                not_member_and_public.append(project.serialize())
+                not_member_and_public.append(project)
 
         return {
             'personal': is_member,

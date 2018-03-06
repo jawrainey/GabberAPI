@@ -94,6 +94,8 @@ from gabber.users.models import Anonymous
 login_manager.anonymous_user = Anonymous
 
 
+import gabber.utils.general
+
 @app.errorhandler(Exception)
 def exceptions(error):
     """

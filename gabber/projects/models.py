@@ -95,7 +95,7 @@ class Project(db.Model):
     @staticmethod
     def all_public_projects():
         return {
-            'public': [i.serialize() for i in Project.query.filter_by(isProjectPublic=1).all()],
+            'public': [project for project in Project.query.filter_by(isProjectPublic=1).all()],
             'personal': []
         }
 
@@ -116,7 +116,8 @@ class Project(db.Model):
 
     def creator_name(self):
         from gabber.users.models import User
-        return User.query.get(self.creator).fullname
+        _creator = User.query.get(self.creator)
+        return {'name': _creator.fullname, 'id': _creator.id}
 
     def interview_sessions(self):
         return InterviewSession.query.filter_by(project_id=self.id).all()
@@ -150,10 +151,10 @@ class Project(db.Model):
             'title': self.title,
             'slug': self.slug,
             'description': self.description,
-            'creatorName': self.creator_name(),
+            'creator': self.creator_name(),
             'members': self.members_json(),
-            'isPublic': self.isProjectPublic,
-            'hasConsent': self.isConsentEnabled,
+            'is_public': self.isProjectPublic,
+            'has_consent': self.isConsentEnabled,
             'timestamp': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
             'prompts': [p.serialize() for p in self.prompts if p.is_active],
             'topics': [p.serialize() for p in self.prompts if p.is_active]

@@ -7,6 +7,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from gabber.projects.models import InterviewSession, Project
 from gabber.users.models import User
 import gabber.api.helpers as helpers
+from gabber.api.schemas.session import RecordingSessionSchema
+from gabber.utils.general import custom_response
 
 
 class ProjectSession(Resource):
@@ -16,7 +18,7 @@ class ProjectSession(Resource):
     @jwt_required
     def get(self, pid, sid):
         """
-        All the interview sessions for a given project
+        All interview sessions for a given project
         if the user is a member of the project or if it is public
 
         :param pid: The project to associate with the session
@@ -28,10 +30,9 @@ class ProjectSession(Resource):
 
         project = Project.query.get(pid)
         helpers.abort_on_unknown_project_id(pid)
-        helpers.abort_if_unknown_project(project)
         helpers.abort_if_not_a_member_and_private(user, project)
 
         session = InterviewSession.query.get(sid)
         helpers.abort_if_unknown_session(session)
 
-        return session.serialize()
+        return custom_response(200, data=RecordingSessionSchema().dump(session))
