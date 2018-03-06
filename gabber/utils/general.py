@@ -2,10 +2,6 @@ from flask import jsonify
 from gabber import app
 
 
-Consistent API responses and serialisation of some endpoints
--
-- Added `CustomException`, which allows helper methods and resources to raise errors that are formatted in the same as a normal response, i.e. using the new `create_response` method.
-
 class CustomException(Exception):
     """
     This allows us to raise this exception within the API, which then
