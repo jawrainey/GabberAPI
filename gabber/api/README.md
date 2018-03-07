@@ -199,6 +199,7 @@ fullname varies across countries, where some consider middle name, etc.
 
     {
         "title": "The title of your neat project",
+        "creator": 10,
         "description": "Describe your project ...",
         "privacy": "public" or "private",
         "topics": ["Topics must strings", "Otherwise madness occurs"]
