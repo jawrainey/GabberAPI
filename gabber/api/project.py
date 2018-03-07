@@ -5,12 +5,12 @@ Content for all projects that a user has access to
 from gabber import db
 from gabber.users.models import User
 from gabber.projects.models import Project as ProjectModel, ProjectPrompt
-from flask_restful import Resource, abort, reqparse
-from flask_jwt_extended import jwt_required, get_jwt_identity, jwt_optional
-import gabber.api.helpers as helpers
-from slugify import slugify
 from gabber.utils.general import custom_response
 from gabber.api.schemas.project import ProjectModelSchema
+from flask_restful import Resource, abort
+from flask_jwt_extended import jwt_required, get_jwt_identity, jwt_optional
+from flask import request
+import gabber.api.helpers as helpers
 
 
 class Project(Resource):
@@ -42,87 +42,26 @@ class Project(Resource):
     @jwt_required
     def put(self, pid):
         """
-        The project to UPDATE
-
-        :param pid: The ID of the project to UPDATE
-        :return: The UPDATED Project as a serialized object
+        The project to UPDATE: expecting a whole Project object to be sent.
         """
         helpers.abort_on_unknown_project_id(pid)
-        user = User.query.filter_by(email=get_jwt_identity()).first()
+        current_user = get_jwt_identity()
+        user = User.query.filter_by(email=current_user).first()
         helpers.abort_if_unknown_user(user)
-        helpers.abort_if_not_admin_or_staff(user, pid, action="UPDATE")
 
-        parser = reqparse.RequestParser()
-        parser.add_argument(
-            'title',
-            required=False,
-            help='A title is required to create a project'
-        )
-        parser.add_argument(
-            'description',
-            required=False,
-            help='A description is required to create a project'
-        )
-        parser.add_argument(
-            'privacy',
-            required=False,
-            help='Privacy must be provided: either `public` or `private`'
-        )
-        parser.add_argument(
-            'topicsCreated',
-            required=False,
-            action='append',
-            help='Expected a JSON object that contains a list of strings containing the topics and related text'
-        )
-        parser.add_argument(
-            'topicsEdited',
-            required=False,
-            action='append',
-            help='Expected a JSON object that contains a list of objects of existing topics that have been edited'
-        )
-        parser.add_argument(
-            'topicsRemoved',
-            required=False,
-            help="Expecting a JSON object that contains a list of IDs of existing topics to remove"
-        )
+        json_data = request.get_json(force=True, silent=True)
+        helpers.abort_if_invalid_json(json_data)
 
-        args = parser.parse_args()
-        # TODO: will be clean when marshalling
-        title = args['title']
-        description = args['description']
-        privacy = args['privacy']
-
-        project = ProjectModel.query.get(pid)
-
-        if title:
-            project.title = title
-            project.slug = slugify(title)
-        if description:
-            project.description = description
-        if privacy:
-            project.visibility = 1 if privacy == 'public' else 0
-
-        topics_to_create = args['topicsCreated']
-        topics_to_update = args['topicsEdited']
-        topics_to_delete = args['topicsRemoved']
-
-        known_topics = [p.id for p in project.prompts.all()]
-
-        # TODO: need to use marshalling to simplify validation below; for now does not exist
-        if topics_to_create:
-            project.prompts.extend([ProjectPrompt(creator=user.id, text_prompt=text) for text in topics_to_create])
-
-        if topics_to_update:
-            for topic in topics_to_update:
-                self.update_topic_by_attribute(topic['id'], known_topics, {'text_prompt': topic['text']})
-
-        if topics_to_delete:
-            for topic_id in topics_to_delete:
-                self.update_topic_by_attribute(topic_id, known_topics, {'is_active': 0}, action="DELETE")
-
-        db.session.add(project)
+        schema = ProjectModelSchema()
+        errors = schema.validate(json_data)
+        helpers.abort_if_errors_in_validation(errors)
+        # Otherwise the update will fail
+        helpers.abort_if_data_pid_not_route_pid(json_data['id'], pid)
+        # Deserialize data to internal ORM representation
+        data = schema.load(json_data, instance=ProjectModel.query.get(pid))
+        # thereby overriding the data and then save it
         db.session.commit()
-        return project.serialize()
+        return custom_response(200, schema.dump(data))
 
     @jwt_required
     def delete(self, pid):
@@ -147,7 +86,6 @@ class Project(Resource):
         :param action: the action being performed as a string to
         :return: an error (400 code) is the topic is not known
         """
-        topic_id = int(topic_id)
         if topic_id not in known_topic_ids:
             ProjectPrompt.query.filter_by(id=topic_id).update(data)
         else:

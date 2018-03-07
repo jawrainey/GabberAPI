@@ -28,8 +28,8 @@ class ProjectSession(Resource):
         user = User.query.filter_by(email=get_jwt_identity()).first()
         helpers.abort_if_unknown_user(user)
 
-        project = Project.query.get(pid)
         helpers.abort_on_unknown_project_id(pid)
+        project = Project.query.get(pid)
         helpers.abort_if_not_a_member_and_private(user, project)
 
         session = InterviewSession.query.get(sid)

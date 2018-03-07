@@ -352,7 +352,31 @@ and only members of a project can view private projects
 
 **Arguments** 
 
-- `TODO`: 
+Same `object` as when getting, creating, etc, however, the `topics` field must include the following attributes as
+it overrides all existing topics for the project; `text_prompt` and `is_active` is required for all topics:
+
+**Delete:** The topics list must include `is_active`, which if flagged as `0` will soft-delete a topic. 
+**Add:** if no ID is provided, then a topic is created.
+**Update:** the `id`, `text` and `is_active` of the topic. The text is overridden for that topic ID.
+
+    {
+        "id": 12,
+        "title": "你好吗?",
+        "description": "你好",
+        "creator": 30,
+        "privacy": "private",
+        "topics": [
+            {
+                "text_prompt": "你好 ANOTHER NEW", "is_active": 1
+            },
+            {
+                "id": 4563, "text_prompt": "MODIFIED AGAIN 你好", "is_active": 1
+            },
+                    {
+                "id": 4564, "text_prompt": "DELETED 你好", "is_active": 0
+            }
+        ]
+    }
 
 **Returns** 
 
@@ -360,7 +384,18 @@ and only members of a project can view private projects
 
 **Errors** 
 
-- `TODO`: ?
+- `ID_404`: The project ID provided in the request does not match the resource endpoint.
+- `UNAUTHORIZED`: You do not have the permission to edit this project.
+- `USER_404`: No user for the creator ID provided in the request exists.
+- `TITLE_EXISTS`: There already exists a project with that title; titles must be unique.
+- `PROJECTS_PRIVACY_INVALID`: The value for the privacy parameter is invalid, which must be private or public.
+- `TOPICS_IS_NOT_DICT`: The value for the topics parameter must be a string.
+- `TOPICS_IS_ACTIVE_KEY_404`: An is_active key is missing from your topics array.
+- `TOPICS_IS_ACTIVE_MUST_BE_INT`: The value of is_active must be an integer.
+- `TOPICS_IS_ACTIVE_MUST_BE_0_OR_1`: The value of is_active must be either 0 (false) or 1 (true).
+- `TOPICS_ID_NOT_PROJECT`: The ID of a topic does not exist for this project.
+- `TOPICS_TEXT_KEY_404`: A text_prompt key is missing from your topics array.
+- `TOPICS_TEXT_IS_NOT_STRING`: The value of a topic_prompt must be a string.
 
 ---
 

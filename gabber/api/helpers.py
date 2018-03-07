@@ -31,12 +31,17 @@ def abort_if_unknown_session(session):
 
 def abort_if_unknown_user(user):
     if not user or user.email not in [user.email for user in User.query.all()]:
-        raise CustomException(400, errors=['GENERAL_UNKNOWN_USER'])
+        raise CustomException(400, errors=['GENERAL_UNKNOWN_JWT_USER'])
 
 
 def abort_if_invalid_json(data):
     if not data:
         raise CustomException(400, errors=['GENERAL_INVALID_JSON'])
+
+
+def abort_if_data_pid_not_route_pid(request_pid, route_pid):
+    if request_pid != route_pid:
+        raise CustomException(400, errors=['GENERAL_REQUEST_DATA_ID_INVALID'])
 
 
 def abort_if_errors_in_validation(errors):
