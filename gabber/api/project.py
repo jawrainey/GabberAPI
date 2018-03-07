@@ -57,9 +57,22 @@ class Project(Resource):
         helpers.abort_if_errors_in_validation(errors)
         # Otherwise the update will fail
         helpers.abort_if_data_pid_not_route_pid(json_data['id'], pid)
-        # Deserialize data to internal ORM representation
+
+        # TODO: When schema.load updates the model it does not invalidate the previous rows, and
+        # (1) sets the FK to NULL and (2) does not update the is_active property.
+        # I cannot figure out how to do that from within the schema and instead retrieve the
+        # topics that exist for the current project, store them before updating the model,
+        # then manually invalidate them. This issue may also relate to how I have setup the models.
+        topics = ProjectModel.query.get(pid).prompts.all()
+
+        # Deserialize data to internal ORM representation thereby overriding the data and then save it
         data = schema.load(json_data, instance=ProjectModel.query.get(pid))
-        # thereby overriding the data and then save it
+
+        # The data schema does not invalidate previous topics and am not sure how to currently achieve that.
+        for topic in topics:
+            ProjectPrompt.query.filter_by(id=topic.id).update({'is_active': 0, 'project_id': pid})
+
+        # Store the updates and manually changes
         db.session.commit()
         return custom_response(200, schema.dump(data))
 
@@ -69,24 +82,5 @@ class Project(Resource):
         user = User.query.filter_by(email=get_jwt_identity()).first()
         helpers.abort_if_unknown_user(user)
         helpers.abort_if_not_admin_or_staff(user, pid, action="DELETE")
-        # TODO: the model needs updated, then /projects/ and /project/<id>
-        # should only return views if the project is active. Likewise, all
-        # actions on a project should not
-        # ProjectModel.query.filter_by(id=pid).update({'is_active': 0})
-        return "", 204
-
-    @staticmethod
-    def update_topic_by_attribute(topic_id, known_topic_ids, data, action="UPDATE"):
-        """
-        Helper method to UPDATE or DELETE a project's Topic
-
-        :param topic_id: the ID of the topic to update
-        :param known_topic_ids: pre-calculated list of known topics
-        :param data: a dictionary of the topic attribute and value to update
-        :param action: the action being performed as a string to
-        :return: an error (400 code) is the topic is not known
-        """
-        if topic_id not in known_topic_ids:
-            ProjectPrompt.query.filter_by(id=topic_id).update(data)
-        else:
-            abort(404, message='The topic you tried to %s does not exist.' % action)
+        ProjectModel.query.filter_by(id=pid).update({'is_active': 0})
+        return custom_response(204)
