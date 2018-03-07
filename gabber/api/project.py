@@ -67,12 +67,12 @@ class Project(Resource):
 
         # Deserialize data to internal ORM representation thereby overriding the data and then save it
         data = schema.load(json_data, instance=ProjectModel.query.get(pid))
-
-        # The data schema does not invalidate previous topics and am not sure how to currently achieve that.
+        # Store the updates and therefore invalidating the previous topics and remove their project_id
+        db.session.commit()
+        # Only Delete is affected by this bug, so we re-populate the project_ids
         for topic in topics:
-            ProjectPrompt.query.filter_by(id=topic.id).update({'is_active': 0, 'project_id': pid})
-
-        # Store the updates and manually changes
+            if not topic.project_id:
+                ProjectPrompt.query.filter_by(id=topic.id).update({'is_active': 0, 'project_id': pid})
         db.session.commit()
         return custom_response(200, schema.dump(data))
 

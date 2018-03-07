@@ -112,6 +112,7 @@ class ProjectTopicSchema(ma.ModelSchema):
     """
     class Meta:
         model = ProjectPrompt
+        include_fk = True
         dateformat = "%d-%b-%Y"
 
 
