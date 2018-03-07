@@ -67,7 +67,7 @@ class Projects(Resource):
         membership = Membership(uid=user.id, pid=project.id, rid=admin_role)
         project.members.append(membership)
 
-        project.prompts.extend([ProjectPrompt(creator=user.id, text_prompt=topic) for topic in ['topics']])
+        project.prompts.extend([ProjectPrompt(creator=user.id, text_prompt=topic) for topic in data['topics']])
         db.session.add(project)
         db.session.commit()
 
