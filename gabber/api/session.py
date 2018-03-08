@@ -34,5 +34,6 @@ class ProjectSession(Resource):
 
         session = InterviewSession.query.get(sid)
         helpers.abort_if_unknown_session(session)
+        helpers.abort_if_session_not_in_project(session, pid)
 
         return custom_response(200, data=RecordingSessionSchema().dump(session))
