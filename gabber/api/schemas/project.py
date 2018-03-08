@@ -110,21 +110,17 @@ class ProjectTopicSchema(ma.ModelSchema):
     """
     No validation is done here as it's all done in ProjectModelSchema before serialization
     """
+    text = ma.String(attribute="text_prompt")
+
     class Meta:
         model = ProjectPrompt
         include_fk = True
         dateformat = "%d-%b-%Y"
+        exclude = ['text_prompt', 'image_path', 'project', 'is_active', 'creator']
 
 
 class ProjectModelSchema(ma.ModelSchema):
-    """
-    Simplify and keep
-    """
-    # Note: these are the same to support backwards comparability with Gabber mobile applications
-    # TODO: remove prompts once tests are in place within the mobile application.
     topics = ma.Nested(ProjectTopicSchema, many=True, attribute="prompts")
-    prompts = ma.Nested(ProjectTopicSchema, many=True, attribute="prompts")
-
     members = ma.Nested(ProjectMember, many=True, attribute="members")
     creator = ma.Method("_creator")
 
@@ -139,7 +135,7 @@ class ProjectModelSchema(ma.ModelSchema):
         include_fk = True
         dateformat = "%d-%b-%Y"
         # TODO: remove other attributes as necessary, i.e. isConsentEnabled and isProjectPublic?
-        exclude = ['codebook']
+        exclude = ['codebook', 'prompts']
 
     @pre_load()
     def __validate(self, data):
