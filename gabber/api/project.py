@@ -86,4 +86,4 @@ class Project(Resource):
         helpers.abort_if_unknown_user(user)
         helpers.abort_if_not_admin_or_staff(user, pid, action="DELETE")
         ProjectModel.query.filter_by(id=pid).update({'is_active': 0})
-        return custom_response(204)
+        return custom_response(200)
