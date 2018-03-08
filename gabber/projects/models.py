@@ -3,12 +3,60 @@
 ???
 """
 from gabber import db
+from flask_sqlalchemy import BaseQuery
 
 codes_for_connections = db.Table(
     'codes_for_connections',
     db.Column('connection_id', db.Integer, db.ForeignKey('connection.id')),
     db.Column('code_id', db.Integer, db.ForeignKey('code.id'))
 )
+
+
+class QueryWithSoftDelete(BaseQuery):
+    """
+    Prepends is_active to the query object SQL statement.
+
+    Note: this is modified version of Miguel Grinberg's SoftDelete: https://goo.gl/QFJK1c
+    """
+    _with_deleted = False
+
+    def __new__(cls, *args, **kwargs):
+        """
+        The query object is created and modified here as in the init it is immutable.
+        Being able to create a new instance of the query also enables overriding Object.query.get()
+        """
+        obj = super(QueryWithSoftDelete, cls).__new__(cls)
+        # Optionally reset the query, e.g. to get all data including deleted.
+        obj._with_deleted = kwargs.pop('_with_deleted', False)
+        if len(args) > 0:
+            super(QueryWithSoftDelete, obj).__init__(*args, **kwargs)
+            return obj.filter_by(is_active=True) if not obj._with_deleted else obj
+        return obj
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def with_deleted(self):
+        """
+        Lets QueryObject.query.with_deleted() be used to retrieve all the objects,
+        including those that have been deleted.
+        """
+        return self.__class__(db.class_mapper(self._mapper_zero().class_),
+                              session=db.session(), _with_deleted=True)
+
+    def _get(self, *args, **kwargs):
+        """
+        This calls the original query.get function from the base class
+        """
+        return super(QueryWithSoftDelete, self).get(*args, **kwargs)
+
+    def get(self, *args, **kwargs):
+        """
+        If QueryObject (say Project).query.get() is called it does not like the
+        filter clause pre-loaded, so this workaround calls get without it.
+        """
+        obj = self.with_deleted()._get(*args, **kwargs)
+        return obj if obj is None or self._with_deleted or obj.is_active else None
 
 
 class Membership(db.Model):
@@ -60,11 +108,16 @@ class Project(db.Model):
         one-to-many: a project can have many codebooks
         many-to-many: a project can have many members
     """
+
+    query_class = QueryWithSoftDelete
+
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(64))
     # URL-friendly representation of the title
     slug = db.Column(db.String(256), unique=True, index=True)
     description = db.Column(db.String(256))
+    # Used as a 'soft-delete' to preserve prompt-content for viewing
+    is_active = db.Column(db.Boolean, default=True)
 
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
     # Is the project public or private? True (1) is public.
@@ -101,7 +154,7 @@ class Project(db.Model):
     @staticmethod
     def all_public_projects():
         return {
-            'public': [project for project in Project.query.filter_by(isProjectPublic=1).all()],
+            'public': [project for project in Project.query.filter(Project.isProjectPublic).all()],
             'personal': []
         }
 

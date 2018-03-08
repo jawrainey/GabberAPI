@@ -26,7 +26,8 @@ class Project(Resource):
         :return: A dictionary of public (i.e. available to all users) and private (user specific) projects.
         """
         helpers.abort_on_unknown_project_id(pid)
-        project = ProjectModel.query.get(pid)
+        project = ProjectModel.query.filter_by(id=pid).first()
+        helpers.abort_if_unknown_project(project)
         schema = ProjectModelSchema()
 
         if project.isProjectPublic:
@@ -38,6 +39,8 @@ class Project(Resource):
             helpers.abort_if_unknown_user(user)
             helpers.abort_if_not_a_member_and_private(user, project)
             return custom_response(200, schema.dump(project))
+        # If the user is not authenticated and the project is private
+        return custom_response(200, errors=['PROJECT_DOES_NOT_EXIST'])
 
     @jwt_required
     def put(self, pid):
@@ -57,16 +60,16 @@ class Project(Resource):
         helpers.abort_if_errors_in_validation(errors)
         # Otherwise the update will fail
         helpers.abort_if_data_pid_not_route_pid(json_data['id'], pid)
-
         # TODO: When schema.load updates the model it does not invalidate the previous rows, and
         # (1) sets the FK to NULL and (2) does not update the is_active property.
         # I cannot figure out how to do that from within the schema and instead retrieve the
         # topics that exist for the current project, store them before updating the model,
         # then manually invalidate them. This issue may also relate to how I have setup the models.
-        topics = ProjectModel.query.get(pid).prompts.all()
+        project = ProjectModel.query.get(pid)
+        topics = project.prompts.all()
 
         # Deserialize data to internal ORM representation thereby overriding the data and then save it
-        data = schema.load(json_data, instance=ProjectModel.query.get(pid))
+        data = schema.load(json_data, instance=project)
         # Store the updates and therefore invalidating the previous topics and remove their project_id
         db.session.commit()
         # Only Delete is affected by this bug, so we re-populate the project_ids

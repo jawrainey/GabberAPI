@@ -147,7 +147,7 @@ class ProjectModelSchema(ma.ModelSchema):
 
         pid_valid = validator.validate('id', 'int', data)
 
-        if pid_valid and data['id'] not in [p.id for p in Project.query.all()]:
+        if pid_valid and data['id'] not in [p.id for p in Project.query.with_deleted().all()]:
             validator.errors.append("ID_404")
             pid_valid = False
 
@@ -169,7 +169,7 @@ class ProjectModelSchema(ma.ModelSchema):
             # The title is different from the previous one, hence it changed.
             if Project.query.get(data['id']).slug != title_as_slug:
                 # The slug does not exist, so it is a unique new title
-                if Project.query.filter_by(slug=title_as_slug).first():
+                if Project.query.with_deleted().filter_by(slug=title_as_slug).first():
                     validator.errors.append("TITLE_EXISTS")
                 else:
                     # Note: this is not passed up and is always calculated in the backend

@@ -15,7 +15,7 @@ from gabber.utils.general import custom_response
 
 class ProjectSessions(Resource):
     """
-    Mapped to: /api/project/<int:id>/sessions/
+    Mapped to: /api/projects/<int:id>/sessions/
     """
     @jwt_optional
     def get(self, pid):
