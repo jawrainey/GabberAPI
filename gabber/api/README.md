@@ -151,7 +151,7 @@ fullname varies across countries, where some consider middle name, etc.
                         "image_path": "default.jpg",
                         "is_active": 1,
                         "project": 2,
-                        "text_prompt": "one topic lol",
+                        "text": "one topic lol",
                         "updated_on": "04-Mar-2018"
                     },
                     ...
@@ -165,7 +165,7 @@ fullname varies across countries, where some consider middle name, etc.
                         "image_path": "default.jpg",
                         "is_active": 1,
                         "project": 2,
-                        "text_prompt": "one topic lol",
+                        "text": "one topic lol",
                         "updated_on": "04-Mar-2018"
                     },
                     ...
@@ -353,11 +353,11 @@ and only members of a project can view private projects
 **Arguments** 
 
 Same `object` as when getting, creating, etc, however, the `topics` field must include the following attributes as
-it overrides all existing topics for the project; `text_prompt` and `is_active` is required for all topics:
+it overrides all existing topics for the project; `text` and `is_active` is required for all topics:
 
-**Delete:** The topics list must include `is_active`, which if flagged as `0` will soft-delete a topic. 
-**Add:** if no ID is provided, then a topic is created.
+**Create:** if no ID is provided, then a topic is created.
 **Update:** the `id`, `text` and `is_active` of the topic. The text is overridden for that topic ID.
+**Delete:** The topics list must include `is_active`, which if flagged as `false` will soft-delete a topic. 
 
     {
         "id": 12,
@@ -367,13 +367,13 @@ it overrides all existing topics for the project; `text_prompt` and `is_active` 
         "privacy": "private",
         "topics": [
             {
-                "text_prompt": "你好 ANOTHER NEW", "is_active": 1
+                "text": "你好 ANOTHER NEW", "is_active": 1
             },
             {
-                "id": 4563, "text_prompt": "MODIFIED AGAIN 你好", "is_active": 1
+                "id": 4563, "text": "MODIFIED AGAIN 你好", "is_active": 1
             },
                     {
-                "id": 4564, "text_prompt": "DELETED 你好", "is_active": 0
+                "id": 4564, "text": "DELETED 你好", "is_active": 0
             }
         ]
     }
@@ -394,7 +394,7 @@ it overrides all existing topics for the project; `text_prompt` and `is_active` 
 - `TOPICS_IS_ACTIVE_MUST_BE_INT`: The value of is_active must be an integer.
 - `TOPICS_IS_ACTIVE_MUST_BE_0_OR_1`: The value of is_active must be either 0 (false) or 1 (true).
 - `TOPICS_ID_NOT_PROJECT`: The ID of a topic does not exist for this project.
-- `TOPICS_TEXT_KEY_404`: A text_prompt key is missing from your topics array.
+- `TOPICS_TEXT_KEY_404`: A text key is missing from your topics array.
 - `TOPICS_TEXT_IS_NOT_STRING`: The value of a topic_prompt must be a string.
 
 ---
@@ -410,6 +410,7 @@ it overrides all existing topics for the project; `text_prompt` and `is_active` 
 **Returns** N/A
 **Errors** 
 
+- `TODO`: ??
 - `TODO`: ??
 
 ---
@@ -456,49 +457,39 @@ A list of sessions that have been recorded for a particular project.
 **Returns** 
 
 
-        [
-            {
-                "created_on": "03-Mar-2018",
-                "creator": {
-                    "id": 6,
-                    "name": "Jay"
-                },
-                "id": "1cee9eca335b45bf82a6886e424c9e86",
-                "participants": [
-                    {
-                        "name": "Jay",
-                        "role": "interviewer",
-                        "user_id": 6
-                    },
-                    ...
-                ],
-                "topics": [
-                    {
-                        "end": "8",
-                        "id": 1,
-                        "start": "0",
-                        "text": "Topics must be less than 280 words"
-                    },
-                    ...
-                ],
-                "user_annotations": [
-                    {
-                        "codes": [],
-                        "comments": [],
-                        "created_on": "04-Mar-2018",
-                        "end_interval": 9,
-                        "id": 1,
-                        "interview": "1cee9eca335b45bf82a6886e424c9e86",
-                        "justification": "first annotation",
-                        "start_interval": 0,
-                        "updated_on": "04-Mar-2018",
-                        "user": 1
-                    },
-                    ...
-                ]
+    [
+        {
+            "created_on": "04-Mar-2018",
+            "creator": {
+                "name": "Hey",
+                "user_id": 7
             },
-            ...
-        ]
+            "id": "ba08ff46c7b04719ba46614551aa10d4",
+            "participants": [
+                {
+                    "name": "Jay",
+                    "role": "interviewer",
+                    "user_id": 6
+                },
+                {
+                    "name": "Henry",
+                    "role": "interviewee",
+                    "user_id": 8
+                }
+            ],
+            "topics": [
+                {
+                    "end": "10",
+                    "id": 12,
+                    "start": "0",
+                    "text": "The first topic being discussed"
+                },
+                ...
+            ],
+            "user_annotations": []
+        },
+        ...
+    ]
 
 
 **Errors** 
@@ -548,51 +539,45 @@ A specific session from the set of sessions for a project
 
 **Returns**
 
-    {
-        "created_on": "03-Mar-2018", 
+
+        "created_on": "03-Mar-2018",
         "creator": {
-            "id": 6, 
-            "name": "Jay"
-        }, 
-        "id": "1cee9eca335b45bf82a6886e424c9e86", 
+            "name": "Jay",
+            "user_id": 6
+        },
+        "id": "1cee9eca335b45bf82a6886e424c9e86",
         "participants": [
             {
-                "name": "Jay", 
-                "role": "interviewer", 
+                "name": "Jay",
+                "role": "interviewer",
                 "user_id": 6
-            }, 
-            {
-                "name": "Hey", 
-                "role": "interviewee", 
-                "user_id": 7
-            }
+            },
             ...
-        ], 
+        ],
         "topics": [
             {
-                "end": "8", 
-                "id": 1, 
-                "start": "0", 
+                "end": "8",
+                "id": 1,
+                "start": "0",
                 "text": "Topics must be less than 280 words"
-            }, 
+            },
             ...
-        ], 
+        ],
         "user_annotations": [
             {
-                "codes": [], 
-                "comments": [], 
-                "created_on": "04-Mar-2018", 
-                "end_interval": 9, 
-                "id": 1, 
-                "interview": "1cee9eca335b45bf82a6886e424c9e86", 
-                "justification": "first annotation", 
-                "start_interval": 0, 
-                "updated_on": "04-Mar-2018", 
-                "user": 1
-            }, 
+                "codes": [],
+                "comments": [],
+                "created_on": "04-Mar-2018",
+                "end_interval": 9,
+                "id": 1,
+                "justification": "first annotation",
+                "session_id": "1cee9eca335b45bf82a6886e424c9e86",
+                "start_interval": 0,
+                "updated_on": "04-Mar-2018",
+                "user_id": 1
+            },
             ...
         ]
-    }
 
 **Errors** 
   

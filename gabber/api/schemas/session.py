@@ -29,8 +29,12 @@ class RecordingParticipantsSchema(ma.ModelSchema):
 
 
 class SessionAnnotationSchema(ma.ModelSchema):
+    user_id = ma.Function(lambda annotation: annotation.user_id)
+    session_id = ma.Function(lambda annotation: annotation.interview_id)
+
     class Meta:
         model = Connection
+        exclude = ['user', 'interview']
         dateformat = "%d-%b-%Y"
 
 
@@ -42,8 +46,9 @@ class RecordingSessionSchema(ma.ModelSchema):
 
     @staticmethod
     def _creator(data):
+        # TODO: method is the same as ProjectSchema
         user = User.query.get(data.creator_id)
-        return {'id': user.id, 'name': user.fullname}
+        return {'user_id': user.id, 'name': user.fullname}
 
     class Meta:
         model = InterviewSession

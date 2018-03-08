@@ -96,14 +96,14 @@ class ProjectPostSchema(ma.Schema):
 
 
 class ProjectMember(ma.ModelSchema):
-    id = ma.Function(lambda member: User.query.get(member.user_id).id)
-    name = ma.Function(lambda member: User.query.get(member.user_id).fullname)
+    fullname = ma.Function(lambda member: User.query.get(member.user_id).fullname)
     role = ma.Function(lambda member: Roles.query.get(member.role_id).name)
+    user_id = ma.Function(lambda member: member.user_id)
 
     class Meta:
         model = Membership
         dateformat = "%d-%b-%Y"
-        exclude = ['project']
+        exclude = ['project', 'user']
 
 
 class ProjectTopicSchema(ma.ModelSchema):
@@ -127,7 +127,7 @@ class ProjectModelSchema(ma.ModelSchema):
     @staticmethod
     def _creator(data):
         user = User.query.get(data.creator)
-        return {'id': user.id, 'name': user.fullname}
+        return {'user_id': user.id, 'fullname': user.fullname}
 
     class Meta:
         model = Project
@@ -196,7 +196,7 @@ class ProjectModelSchema(ma.ModelSchema):
                         validator.errors.append('TOPICS_ID_NOT_PROJECT')
 
                     # We do not check for ID as if it does not exist then a topic will be created
-                    if not item.get('text_prompt'):
+                    if not item.get('text'):
                         validator.errors.append('TOPICS_TEXT_KEY_404')
                     else:
                         if not isinstance(item['text_prompt'], basestring):
