@@ -73,7 +73,13 @@ class Project(db.Model):
     isConsentEnabled = db.Column(db.Boolean, default=0)
 
     codebook = db.relationship('Codebook', backref='project', lazy='dynamic')
-    prompts = db.relationship('ProjectPrompt', backref='project', lazy='dynamic')
+    # When retrieving prompts, only show the active ones.
+    prompts = db.relationship(
+        'ProjectPrompt',
+        backref='project',
+        lazy='dynamic',
+        primaryjoin="and_(Project.id==ProjectPrompt.project_id, ProjectPrompt.is_active)"
+    )
     members = db.relationship("Membership", back_populates="project")
 
     created_on = db.Column(db.DateTime, default=db.func.now())
@@ -178,7 +184,6 @@ class ProjectPrompt(db.Model):
     image_path = db.Column(db.String(260), default="default.jpg")
     # Used as a 'soft-delete' to preserve prompt-content for viewing
     is_active = db.Column(db.SmallInteger, default=1)
-    # order = db.Column(db.Integer)
 
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
 
