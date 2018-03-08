@@ -27,9 +27,9 @@ def validate_password_length(is_valid, attribute, errors):
 
 def validate_password(data, validator):
     password_valid = validator.validate('password', 'str', data)
-
-    if password_valid:
-        validate_password_length(password_valid, data['password'], validator.errors)
+    #
+    # if password_valid:
+    #     validate_password_length(password_valid, data['password'], validator.errors)
 
 
 class AuthLoginSchema(ma.Schema):
