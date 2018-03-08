@@ -116,7 +116,10 @@ class ProjectSessions(Resource):
         :param project_id: the project associated with the session
         """
         from gabber.utils import amazon
-        amazon.upload(recording, str(project_id) + "/" + str(session_id))
+        try:
+            amazon.upload(recording, str(project_id) + "/" + str(session_id))
+        except Exception:
+            abort(500, message={'errors': 'There was an issue uploading your session.'})
 
     @staticmethod
     def __add_participants(participants, session_id):
