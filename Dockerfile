@@ -13,10 +13,9 @@ COPY conf/nginx.conf /etc/nginx/conf.d/
 COPY conf/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Setup the Flask application
-WORKDIR /app
 COPY requirements.txt .
 RUN pip install --quiet -r requirements.txt
 COPY . /app/
-VOLUME /app/gabber/protected
+WORKDIR /app
 
 CMD ["/usr/bin/supervisord"]

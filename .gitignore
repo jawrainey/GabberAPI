@@ -11,3 +11,4 @@ dati.db
 /experiences
 /gabber/protected
 /frontend/static/img/*
+.env
