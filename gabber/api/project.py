@@ -30,7 +30,7 @@ class Project(Resource):
         helpers.abort_if_unknown_project(project)
         schema = ProjectModelSchema()
 
-        if project.isProjectPublic:
+        if project.is_public:
             return custom_response(200, schema.dump(project))
 
         current_user = get_jwt_identity()

@@ -121,9 +121,8 @@ class Project(db.Model):
 
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
     # Is the project public or private? True (1) is public.
-    isProjectPublic = db.Column(db.Boolean, default=1)
-    # Should consent (via email) be enabled for this project?
     isConsentEnabled = db.Column(db.Boolean, default=0)
+    is_public = db.Column(db.Boolean, default=1)
 
     codebook = db.relationship('Codebook', backref='project', lazy='dynamic')
     # When retrieving prompts, only show the active ones.
@@ -144,7 +143,7 @@ class Project(db.Model):
         self.slug = slugify(title)
         self.description = description
         self.creator = creator
-        self.isProjectPublic = visibility
+        self.is_public = visibility
 
     @staticmethod
     def __flatten(_):
@@ -154,7 +153,7 @@ class Project(db.Model):
     @staticmethod
     def all_public_projects():
         return {
-            'public': [project for project in Project.query.filter(Project.isProjectPublic).all()],
+            'public': [project for project in Project.query.filter(Project.is_public).all()],
             'personal': []
         }
 
@@ -212,8 +211,8 @@ class Project(db.Model):
             'description': self.description,
             'creator': self.creator_name(),
             'members': self.members_json(),
-            'is_public': self.isProjectPublic,
             'has_consent': self.isConsentEnabled,
+            'is_public': self.is_public,
             'timestamp': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
             'prompts': [p.serialize() for p in self.prompts if p.is_active],
             'topics': [p.serialize() for p in self.prompts if p.is_active]

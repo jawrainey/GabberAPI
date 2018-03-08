@@ -15,7 +15,7 @@ def abort_on_unknown_project_id(pid):
 
 
 def abort_if_not_a_member_and_private(user, project):
-    if not user.is_project_member(project.id) and not project.isProjectPublic:
+    if not user.is_project_member(project.id) and not project.is_public:
         raise CustomException(401, errors=['PROJECT_UNAUTHORIZED'])
 
 

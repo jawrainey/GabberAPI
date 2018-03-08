@@ -24,7 +24,7 @@ class ProjectMembership(Resource):
         helpers.abort_if_unknown_project(_project)
         usr = User.query.filter_by(email=get_jwt_identity()).first()
 
-        if _project.isProjectPublic and not usr.is_project_member(pid):
+        if _project.is_public and not usr.is_project_member(pid):
             user_role = Roles.query.filter_by(name='user').first().id
             membership = Membership(uid=usr.id, pid=_project.id, rid=user_role)
             _project.members.append(membership)

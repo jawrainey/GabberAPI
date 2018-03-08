@@ -74,7 +74,7 @@ class User(UserMixin, db.Model):
         for project in Project.query.order_by(Project.id.desc()).all():
             if project.id in memberships:
                 is_member.append(project)
-            if project.id not in memberships and project.isProjectPublic:
+            if project.id not in memberships and project.is_public:
                 not_member_and_public.append(project)
 
         return {

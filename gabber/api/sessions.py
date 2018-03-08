@@ -28,7 +28,7 @@ class ProjectSessions(Resource):
         project = Project.query.get(pid)
         helpers.abort_if_unknown_project(project)
 
-        if project.isProjectPublic:
+        if project.is_public:
             sessions = InterviewSession.query.filter_by(project_id=pid).all()
             return custom_response(200, data=RecordingSessionSchema(many=True).dump(sessions))
 
