@@ -41,7 +41,11 @@ class ParticipantScheme(ma.Schema):
         required=True,
         error_messages={'required': required_message('Name of a participant', 'session')}
     )
-    Email = ma.Email(
+    # TODO: for now this is a string as although we validate the participants email on the device,
+    # some emails (such as w@w.w) are invalid, which means the session would not be uploaded.
+    # Instead, we accept invalid emails for now, then we can determine (by asking the creator)
+    # to verify these if they are invalid.
+    Email = ma.Str(
         required=True,
         error_messages={'required': required_message('Email of a participant', 'session')}
     )
