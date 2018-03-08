@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Contains a set of APIs required to access project, region, and playlist data.
-This is in contrast to /api/views.py which can be considered the 'old' API.
 
 TODO: clean user-input and authentication
 """

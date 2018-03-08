@@ -37,12 +37,15 @@ from gabber.api.project import Project
 from gabber.api.membership import ProjectMembership
 from gabber.api.sessions import ProjectSessions
 from gabber.api.session import ProjectSession
+from gabber.api.annotations import UserAnnotations, UserAnnotation
 
 restful_api.add_resource(Projects, '/api/projects/')
 restful_api.add_resource(Project, '/api/projects/<int:pid>/')
 restful_api.add_resource(ProjectMembership, '/api/projects/<int:pid>/membership/')
 restful_api.add_resource(ProjectSessions, '/api/projects/<int:pid>/sessions/')
 restful_api.add_resource(ProjectSession, '/api/projects/<int:pid>/sessions/<string:sid>/')
+restful_api.add_resource(UserAnnotations, '/api/projects/<int:pid>/sessions/<string:sid>/annotations/')
+restful_api.add_resource(UserAnnotation, '/api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/')
 
 from gabber.api.auth import TokenRefresh, UserRegistration, UserLogin
 restful_api.add_resource(TokenRefresh, '/api/auth/token/refresh/')
@@ -76,8 +79,6 @@ restful_api.add_resource(
 
 from gabber.main.views import main
 app.register_blueprint(main, url_prefix='/')
-from gabber.api.views import api
-app.register_blueprint(api, url_prefix='/api/')
 from gabber.users.views import users
 app.register_blueprint(users, url_prefix='/')
 from gabber.projects.views import project

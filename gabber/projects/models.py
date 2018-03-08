@@ -432,17 +432,17 @@ class Connection(db.Model):
     # TODO: this should be renamed to UserAnnotation as connection is outdated
     id = db.Column(db.Integer, primary_key=True)
     # Although many are chosen, a general justification by the user must be provided.
-    justification = db.Column(db.String(1120))
+    content = db.Column(db.String(1120))
     # Where in the interview this connection starts and ends
     start_interval = db.Column(db.Integer)
     end_interval = db.Column(db.Integer, default=0)
 
     # A connection can be associated with many codes
-    codes = db.relationship("Code", secondary=codes_for_connections, backref="connections")
+    tags = db.relationship("Code", secondary=codes_for_connections, backref="connections")
     comments = db.relationship('ConnectionComments', backref='connection', lazy='dynamic')
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    interview_id = db.Column(db.String(260), db.ForeignKey('interview_session.id'))
+    session_id = db.Column(db.String(260), db.ForeignKey('interview_session.id'))
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
@@ -454,7 +454,7 @@ class Connection(db.Model):
 
         :return: the topic being discussed where this annotation was created.
         """
-        for topic in InterviewPrompts.query.filter_by(interview_id=self.interview_id).all():
+        for topic in InterviewPrompts.query.filter_by(interview_id=self.session_id).all():
             if topic.start_interval <= self.start_interval <= topic.end_interval:
                 return ProjectPrompt.query.get(topic.prompt_id).text_prompt
 
@@ -470,7 +470,7 @@ class Connection(db.Model):
         import datetime
         return {
             'id': self.id,
-            'content': u''.join(self.justification).encode('utf-8').strip(),
+            'content': u''.join(self.content).encode('utf-8').strip(),
             'start': self.start_interval,
             'end': self.end_interval,
             'length': self.end_interval - self.start_interval,
@@ -481,10 +481,10 @@ class Connection(db.Model):
             'tags': [str(i.text) for i in self.codes],
             'comments': [i.serialize() for i in self.comments],
             'interview': {
-                'id': str(self.interview_id),
+                'id': str(self.session_id),
                 'topic': str(self.structural_prompt_if_overlapped()),
-                'url': str(InterviewSession.query.get(self.interview_id).generate_signed_url_for_recording()),
-                'uri': url_for('project.session', interview_id=str(self.interview_id), _external=True) + "?r=" + str(self.id)
+                'url': str(InterviewSession.query.get(self.session_id).generate_signed_url_for_recording()),
+                'uri': url_for('project.session', interview_id=str(self.session_id), _external=True) + "?r=" + str(self.id)
             }
         }
 
@@ -504,7 +504,7 @@ class ConnectionComments(db.Model):
 
     # If this is zero, then it is a response to the root, e.g. the connection itself.
     parent_id = db.Column(db.Integer, db.ForeignKey('connection_comments.id'))
-    children = db.relationship('ConnectionComments', backref=db.backref('parent', remote_side=[id]), lazy='dynamic')
+    replies = db.relationship('ConnectionComments', backref=db.backref('parent', remote_side=[id]), lazy='dynamic')
 
     # Who created it and for what purpose?
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -523,7 +523,7 @@ class ConnectionComments(db.Model):
             'timestamp': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
             'days_since': abs((self.created_on - datetime.datetime.now()).days),
             'creator': str(User.query.filter_by(id=self.user_id).first().fullname),
-            'children': [i.serialize() for i in self.children.order_by(db.desc(ConnectionComments.created_on)).all()],
+            'children': [i.serialize() for i in self.replies.order_by(db.desc(ConnectionComments.created_on)).all()],
         }
 
 
@@ -540,7 +540,7 @@ class Codebook(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     # Used to differentiate and support multiple codebooks for the same project
-    codes = db.relationship('Code', backref="codebook", lazy='dynamic')
+    tags = db.relationship('Code', backref="codebook", lazy='dynamic')
     name = db.Column(db.String(40))
 
 

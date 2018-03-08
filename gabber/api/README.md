@@ -596,11 +596,64 @@ All user annotations for a given session from a project
 
 **Description** 
 
-- gets a list of user annotations on a session recording
+- A list of user annotations on a recording session
 
 **Returns** 
 
-- `True` if success, otherwise `False` within the `meta` object.
+Note: `replies` currently returns a list of IDs of other comments on this comment. I will update
+this once I get recursive serialization working as comments are self referential.
+
+    [
+        {
+            "comments": [
+                {
+                    "connection": 1,
+                    "created_on": "03-Mar-2018",
+                    "id": 1,
+                    "replies": [
+                        1,
+                        2
+                    ],
+                    "text": "Hello",
+                    "updated_on": "03-Mar-2018",
+                    "user_id": 1
+                },
+                {
+                    "connection": 1,
+                    "created_on": null,
+                    "id": 3,
+                    "replies": [],
+                    "text": "much deeper",
+                    "updated_on": null,
+                    "user_id": 1
+                }
+            ],
+            "content": "Hello world",
+            "created_on": "04-Mar-2018",
+            "end_interval": 10,
+            "id": 1,
+            "tags": [
+                {
+                    "id": 1,
+                    "text": "tag one"
+                },
+                {
+                    "id": 2,
+                    "text": "tag two"
+                },
+                {
+                    "id": 3,
+                    "text": "faith"
+                }
+            ],
+            "session_id": "1cee9eca335b45bf82a6886e424c9e86",
+            "start_interval": 3,
+            "updated_on": "08-Mar-2018",
+            "user_id": 1
+        },
+        ...
+    ]
+    
 
 **Errors** 
 
@@ -613,8 +666,23 @@ All user annotations for a given session from a project
 - Creates a new user annotation on a session recording
 
 **Arguments** 
+
+The same as in a `PUT` request where the tags are the IDs of the 
+
+    {
+        "content": "Now updating",
+        "start_interval": 20,
+        "end_interval": 20,
+        "tags": [1,2]
+    }
+
 **Returns** 
+
+- The created annotation object as above.
+
 **Errors**  
+
+- `TODO`: ??
 
 ## ACTIONS on an annotation
 
@@ -624,10 +692,7 @@ A specific annotation for a given session from a project
 
 **Description** 
 
-- A specific annotation for a given session
-
-**Returns** 
-**Errors** 
+- **NOT IMPLEMENTED:** is this endpoint useful?
 
 #### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/`[PUT]`
 
@@ -635,7 +700,36 @@ A specific annotation for a given session from a project
 
 - Updates an annotation on a session recording
 
+**Arguments** 
+
+Note: the `tags` argument is currently optional (so can be not sent in the request); if an empty list is sent, then all tags are
+removed.
+
+    {
+        "content": "Now updating",
+        "start_interval": 20,
+        "end_interval": 20,
+        "tags": []
+    }
+
 **Returns** 
+
+The modified annotation object:
+
+    {
+        "comments": [],
+        "content": "Now updating",
+        "created_on": "08-Mar-2018",
+        "end_interval": 20,
+        "id": 6,
+        "labels": [],
+        "session_id": "1cee9eca335b45bf82a6886e424c9e86",
+        "start_interval": 20,
+        "tags": [],
+        "updated_on": "08-Mar-2018",
+        "user_id": 30
+    }
+
 **Errors**  
 
 #### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/`[DELETE]`
