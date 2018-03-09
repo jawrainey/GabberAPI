@@ -1,7 +1,7 @@
 from gabber.projects.models import Project
 from gabber.utils.general import CustomException
 from gabber.users.models import User
-from gabber.projects.models import InterviewSession
+from gabber.projects.models import InterviewSession, ConnectionComments
 from flask_jwt_extended import get_jwt_identity
 
 
@@ -39,6 +39,21 @@ def abort_if_unknown_session(session):
 def abort_if_unknown_user(user):
     if not user or user.email not in [user.email for user in User.query.all()]:
         raise CustomException(400, errors=['GENERAL_UNKNOWN_JWT_USER'])
+
+
+def abort_if_unknown_comment(cid, aid):
+    if cid not in [i.id for i in ConnectionComments.query.all()]:
+        raise CustomException(400, errors=['COMMENT_404'])
+
+    if aid != ConnectionComments.query.get(cid).connection_id:
+        raise CustomException(400, errors=['COMMENT_NOT_IN_SESSION'])
+
+
+def jsonify_request_or_abort():
+    from flask import request
+    data = request.get_json(force=True, silent=True)
+    abort_if_invalid_json(data)
+    return data
 
 
 def abort_if_invalid_json(data):

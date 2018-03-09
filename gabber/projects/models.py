@@ -510,8 +510,8 @@ class ConnectionComments(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(1120), default=None)
 
-    # If this is zero, then it is a response to the root, e.g. the connection itself.
-    parent_id = db.Column(db.Integer, db.ForeignKey('connection_comments.id'))
+    # If this is NULL, then it is a response to the root, e.g. the annotation itself.
+    parent_id = db.Column(db.Integer, db.ForeignKey('connection_comments.id'), nullable=True)
     replies = db.relationship('ConnectionComments', backref=db.backref('parent', remote_side=[id]), lazy='dynamic')
 
     # Who created it and for what purpose?
@@ -520,6 +520,13 @@ class ConnectionComments(db.Model):
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+
+    def __init__(self, text, pid, uid, aid):
+        self.text = text
+        self.parent_id = pid
+        self.user_id = uid
+        self.connection_id = aid
+
 
     def serialize(self):
         from gabber.users.models import User

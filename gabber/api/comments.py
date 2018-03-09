@@ -1,0 +1,81 @@
+# -*- coding: utf-8 -*-
+"""
+READ a list of the comments for an annotation or CREATE a new comment.
+"""
+from flask_restful import Resource
+from flask_jwt_extended import jwt_required
+from gabber.projects.models import ConnectionComments as CommentsModel, Project
+from gabber.api.schemas.annotations import UserAnnotationCommentSchema
+from gabber.utils.general import custom_response
+from gabber import db
+import gabber.api.helpers as helpers
+
+
+def create_comment(project_id, session_id, annotation_id, comment_id=None):
+    """
+    CREATE a comment within a session to an annotation, however, if comment_id
+    is provided, then the comment is a comment on a comment, rather than on an annotation.
+    """
+    helpers.abort_if_invalid_parameters(project_id, session_id)
+    user = helpers.abort_if_unauthorized(Project.query.get(project_id))
+    if comment_id:
+        helpers.abort_if_unknown_comment(comment_id, annotation_id)
+
+    data = helpers.jsonify_request_or_abort()
+
+    schema = UserAnnotationCommentSchema()
+    helpers.abort_if_errors_in_validation(schema.validate(data))
+    # Note: comment_id can be null, which represents that it is a parent
+    comment = CommentsModel(data['content'], comment_id, user.id, annotation_id)
+    db.session.add(comment)
+    db.session.commit()
+    return custom_response(201, data=schema.dump(comment))
+
+
+class Comments(Resource):
+    """
+    All comments for an annotation
+
+    Mapped to: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/
+    """
+    @jwt_required
+    def post(self, pid, sid, aid):
+        """
+        CREATE a comment on a session annotation
+        """
+        return create_comment(pid, sid, aid)
+
+
+class Comment(Resource):
+    """
+    Read/Update/Delete a comment on an annotation, or CREATE a new comment of a comment.
+
+    Mapped to: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>
+    """
+    @jwt_required
+    def post(self, pid, sid, aid, cid):
+        """
+        CREATE a comment on a comment of an session annotation
+        """
+        return create_comment(pid, sid, aid, cid)
+
+    @jwt_required
+    def get(self, pid, sid, aid, cid):
+        """
+        READ a comment an session annotation
+        """
+        return custom_response(200, data=[pid, sid, aid, cid])
+
+    @jwt_required
+    def put(self, pid, sid, aid, cid):
+        """
+        UPDATE a comment an session annotation
+        """
+        return custom_response(200, data=[pid, sid, aid, cid])
+
+    @jwt_required
+    def delete(self, pid, sid, aid, cid):
+        """
+        DELETE a comment an session annotation
+        """
+        return custom_response(204, data=[pid, sid, aid, cid])

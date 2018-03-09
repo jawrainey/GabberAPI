@@ -38,6 +38,7 @@ from gabber.api.membership import ProjectMembership
 from gabber.api.sessions import ProjectSessions
 from gabber.api.session import ProjectSession
 from gabber.api.annotations import UserAnnotations, UserAnnotation
+from gabber.api.comments import Comments, Comment
 
 restful_api.add_resource(Projects, '/api/projects/')
 restful_api.add_resource(Project, '/api/projects/<int:pid>/')
@@ -46,6 +47,8 @@ restful_api.add_resource(ProjectSessions, '/api/projects/<int:pid>/sessions/')
 restful_api.add_resource(ProjectSession, '/api/projects/<int:pid>/sessions/<string:sid>/')
 restful_api.add_resource(UserAnnotations, '/api/projects/<int:pid>/sessions/<string:sid>/annotations/')
 restful_api.add_resource(UserAnnotation, '/api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/')
+restful_api.add_resource(Comments, '/api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/')
+restful_api.add_resource(Comment, '/api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>')
 
 from gabber.api.auth import TokenRefresh, UserRegistration, UserLogin
 restful_api.add_resource(TokenRefresh, '/api/auth/token/refresh/')
