@@ -30,7 +30,7 @@ class RecordingParticipantsSchema(ma.ModelSchema):
 
 class SessionAnnotationSchema(ma.ModelSchema):
     user_id = ma.Function(lambda annotation: annotation.user_id)
-    session_id = ma.Function(lambda annotation: annotation.interview_id)
+    session_id = ma.Function(lambda annotation: annotation.session_id)
 
     class Meta:
         model = Connection
