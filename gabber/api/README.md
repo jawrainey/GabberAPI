@@ -123,38 +123,20 @@ fullname varies across countries, where some consider middle name, etc.
             {
                 "created_on": "04-Mar-2018",
                 "creator": {
-                    "id": 13,
-                    "name": "Jay Rainey"
+                    "user_id": 13,
+                    "fullname": "Jay Rainey"
                 },
                 "description": "new desc",
+                "has_consent": false,
                 "id": 2,
-                "isConsentEnabled": false,
-                "isProjectPublic": true,
+                "is_public": true,
+                "is_active": true,
                 "members": [
                     {
-                        "id": 13,
-                        "name": "Jay Rainey",
+                        "fullname": "Jay Rainey",
                         "role": "admin",
-                        "user": 13
+                        "user_id": 13
                     },
-                    {
-                        "id": 14,
-                        "name": "Edward Jenkins",
-                        "role": "user",
-                        "user": 14
-                    }
-                ],
-                "prompts": [
-                    {
-                        "created_on": "04-Mar-2018",
-                        "id": 3,
-                        "image_path": "default.jpg",
-                        "is_active": 1,
-                        "project": 2,
-                        "text": "one topic lol",
-                        "updated_on": "04-Mar-2018"
-                    },
-                    ...
                 ],
                 "slug": "ni-oal",
                 "title": "ni oal",
@@ -162,9 +144,8 @@ fullname varies across countries, where some consider middle name, etc.
                     {
                         "created_on": "04-Mar-2018",
                         "id": 3,
-                        "image_path": "default.jpg",
                         "is_active": 1,
-                        "project": 2,
+                        "project_id": 2,
                         "text": "one topic lol",
                         "updated_on": "04-Mar-2018"
                     },
@@ -178,8 +159,6 @@ fullname varies across countries, where some consider middle name, etc.
 **Notes** 
 
 1) If a project is public and a user is a member then it appears in the personal list.
-2) `prompt` mirrors `topics` for backwards comparability with mobile application. This is temporary. **Always use topics**
-3) `imageURL` is a deprecated from when topics also supported images.
 4) `has_consent` and `is_public` are the configuration properties of a project
 
 
@@ -212,30 +191,20 @@ The same format as `/projects/`, but for the individual project the user just cr
     {
         "created_on": "05-Mar-2018",
         "creator": {
-            "id": 22,
-            "name": "jay rainey"
+            "user_id": 22,
+            "fullname": "jay rainey"
         },
         "description": "new desc",
+        "has_consent": false,
         "id": 11,
-        "isConsentEnabled": false,
-        "isProjectPublic": true,
+        "is_public": true,
+        "is_active": true,
         "members": [
             {
                 "id": 22,
                 "name": "jay rainey",
                 "role": "admin",
-                "user": 22
-            }
-        ],
-        "prompts": [
-            {
-                "created_on": "05-Mar-2018",
-                "id": 14,
-                "image_path": "default.jpg",
-                "is_active": 1,
-                "project": 11,
-                "text_prompt": "topics",
-                "updated_on": "05-Mar-2018"
+                "user_id": 22
             }
         ],
         "slug": "super-new-title",
@@ -244,10 +213,9 @@ The same format as `/projects/`, but for the individual project the user just cr
             {
                 "created_on": "05-Mar-2018",
                 "id": 14,
-                "image_path": "default.jpg",
                 "is_active": 1,
-                "project": 11,
-                "text_prompt": "topics",
+                "project_id": 11,
+                "text": "topics",
                 "updated_on": "05-Mar-2018"
             }
         ],
@@ -290,48 +258,35 @@ and only members of a project can view private projects
     {
         "created_on": "03-Mar-2018",
         "creator": {
-            "id": 1,
-            "name": "Jay Rainey"
+            "user_id": 1,
+            "fullname": "Jay Rainey"
         },
         "description": "Describe your project in at most 230 words",
-        "id": 1,
-        "isConsentEnabled": false,
-        "isProjectPublic": true,
+        "has_consent": false,
+        "id": 11,
+        "is_public": true,
+        "is_active": true,
         "members": [
             {
-                "id": 1,
-                "name": "Jay Rainey",
+                "fullname": "Jay Rainey",
                 "role": "user",
-                "user": 1
+                "user_id": 1
             }
             ...
         ],
-        "prompts": [
+        "topics": [
             {
                 "created_on": "03-Mar-2018",
                 "id": 1,
-                "image_path": "default.jpg",
                 "is_active": 0,
-                "project": 1,
-                "text_prompt": "Topics must be less than 280 words",
+                "project_id": 1,
+                "text": "Topics must be less than 280 words",
                 "updated_on": "03-Mar-2018"
             }
             ...
         ],
         "slug": "the-title-of-your-a",
         "title": "The title of your a",
-        "topics": [
-            {
-                "created_on": "03-Mar-2018",
-                "id": 1,
-                "image_path": "default.jpg",
-                "is_active": 0,
-                "project": 1,
-                "text_prompt": "Topics must be less than 280 words",
-                "updated_on": "03-Mar-2018"
-            }
-            ...
-        ],
         "updated_on": "05-Mar-2018"
     }
 
@@ -395,7 +350,7 @@ it overrides all existing topics for the project; `text` and `is_active` is requ
 - `TOPICS_IS_ACTIVE_MUST_BE_0_OR_1`: The value of is_active must be either 0 (false) or 1 (true).
 - `TOPICS_ID_NOT_PROJECT`: The ID of a topic does not exist for this project.
 - `TOPICS_TEXT_KEY_404`: A text key is missing from your topics array.
-- `TOPICS_TEXT_IS_NOT_STRING`: The value of a topic_prompt must be a string.
+- `TOPICS_TEXT_IS_NOT_STRING`: The value of a text must be a string.
 
 ---
 

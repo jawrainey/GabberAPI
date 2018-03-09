@@ -116,7 +116,7 @@ class ProjectTopicSchema(ma.ModelSchema):
         model = ProjectPrompt
         include_fk = True
         dateformat = "%d-%b-%Y"
-        exclude = ['text_prompt', 'image_path', 'project', 'is_active', 'creator']
+        exclude = ['text_prompt', 'image_path', 'project', 'creator']
 
 
 class ProjectModelSchema(ma.ModelSchema):
