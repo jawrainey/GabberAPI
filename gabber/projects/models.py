@@ -289,7 +289,12 @@ class InterviewSession(db.Model):
 
     prompts = db.relationship('InterviewPrompts', backref='interview', lazy='dynamic')
     participants = db.relationship('InterviewParticipants', backref='interview', lazy='dynamic')
-    connections = db.relationship('Connection', backref='interview', lazy='dynamic')
+    connections = db.relationship(
+        'Connection',
+        backref='interview',
+        lazy='dynamic',
+        primaryjoin="and_(InterviewSession.id==Connection.session_id, Connection.is_active)"
+    )
 
     def generate_signed_url_for_recording(self):
         """
@@ -429,6 +434,8 @@ class Connection(db.Model):
         Can refer to its creator with 'user'
         Can refer to its parent interview with 'interview'
     """
+    query_class = QueryWithSoftDelete
+
     # TODO: this should be renamed to UserAnnotation as connection is outdated
     id = db.Column(db.Integer, primary_key=True)
     # Although many are chosen, a general justification by the user must be provided.
@@ -436,6 +443,7 @@ class Connection(db.Model):
     # Where in the interview this connection starts and ends
     start_interval = db.Column(db.Integer)
     end_interval = db.Column(db.Integer, default=0)
+    is_active = db.Column(db.Boolean, default=True)
 
     # A connection can be associated with many codes
     tags = db.relationship("Code", secondary=codes_for_connections, backref="connections")

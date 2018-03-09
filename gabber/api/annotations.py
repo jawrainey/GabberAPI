@@ -82,10 +82,10 @@ class UserAnnotation(Resource):
         helpers.abort_if_invalid_parameters(pid, sid)
         helpers.abort_if_unauthorized(Project.query.get(pid))
         user = User.query.filter_by(email=get_jwt_identity()).first()
+        helpers.abort_if_unknown_user(user)
         annotation = UserAnnotationModel.query.get(aid)
         helpers.abort_if_unknown_annotation(annotation)
         helpers.abort_if_not_a_member_and_private(user, Project.query.get(pid))
-
         helpers.abort_if_not_user_made(user.id, annotation.user_id)
 
         json_data = request.get_json(force=True, silent=True)
@@ -104,4 +104,18 @@ class UserAnnotation(Resource):
         """
         Soft delete an existing annotation
         """
+        helpers.abort_on_unknown_project_id(pid)
+        helpers.abort_if_invalid_parameters(pid, sid)
+        helpers.abort_if_unauthorized(Project.query.get(pid))
+
+        user = User.query.filter_by(email=get_jwt_identity()).first()
+        helpers.abort_if_unknown_user(user)
+        helpers.abort_if_not_a_member_and_private(user, Project.query.get(pid))
+
+        annotation = UserAnnotationModel.query.get(aid)
+        helpers.abort_if_unknown_annotation(annotation)
+        helpers.abort_if_not_user_made(user.id, annotation.user_id)
+
+        UserAnnotationModel.query.filter_by(id=aid).update({'is_active': 0})
+
         return custom_response(200)
