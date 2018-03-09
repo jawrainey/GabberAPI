@@ -121,8 +121,8 @@ class Project(db.Model):
 
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
     # Is the project public or private? True (1) is public.
-    isConsentEnabled = db.Column(db.Boolean, default=0)
-    is_public = db.Column(db.Boolean, default=1)
+    has_consent = db.Column(db.Boolean, default=False)
+    is_public = db.Column(db.Boolean, default=True)
 
     codebook = db.relationship('Codebook', backref='project', lazy='dynamic')
     # When retrieving prompts, only show the active ones.
@@ -211,7 +211,7 @@ class Project(db.Model):
             'description': self.description,
             'creator': self.creator_name(),
             'members': self.members_json(),
-            'has_consent': self.isConsentEnabled,
+            'has_consent': self.has_consent,
             'is_public': self.is_public,
             'timestamp': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
             'prompts': [p.serialize() for p in self.prompts if p.is_active],
@@ -411,7 +411,7 @@ class InterviewParticipants(db.Model):
     consent_type = db.Column(db.Integer, default=0)
     # 0: interviewee, 1: interviewer
     # Although this could be inferred through interview.creator, this simplifies queries
-    role = db.Column(db.Boolean, default=0)
+    role = db.Column(db.Boolean, default=False)
 
     def fullname(self):
         """
