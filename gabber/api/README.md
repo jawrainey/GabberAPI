@@ -88,22 +88,76 @@ fullname varies across countries, where some consider middle name, etc.
 
 ---
 
-#### Endpoint: /api/auth/reset_password/`[PUT]`
+#### Endpoint: /api/auth/forgot/`[POST]`
 
 **Description** 
 
-- emails a user with a `magic URL` to reset their password
+- Emails a user with a time serialized URL that can be used to reset their password
+
+**Arguments**
+
+- `email`: the email address of the user to reset the password for
+
+**Returns**
+
+- Empty custom response where `success` if True if the email has been sent, otherwise False.
+
+**Actions**
+
+- Emails a _unique_ [timed serializer URL](http://pythonhosted.org/itsdangerous/) (i.e. token) to reset password
+
+**Errors**:
+
+- `GENERAL_INVALID_JSON`: The request you made contains invalid JSON.
+- `EMAIL_NOT_FOUND`: The email address provided does not belong to a known user.
+- `MUST_BE_EMAIL`: You have not provided a valid email address.
+- `ISSUE_SENDING_EMAIL`: An error occurred when trying to send the email. If this continues, please get in touch.
+
+#### Endpoint: /api/auth/reset/<token>/`[GET]`
+
+**Description** 
+
+- Returns the email address associated with that token if a token is valid, which
+can be used on the frontend to pre-populate fields, etc.
+
+**Arguments** 
+
+- N/A
+
+**Returns**
+
+    { 
+      "email": "jawrainey@gmail.com"
+    }
+
+**Errors**:
+
+- `TOKEN_404:` ???
+
+#### Endpoint: /api/auth/reset/`[POST]`
+
+**Description** 
+
+- Changes password of a given email if the token sent is also valid.
 
 **Arguments**
 
 - `email`: the email address of the user to reset
-
-**/api/auth/reset_password/**
-**/api/users/<int:uid>/reset_password/**
+- `password`: the password to change the email address to
+- `token`: the token from the email that was sent
 
 **Returns**
 
-- TODO
+The same response as login/register:
+
+    { 
+      "access_token": "",
+      "refresh_token": ""
+    }
+
+**Errors**:
+
+- `TODO:` ???
 
 ---
 
@@ -362,11 +416,15 @@ it overrides all existing topics for the project; `text` and `is_active` is requ
 - Soft deletes an existing project. The JWT user must have the creator role of a project to delete it.
 
 **Arguments** N/A
-**Returns** N/A
+**Returns** 
+
+- 
+
 **Errors** 
 
-- `TODO`: ??
-- `TODO`: ??
+- `PROJECT_DOES_NOT_EXIST`: ??
+- `GENERAL_UNKNOWN_JWT_USER`: ??
+- `PROJECT_DELETE_UNAUTHORIZED`: ??
 
 ---
 
@@ -555,8 +613,13 @@ All user annotations for a given session from a project
 
 **Returns** 
 
-Note: `replies` currently returns a list of IDs of other comments on this comment. I will update
+Note: 
+
+1) `replies` currently returns a list of IDs of other comments on this comment. I will update
 this once I get recursive serialization working as comments are self referential.
+2) `labels` and `tags` present the same information, whereas `tags` only contains the IDs of tags, which
+simplifies updating the model.
+
 
     [
         {
@@ -565,21 +628,23 @@ this once I get recursive serialization working as comments are self referential
                     "connection": 1,
                     "created_on": "03-Mar-2018",
                     "id": 1,
+                    "parent_id": 1,
                     "replies": [
                         1,
                         2
                     ],
-                    "text": "Hello",
+                    "text": "Top comment",
                     "updated_on": "03-Mar-2018",
                     "user_id": 1
                 },
                 {
                     "connection": 1,
-                    "created_on": null,
+                    "created_on": "03-Mar-2018",
                     "id": 3,
+                    "parent_id": 1,
                     "replies": [],
-                    "text": "much deeper",
-                    "updated_on": null,
+                    "text": "A respond to",
+                    "updated_on": "03-Mar-2018",
                     "user_id": 1
                 }
             ],
@@ -587,7 +652,7 @@ this once I get recursive serialization working as comments are self referential
             "created_on": "04-Mar-2018",
             "end_interval": 10,
             "id": 1,
-            "tags": [
+            "labels": [
                 {
                     "id": 1,
                     "text": "tag one"
@@ -601,6 +666,7 @@ this once I get recursive serialization working as comments are self referential
                     "text": "faith"
                 }
             ],
+            "tags": [1,2,3],
             "session_id": "1cee9eca335b45bf82a6886e424c9e86",
             "start_interval": 3,
             "updated_on": "08-Mar-2018",
@@ -612,7 +678,11 @@ this once I get recursive serialization working as comments are self referential
 
 **Errors** 
 
-- `TODO`: ??
+- `PROJECT_DOES_NOT_EXIST`: ??
+- `SESSION_UNKNOWN`: ??
+- `SESSION_NOT_IN_PROJECT`: ??
+- `GENERAL_UNKNOWN_JWT_USER`: ??
+- `PROJECT_UNAUTHORIZED`: ??
 
 #### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/`[POST]`
 
@@ -622,8 +692,6 @@ this once I get recursive serialization working as comments are self referential
 
 **Arguments** 
 
-The same as in a `PUT` request where the tags are the IDs of the 
-
     {
         "content": "Now updating",
         "start_interval": 20,
@@ -631,21 +699,67 @@ The same as in a `PUT` request where the tags are the IDs of the
         "tags": [1,2]
     }
 
+
+Note: the `tags` argument is currently optional (so can be not sent in the request); if an empty list is sent, then all tags are
+removed.
+
 **Returns** 
 
-- The created annotation object as above.
+- The created annotation object, e.g.
+
+    {
+        "comments": [],
+        "content": "Hello world",
+        "created_on": "09-Mar-2018",
+        "end_interval": 10,
+        "id": 11,
+        "is_active": true,
+        "labels": [
+            {
+                "id": 1,
+                "text": "First tag"
+            },
+            {
+                "id": 3,
+                "text": "Third tag"
+            }
+        ],
+        "session_id": "1cee9eca335b45bf82a6886e424c9e86",
+        "start_interval": 3,
+        "tags": [
+            1,
+            3
+        ],
+        "updated_on": "09-Mar-2018",
+        "user_id": 30
+    }
 
 **Errors**  
 
-- `TODO`: ??
+- `PROJECT_DOES_NOT_EXIST`: ??
+- `SESSION_UNKNOWN`: ??
+- `SESSION_NOT_IN_PROJECT`: ??
+- `GENERAL_UNKNOWN_JWT_USER`: ??
+- `PROJECT_UNAUTHORIZED`: ??
+- `GENERAL_INVALID_JSON`: ??
+- `CONTENT_REQUIRED`: ??
+- `CONTENT_IS_NOT_STRING`: ??
+- `CONTENT_IS_EMPTY`: ??
+- `START_INTERVAL_REQUIRED`: ??
+- `START_INTERVAL_IS_NOT_INT`: ??
+- `START_INTERVAL_MUST_BE_POSITIVE_INT`: ??
+- `END_INTERVAL_REQUIRED`: ??
+- `END_INTERVAL_IS_NOT_INT`: ??
+- `END_INTERVAL_MUST_BE_POSITIVE_INT`: ??    
+- `START_BEFORE_END`: ??
+- `TAGS_IS_NOT_LIST`: ??
+- `TAG_IS_NOT_INT`: ??
 
 ## ACTIONS on an annotation
 
 A specific annotation for a given session from a project
 
 #### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/`[GET]`
-
-**Description** 
 
 - **NOT IMPLEMENTED:** is this endpoint useful?
 
@@ -657,15 +771,15 @@ A specific annotation for a given session from a project
 
 **Arguments** 
 
-Note: the `tags` argument is currently optional (so can be not sent in the request); if an empty list is sent, then all tags are
-removed.
-
     {
         "content": "Now updating",
         "start_interval": 20,
         "end_interval": 20,
         "tags": []
     }
+
+Note: the `tags` argument is currently optional (so can be not sent in the request); if an empty list is sent, then all tags are
+removed.
 
 **Returns** 
 
@@ -687,14 +801,45 @@ The modified annotation object:
 
 **Errors**  
 
+- `PROJECT_DOES_NOT_EXIST`: ?
+- `SESSION_UNKNOWN`: ?
+- `SESSION_NOT_IN_PROJECT`: ?
+- `GENERAL_UNKNOWN_JWT_USER`: ?
+- `PROJECT_UNAUTHORIZED`: ?
+- `ANNOTATION_404`: ?
+- `GENERAL_INVALID_JSON`:?
+- `CONTENT_REQUIRED`: ??
+- `CONTENT_IS_NOT_STRING`: ??
+- `CONTENT_IS_EMPTY`: ??
+- `START_INTERVAL_REQUIRED`: ??
+- `START_INTERVAL_IS_NOT_INT`: ??
+- `START_INTERVAL_MUST_BE_POSITIVE_INT`: ??
+- `END_INTERVAL_REQUIRED`: ??
+- `END_INTERVAL_IS_NOT_INT`: ??
+- `END_INTERVAL_MUST_BE_POSITIVE_INT`: ??    
+- `START_BEFORE_END`: ??
+- `TAGS_IS_NOT_LIST`: ??
+- `TAG_IS_NOT_INT`: ??
+
 #### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/`[DELETE]`
 
 **Description** 
 
-- Deletes a users annotation on a session recording. Only users who creates the annotation can delete it.
+- Deletes a users annotation on a session recording. Only users who created the annotation can delete it.
 
 **Returns** 
+
+- Custom response where `meta.success` is True if the annotation was deleted, otherwise an error below is provided.
+
 **Errors** 
+
+- `PROJECT_DOES_NOT_EXIST`: ??
+- `SESSION_UNKNOWN`: ??
+- `SESSION_NOT_IN_PROJECT`: ??
+- `GENERAL_UNKNOWN_JWT_USER` ??
+- `PROJECT_UNAUTHORIZED`: ??
+- `ANNOTATION_404`: ??
+- `NOT_ANNOTATION_CREATOR`: ??
 
 ---
 
