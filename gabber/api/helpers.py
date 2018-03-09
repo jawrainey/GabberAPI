@@ -67,13 +67,28 @@ def abort_if_not_user_made(user_id, user_of_annotation):
 
 
 def abort_if_unauthorized(project):
+    """
+    Can return the following:
+
+        - GENERAL_UNKNOWN_JWT_USER
+        - PROJECT_UNAUTHORIZED
+    """
+
     current_user = get_jwt_identity()
     user = User.query.filter_by(email=current_user).first()
     abort_if_unknown_user(user)
     abort_if_not_a_member_and_private(user, project)
+    return user
 
 
 def abort_if_invalid_parameters(pid, sid):
+    """
+    Can return the following:
+
+        - PROJECT_DOES_NOT_EXIST
+        - SESSION_UNKNOWN
+        - SESSION_NOT_IN_PROJECT
+    """
     abort_on_unknown_project_id(pid)
     sess = InterviewSession.query.get(sid)
     abort_if_unknown_session(sess)

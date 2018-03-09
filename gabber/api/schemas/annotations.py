@@ -74,33 +74,3 @@ class UserAnnotationSchema(ma.ModelSchema):
                         validator.errors.append('TAG_IS_NOT_INT')
 
         validator.raise_if_errors()
-
-
-class UserAnnotationPostSchema(ma.Schema):
-    """
-    A new schema is required as it loads (serializes) the object, hence we need to
-    validate it to produce custom error codes, which mashmallow does not support.
-    """
-
-    message = ma.String()
-    start = ma.Int()
-    end = ma.Int()
-    tags = ma.List(ma.Int())
-
-    @pre_load()
-    def __validate(self, data):
-        validator = HelperSchemaValidator('USER_ANNOTATIONS')
-
-        message_valid = validator.validate('message', 'str', data)
-        start_valid = validator.validate('start', 'int', data)
-        end_valid = validator.validate('end', 'int', data)
-        tags_valid = validator.validate('tags', 'list', data)
-
-        if tags_valid:
-            for topic in data['tag']:
-                if validator.is_not_str(topic):
-                    validator.errors.append('TOPIC_IS_NOT_STRING')
-                if not topic:
-                    validator.errors.append('TOPIC_IS_EMPTY')
-
-        validator.raise_if_errors()
