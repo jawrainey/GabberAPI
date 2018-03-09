@@ -4,6 +4,7 @@ from gabber.projects.models import \
     Connection as UserAnnotations, \
     Code as Tags, \
     ConnectionComments as Comments
+from gabber.users.models import User
 from marshmallow import pre_load
 from gabber.api.schemas.project import HelperSchemaValidator
 
@@ -16,7 +17,12 @@ class UserAnnotationTagSchema(ma.ModelSchema):
 
 
 class UserAnnotationCommentSchema(ma.ModelSchema):
-    user_id = ma.Function(lambda annotation: annotation.user.id)
+    creator = ma.Method("_creator")
+
+    @staticmethod
+    def _creator(data):
+        user = User.query.get(data.user_id)
+        return {'user_id': user.id, 'fullname': user.fullname}
 
     class Meta:
         model = Comments
@@ -34,12 +40,18 @@ class UserAnnotationSchema(ma.ModelSchema):
     """
     labels = ma.Nested(UserAnnotationTagSchema, many=True, attribute="tags")
     comments = ma.Nested(UserAnnotationCommentSchema, many=True, attribute="comments")
+    creator = ma.Method("_creator")
+
+    @staticmethod
+    def _creator(data):
+        user = User.query.get(data.user_id)
+        return {'user_id': user.id, 'fullname': user.fullname}
 
     class Meta:
         model = UserAnnotations
         include_fk = True
         dateformat = "%d-%b-%Y"
-        exclude = ['interview', 'user']
+        exclude = ['interview', 'user', 'user_id']
 
     @staticmethod
     def validate_intervals(attribute, data, validator):
