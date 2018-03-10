@@ -32,6 +32,32 @@ def validate_password(data, validator):
     #     validate_password_length(password_valid, data['password'], validator.errors)
 
 
+class ForgotPasswordSchema(ma.Schema):
+    email = ma.String()
+
+    @pre_load()
+    def __validate(self, data):
+        validator = HelperSchemaValidator('AUTH')
+        email_valid = validator.validate('email', 'str', data)
+
+        if email_valid:
+            validate_email(data['email'], validator.errors)
+        elif not validator.errors and data['email'] not in known_users():
+            validator.errors.append("USER_DOES_NOT_EXIST")
+        validator.raise_if_errors()
+
+
+class ResetPasswordSchema(ma.Schema):
+    password = ma.String()
+
+    @pre_load()
+    def __validate(self, data):
+        validator = HelperSchemaValidator('AUTH')
+        # TODO: VALIDATE PASSWORD LENGTH: currently there is no upper/lower limit
+        validate_password(data, validator)
+        validator.raise_if_errors()
+
+
 class AuthLoginSchema(ma.Schema):
     email = ma.String()
     password = ma.String()

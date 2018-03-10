@@ -50,10 +50,12 @@ restful_api.add_resource(UserAnnotation, '/api/projects/<int:pid>/sessions/<stri
 restful_api.add_resource(Comments, '/api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/')
 restful_api.add_resource(Comment, '/api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>')
 
-from gabber.api.auth import TokenRefresh, UserRegistration, UserLogin
+from gabber.api.auth import TokenRefresh, UserRegistration, UserLogin, ForgotPassword, ResetPassword
 restful_api.add_resource(TokenRefresh, '/api/auth/token/refresh/')
 restful_api.add_resource(UserRegistration, '/api/auth/register/')
 restful_api.add_resource(UserLogin, '/api/auth/login/')
+restful_api.add_resource(ForgotPassword, '/api/auth/forgot/')
+restful_api.add_resource(ResetPassword, '/api/auth/reset/<string:token>', endpoint="api.reset")
 
 # The existing API is confusing because methods are separate ...
 from gabber.api.playlists import UserPlaylists, RegionsListForPlaylist, RegionsListByProject, RegionNote

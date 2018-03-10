@@ -2,6 +2,16 @@ from gabber import db, bcrypt
 from flask_login import UserMixin, AnonymousUserMixin
 
 
+class ResetTokens(db.Model):
+    """
+    Used to determine if a token has been previously used to reset a users password.
+    From a UX/SEC perspective, if it has, then we do not want the user to be able to reset it again.
+    """
+    token = db.Column(db.String(192), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    is_active = db.Column(db.Boolean, default=True)
+
+
 class User(UserMixin, db.Model):
     """
     A registered user of the system
@@ -23,10 +33,13 @@ class User(UserMixin, db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
-    def __init__(self, email, password, fullname):
-        self.email = email
-        self.password = bcrypt.generate_password_hash(password)
+    def __init__(self, email, plaintext, fullname):
         self.fullname = fullname
+        self.email = email
+        self.set_password(plaintext)
+
+    def set_password(self, plaintext):
+        self.password = bcrypt.generate_password_hash(plaintext)
 
     def is_correct_password(self, plaintext):
         return bcrypt.check_password_hash(self.password, plaintext)
