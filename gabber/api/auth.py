@@ -43,8 +43,6 @@ class ForgotPassword(Resource):
 
         email = data['email']
         user = User.query.filter_by(email=email).first()
-        helpers.abort_if_unknown_user(user)
-
         token = URLSafeTimedSerializer(app.config["SECRET_KEY"]).dumps(email, app.config['SALT'])
         invalidate_other_user_tokens(email)
 
@@ -96,9 +94,7 @@ class ResetPassword(Resource):
     @staticmethod
     def abort_if_invalid_token(token, user_id):
         reset_token = ResetTokens.query.filter_by(token=token, user_id=user_id).first()
-        if not reset_token:
-            raise CustomException(400, errors=['NOT_RESET'])
-        elif not reset_token.token:
+        if not reset_token or not reset_token.token:
             # The user has not requested a password reset
             raise CustomException(400, errors=['TOKEN_404'])
         elif not reset_token.is_active:
@@ -109,7 +105,7 @@ class ResetPassword(Resource):
     def serialize_token_or_abort(self, token):
         serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
         try:
-            email = serializer.loads(token, salt=app.config['SALT'], max_age=100000)
+            email = serializer.loads(token, salt=app.config['SALT'], max_age=86400)  # one day expire time
         except SignatureExpired:
             email = serializer.loads(token, salt=app.config['SALT'])
             user = User.query.filter_by(email=email).first()
