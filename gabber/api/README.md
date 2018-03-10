@@ -100,7 +100,9 @@ fullname varies across countries, where some consider middle name, etc.
 
 **Returns**
 
-- Empty custom response where `success` if True if the email has been sent, otherwise False.
+The magic URL that is generated and sent in an email, which could be used on the client to simplify workflow:
+
+    "reset_url": "http://0.0.0.0:5000/api/auth/reset/Imphd3JhaW5leUBnbWFpbC5jb20i.DYWvEQ.A_ave4r-iQeCfnDaOnCblF3MsVo"
 
 **Actions**
 
@@ -109,16 +111,19 @@ fullname varies across countries, where some consider middle name, etc.
 **Errors**:
 
 - `GENERAL_INVALID_JSON`: The request you made contains invalid JSON.
-- `EMAIL_NOT_FOUND`: The email address provided does not belong to a known user.
-- `MUST_BE_EMAIL`: You have not provided a valid email address.
+- `USER_DOES_NOT_EXIST`: The email provided is not associated with a known user.
+- `AUTH_INVALID_EMAIL`: You have not provided a valid email address.
+- `AUTH_EMAIL_KEY_REQUIRED`: The attribute `email` is required in your request body.
+- `AUTH_EMAIL_IS_EMPTY`: The attribute `email` must not be empty.
+- `AUTH_EMAIL_IS_NOT_STRING`: The attribute `email` must be a string.
 - `ISSUE_SENDING_EMAIL`: An error occurred when trying to send the email. If this continues, please get in touch.
 
-#### Endpoint: /api/auth/reset/<token>/`[GET]`
+#### Endpoint: /api/auth/reset/<string:token>/`[GET]`
 
 **Description** 
 
-- Returns the email address associated with that token if a token is valid, which
-can be used on the frontend to pre-populate fields, etc.
+- Returns the email address associated with that token if a token is valid, which can be 
+used on the frontend to pre-populate fields, etc. This is _not_ used in the following `POST`.
 
 **Arguments** 
 
@@ -126,38 +131,43 @@ can be used on the frontend to pre-populate fields, etc.
 
 **Returns**
 
-    { 
-      "email": "jawrainey@gmail.com"
-    }
+The email address of the user who is visiting the reset page with the magic URL.
+
+    "email": "notjawrainey@gmail.com"
 
 **Errors**:
 
-- `TOKEN_404:` ???
+- `TOKEN_EXPIRED`: The token is invalid as it has expired.
+- `TOKEN_404:` The token does not exist.
+- `TOKEN_USED`: This token was previously used to reset the password. 
 
-#### Endpoint: /api/auth/reset/`[POST]`
+#### Endpoint: /api/auth/reset/<string:token>/`[POST]`
 
 **Description** 
 
-- Changes password of a given email if the token sent is also valid.
+- Changes the password of a given email if the token sent is also valid.
 
 **Arguments**
 
-- `email`: the email address of the user to reset
 - `password`: the password to change the email address to
-- `token`: the token from the email that was sent
 
 **Returns**
 
-The same response as login/register:
+- The same response as login/register, e.g. the access and refresh tokens.
 
-    { 
-      "access_token": "",
-      "refresh_token": ""
-    }
+**Actions**
+
+- Emails the user to inform them that their password was reset
 
 **Errors**:
 
-- `TODO:` ???
+- `GENERAL_INVALID_JSON:` The request made contains invalid JSON
+- `AUTH_PASSWORD_KEY_REQUIRED`: The password attribute is required.
+- `AUTH_PASSWORD_IS_EMPTY`: The provided password attribute is empty.
+- `AUTH_PASSWORD_IS_NOT_STRING`: The password attribute must be a string.
+- `TOKEN_EXPIRED`: The token is invalid as it has expired.
+- `TOKEN_404:` The token does not exist.
+- `TOKEN_USED`: This token was previously used to reset the password. 
 
 ---
 
