@@ -13,9 +13,9 @@ All requests are returned in the following format where errors contains unique _
         }
     }
 
-**Note:** all `POST/PUT/DELETE` requests must be in `json` format.
+**Note:** all `POST/PUT` requests must be in `json` format.
 
-The following are general errors that can be returned across resources:
+The following are errors that can be returned across resources:
 
 - `GENERAL_INVALID_JSON`: The request made contains invalid JSON
 - `GENERAL_UNKNOWN_USER`: The user in the JWT request does not exist.
@@ -418,7 +418,7 @@ it overrides all existing topics for the project; `text` and `is_active` is requ
 **Arguments** N/A
 **Returns** 
 
-- 
+- `meta.success` will be True if successful.
 
 **Errors** 
 
@@ -441,13 +441,13 @@ an admin adding/removing them, etc.
 
 **Errors** 
 
-- `TODO`: ??
+- `PROJECT_UNKNOWN`: ??
 
 ---
 
 #### Endpoint: /api/projects/<int:pid>/membership/`[DELETE]`
 
-**Description** leaves a project that the user is a member of. _Note: this NOT yet implemented._
+**Description** leaves a project that the user is a member of.
 
 **Returns** True if success, otherwise False within the `meta` object.
 
@@ -613,68 +613,66 @@ All user annotations for a given session from a project
 
 **Returns** 
 
-Note: 
 
-1) `replies` currently returns a list of IDs of other comments on this comment. I will update
+        [
+            {
+                "comments": [
+                    {
+                        "connection": 1,
+                        "created_on": "03-Mar-2018",
+                        "id": 1,
+                        "parent_id": 1,
+                        "replies": [
+                            1,
+                            2
+                        ],
+                        "text": "Top comment",
+                        "updated_on": "03-Mar-2018",
+                        "user_id": 1
+                    },
+                    {
+                        "connection": 1,
+                        "created_on": "03-Mar-2018",
+                        "id": 3,
+                        "parent_id": 1,
+                        "replies": [],
+                        "text": "A respond to",
+                        "updated_on": "03-Mar-2018",
+                        "user_id": 1
+                    }
+                ],
+                "content": "Hello world",
+                "created_on": "04-Mar-2018",
+                "end_interval": 10,
+                "id": 1,
+                "labels": [
+                    {
+                        "id": 1,
+                        "text": "tag one"
+                    },
+                    {
+                        "id": 2,
+                        "text": "tag two"
+                    },
+                    {
+                        "id": 3,
+                        "text": "faith"
+                    }
+                ],
+                "tags": [1,2,3],
+                "session_id": "1cee9eca335b45bf82a6886e424c9e86",
+                "start_interval": 3,
+                "updated_on": "08-Mar-2018",
+                "user_id": 1
+            },
+            ...
+        ]
+
+- `replies` currently returns a list of IDs of other comments on this comment. I will update
 this once I get recursive serialization working as comments are self referential.
-2) `labels` and `tags` present the same information, whereas `tags` only contains the IDs of tags, which
+- `labels` and `tags` present the same information, whereas `tags` only contains the IDs of tags, which
 simplifies updating the model.
 
-
-    [
-        {
-            "comments": [
-                {
-                    "connection": 1,
-                    "created_on": "03-Mar-2018",
-                    "id": 1,
-                    "parent_id": 1,
-                    "replies": [
-                        1,
-                        2
-                    ],
-                    "text": "Top comment",
-                    "updated_on": "03-Mar-2018",
-                    "user_id": 1
-                },
-                {
-                    "connection": 1,
-                    "created_on": "03-Mar-2018",
-                    "id": 3,
-                    "parent_id": 1,
-                    "replies": [],
-                    "text": "A respond to",
-                    "updated_on": "03-Mar-2018",
-                    "user_id": 1
-                }
-            ],
-            "content": "Hello world",
-            "created_on": "04-Mar-2018",
-            "end_interval": 10,
-            "id": 1,
-            "labels": [
-                {
-                    "id": 1,
-                    "text": "tag one"
-                },
-                {
-                    "id": 2,
-                    "text": "tag two"
-                },
-                {
-                    "id": 3,
-                    "text": "faith"
-                }
-            ],
-            "tags": [1,2,3],
-            "session_id": "1cee9eca335b45bf82a6886e424c9e86",
-            "start_interval": 3,
-            "updated_on": "08-Mar-2018",
-            "user_id": 1
-        },
-        ...
-    ]
-    
 
 **Errors** 
 
@@ -707,6 +705,7 @@ removed.
 
 - The created annotation object, e.g.
 
+
     {
         "comments": [],
         "content": "Hello world",
@@ -733,6 +732,7 @@ removed.
         "updated_on": "09-Mar-2018",
         "user_id": 30
     }
+    
 
 **Errors**  
 
@@ -849,16 +849,54 @@ User comments on other (or their own) annotations on a recording
 
 #### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/`[GET]`
 
-**Description**
-**Returns** 
-**Errors** 
+- **NOT IMPLEMENTED:** if you want comments for an annotation see `/annotations/<int:aid>/[GET]`
 
 #### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/`[POST]`
 
 **Description** 
+
+- Create a **new** comment on an annotation
+
 **Arguments**
+
+The content of the comment
+
+
+    {
+        "content": "The content of the comment"
+    }
+
+
 **Returns**
+
+- The comment as an object; `parent_id` is `null` if it is a comment
+
+
+    {
+        "annotation_id": 1,
+        "created_on": "09-Mar-2018",
+        "creator": {
+            "fullname": "jay",
+            "user_id": 30
+        },
+        "id": 15,
+        "parent_id": 10,
+        "replies": [],
+        "content": "again ... updates",
+        "session_id": "1cee9eca335b45bf82a6886e424c9e86",
+        "updated_on": "09-Mar-2018"
+    }
+
+
 **Errors** 
+
+- `PROJECT_DOES_NOT_EXIST`: ??
+- `SESSION_UNKNOWN`: ??
+- `SESSION_NOT_IN_PROJECT`: ??
+- `GENERAL_UNKNOWN_JWT_USER`: ??
+- `PROJECT_UNAUTHORIZED`: ??
+- `COMMENT_404`: ??
+- `COMMENT_NOT_IN_SESSION`: ??
 
 ---
 
@@ -869,17 +907,112 @@ Users who have created a comment can fetch, edit or delete them.
 #### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/`[GET]`
 
 **Description**
+
+- Retrieves a specific comment of an annotation.
+
 **Returns** 
+
+- The comment as an object; `parent_id` is `null` if it is a comment
+
+
+    {
+        "annotation_id": 1,
+        "content": "no you",
+        "created_on": "03-Mar-2018",
+        "creator": {
+            "fullname": "Jay Rainey",
+            "user_id": 1
+        },
+        "id": 1,
+        "parent_id": 1,
+        "replies": [
+            1,
+            2,
+            8,
+            9,
+            10,
+            11
+        ],
+        "session_id": "1cee9eca335b45bf82a6886e424c9e86",
+        "updated_on": "09-Mar-2018"
+    }
+
+
 **Errors** 
 
+- `PROJECT_DOES_NOT_EXIST`: ??
+- `SESSION_UNKNOWN`: ??
+- `SESSION_NOT_IN_PROJECT`: ??
+- `GENERAL_UNKNOWN_JWT_USER`: ??
+- `PROJECT_UNAUTHORIZED`: ??
+- `COMMENT_404`: ??
+- `COMMENT_NOT_IN_SESSION`: ??
+        
 #### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/`[PUT]`
 
 **Description**
+
+- Update the content of a comment, i.e. via an `edit` feature
+
+**Arguments** 
+
+- `content` the same argument as `POST` for a comment to an annotation above.
+
 **Returns** 
+
+- The updated comment object as above.
+
 **Errors**
+
+- `PROJECT_DOES_NOT_EXIST`: ??
+- `SESSION_UNKNOWN`: ??
+- `SESSION_NOT_IN_PROJECT`: ??
+- `GENERAL_UNKNOWN_JWT_USER`: ??
+- `PROJECT_UNAUTHORIZED`: ??
+- `COMMENT_404`: ??
+- `COMMENT_NOT_IN_SESSION`: ??
+- `GENERAL_INVALID_JSON`: ??
+- `NOT_COMMENT_CREATOR`: ??
+- `USER_COMMENT_CONTENT_KEY_REQUIRED`: ??
+- `USER_COMMENT_IS_NOT_STRING`: ??
+
+#### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/`[POST]`
+
+**Description**
+
+- Creates a new comment on another comment, e.g. nested comments.
+
+**Returns** 
+
+- The new comment resource.
+
+**Errors** 
+
+- `PROJECT_DOES_NOT_EXIST`: ??
+- `SESSION_UNKNOWN`: ??
+- `SESSION_NOT_IN_PROJECT`: ??
+- `GENERAL_UNKNOWN_JWT_USER`: ??
+- `PROJECT_UNAUTHORIZED`: ??
+- `COMMENT_404`: ??
+- `COMMENT_NOT_IN_SESSION`: ??
 
 #### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/`[DELETE]`
 
 **Description**
+
+- Soft-deletes the entire comment, i.e. via an `delete` feature
+
 **Returns** 
+
+- `204` no content status code
+
 **Errors**
+
+- `PROJECT_DOES_NOT_EXIST`: ??
+- `SESSION_UNKNOWN`: ??
+- `SESSION_NOT_IN_PROJECT`: ??
+- `GENERAL_UNKNOWN_JWT_USER`: ??
+- `PROJECT_UNAUTHORIZED`: ??
+- `COMMENT_404`: ??
+- `COMMENT_NOT_IN_SESSION`: ??
+- `NOT_COMMENT_CREATOR`: ??

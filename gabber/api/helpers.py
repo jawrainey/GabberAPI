@@ -81,6 +81,11 @@ def abort_if_not_user_made(user_id, user_of_annotation):
         raise CustomException(400, errors=['NOT_ANNOTATION_CREATOR'])
 
 
+def abort_if_not_user_made_comment(user_id, user_of_comment):
+    if user_id != user_of_comment:
+        raise CustomException(400, errors=['NOT_COMMENT_CREATOR'])
+
+
 def abort_if_unauthorized(project):
     """
     Can return the following:

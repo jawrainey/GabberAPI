@@ -64,18 +64,37 @@ class Comment(Resource):
         """
         READ a comment an session annotation
         """
-        return custom_response(200, data=[pid, sid, aid, cid])
+        helpers.abort_if_invalid_parameters(pid, sid)
+        helpers.abort_if_unauthorized(Project.query.get(pid))
+        helpers.abort_if_unknown_comment(cid, aid)
+        return custom_response(200, data=UserAnnotationCommentSchema().dump(CommentsModel.query.get(cid)))
 
     @jwt_required
     def put(self, pid, sid, aid, cid):
         """
         UPDATE a comment an session annotation
         """
-        return custom_response(200, data=[pid, sid, aid, cid])
+        helpers.abort_if_invalid_parameters(pid, sid)
+        user = helpers.abort_if_unauthorized(Project.query.get(pid))
+        helpers.abort_if_unknown_comment(cid, aid)
+        comment = CommentsModel.query.filter_by(id=cid)
+        helpers.abort_if_not_user_made_comment(user.id, comment.first().user_id)
+
+        data = helpers.jsonify_request_or_abort()
+        schema = UserAnnotationCommentSchema()
+        helpers.abort_if_errors_in_validation(schema.validate(data))
+        comment.update({'content': data['content']})
+        return custom_response(200, data=schema.dump(comment.first()))
 
     @jwt_required
     def delete(self, pid, sid, aid, cid):
         """
         DELETE a comment an session annotation
         """
-        return custom_response(204, data=[pid, sid, aid, cid])
+        helpers.abort_if_invalid_parameters(pid, sid)
+        user = helpers.abort_if_unauthorized(Project.query.get(pid))
+        helpers.abort_if_unknown_comment(cid, aid)
+        comment = CommentsModel.query.filter_by(id=cid)
+        helpers.abort_if_not_user_made_comment(user.id, comment.first().user_id)
+        # comment.update({'is_active': False})
+        return custom_response(204)

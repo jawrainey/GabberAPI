@@ -18,16 +18,24 @@ class UserAnnotationTagSchema(ma.ModelSchema):
 
 class UserAnnotationCommentSchema(ma.ModelSchema):
     creator = ma.Method("_creator")
+    parent_id = ma.Function(lambda data: data.parent_id)
+    annotation_id = ma.Function(lambda data: data.connection.id)
+    session_id = ma.Function(lambda data: data.connection.session_id)
 
     @staticmethod
     def _creator(data):
-        user = User.query.get(data.user_id)
-        return {'user_id': user.id, 'fullname': user.fullname}
+        return {'user_id': data.user.id, 'fullname': data.user.fullname}
 
     class Meta:
         model = Comments
         dateformat = "%d-%b-%Y"
-        exclude = ['user']
+        exclude = ['user', 'connection', 'parent']
+
+    @pre_load()
+    def __validate(self, data):
+        validator = HelperSchemaValidator('USER_COMMENT')
+        validator.validate('content', 'str', data)
+        validator.raise_if_errors()
 
 
 class UserAnnotationSchema(ma.ModelSchema):
@@ -44,8 +52,7 @@ class UserAnnotationSchema(ma.ModelSchema):
 
     @staticmethod
     def _creator(data):
-        user = User.query.get(data.user_id)
-        return {'user_id': user.id, 'fullname': user.fullname}
+        return {'user_id': data.user.id, 'fullname': data.user.fullname}
 
     class Meta:
         model = UserAnnotations

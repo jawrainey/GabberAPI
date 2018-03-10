@@ -31,7 +31,7 @@ class HelperSchemaValidator:
 
     def validate(self, attribute, _type, data):
         if attribute not in data:
-            self.errors.append('%s_REQUIRED' % attribute)
+            self.errors.append('%s_KEY_REQUIRED' % attribute)
         elif not data[attribute]:
             self.errors.append('%s_IS_EMPTY' % attribute)
         elif _type == "str" and self.is_not_str(data[attribute]):

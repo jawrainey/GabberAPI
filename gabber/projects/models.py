@@ -508,7 +508,7 @@ class ConnectionComments(db.Model):
     __tablename__ = 'connection_comments'
 
     id = db.Column(db.Integer, primary_key=True)
-    text = db.Column(db.String(1120), default=None)
+    content = db.Column(db.String(1120), default=None)
 
     # If this is NULL, then it is a response to the root, e.g. the annotation itself.
     parent_id = db.Column(db.Integer, db.ForeignKey('connection_comments.id'), nullable=True)
@@ -521,8 +521,8 @@ class ConnectionComments(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
-    def __init__(self, text, pid, uid, aid):
-        self.text = text
+    def __init__(self, content, pid, uid, aid):
+        self.content = content
         self.parent_id = pid
         self.user_id = uid
         self.connection_id = aid
@@ -534,7 +534,7 @@ class ConnectionComments(db.Model):
         return {
             'id': self.id,
             'pid': self.parent_id,
-            'content': str(self.text),
+            'content': str(self.content),
             'timestamp': self.created_on.strftime("%Y-%m-%d %H:%M:%S"),
             'days_since': abs((self.created_on - datetime.datetime.now()).days),
             'creator': str(User.query.filter_by(id=self.user_id).first().fullname),
