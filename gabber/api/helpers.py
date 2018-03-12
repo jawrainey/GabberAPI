@@ -26,6 +26,11 @@ def abort_if_not_a_member_and_private(user, project):
         raise CustomException(401, errors=['PROJECT_UNAUTHORIZED'])
 
 
+def abort_if_not_project_member(user, project_id):
+    if not user.is_project_member(project_id):
+        raise CustomException(401, errors=['USER_NOT_PROJECT_MEMBER'])
+
+
 def abort_if_unknown_project(project):
     if not project:
         raise CustomException(404, errors=['PROJECT_UNKNOWN'])
@@ -93,10 +98,10 @@ def abort_if_unauthorized(project):
         - GENERAL_UNKNOWN_JWT_USER
         - PROJECT_UNAUTHORIZED
     """
-
     current_user = get_jwt_identity()
     user = User.query.filter_by(email=current_user).first()
     abort_if_unknown_user(user)
+    abort_on_unknown_project_id(project.id)
     abort_if_not_a_member_and_private(user, project)
     return user
 

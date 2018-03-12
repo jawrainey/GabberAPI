@@ -73,15 +73,23 @@ class Membership(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), primary_key=True)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    # Used to determine if a user has confirmed their membership
+    confirmed = db.Column(db.Boolean, default=False)
+    # Should someone leave a project, we make deactivate their membership for posterity.
+    deactivated = db.Column(db.Boolean, default=False)
+    # Determines (1) when membership was sent, and (2) for how long they were a member.
+    date_sent = db.Column(db.DateTime, default=db.func.now())
+    date_accepted = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
     user = db.relationship("User", back_populates="member_of")
     project = db.relationship("Project", back_populates="members")
     role = db.relationship("Roles", backref=db.backref("member_of", uselist=False))
 
-    def __init__(self, uid, pid, rid):
+    def __init__(self, uid, pid, rid, confirmed=False):
         self.user_id = uid
         self.project_id = pid
         self.role_id = rid
+        self.confirmed = confirmed
 
 
 class Roles(db.Model):

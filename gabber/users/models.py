@@ -1,5 +1,6 @@
 from gabber import db, bcrypt
 from flask_login import UserMixin, AnonymousUserMixin
+from uuid import uuid4
 
 
 class ResetTokens(db.Model):
@@ -25,6 +26,9 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64), unique=True)
     password = db.Column(db.String(192))
     fullname = db.Column(db.String(64))
+    # User accounts are created when participating in a session; once registered,
+    # this is changed so that we can identify between registers/unregistered users.
+    registered = db.Column(db.Boolean, default=False)
 
     member_of = db.relationship("Membership", back_populates="user", lazy='dynamic')
     connections = db.relationship('Connection', backref='user', lazy='dynamic')
@@ -33,10 +37,17 @@ class User(UserMixin, db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
-    def __init__(self, email, plaintext, fullname):
+    def __init__(self, fullname, email, password):
         self.fullname = fullname
         self.email = email
-        self.set_password(plaintext)
+        self.set_password(password)
+
+    @staticmethod
+    def create_unregistered_user(fullname, email):
+        user = User(fullname, email, uuid4().hex)
+        db.session.add(user)
+        db.session.commit()
+        return user
 
     def set_password(self, plaintext):
         self.password = bcrypt.generate_password_hash(plaintext)
