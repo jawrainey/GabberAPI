@@ -433,10 +433,9 @@ it overrides all existing topics for the project; `text` and `is_active` is requ
 
 ---
 
-### Endpoint
+### Endpoint: projects.destroy
 
-`ELETE: /api/projects/<int:pid>/`[D`
-
+`DELETE: /api/projects/<int:pid>/`
 
 > Soft deletes an existing project. The JWT user must have the creator role of a project to delete it.
 
@@ -471,9 +470,9 @@ This is for when project members join (public) or leave, rather than an admin ad
 
 ---
 
-### Endpoint
+### Endpoint: projects.members.destroy
 
-`ELETE: /api/projects/<int:pid>/membership/`[D`
+`DELETE: /api/projects/<int:pid>/membership/`
 
 **Description** leaves a project that the user is a member of.
 
@@ -544,7 +543,7 @@ A list of sessions that have been recorded for a particular project.
 
 ### Endpoint: projects.session.create
 
-`POST: /api/projects/<int:pid>/sessions/``
+`POST: /api/projects/<int:pid>/sessions/`
 
 ### MOBILE SUPPORT: LEGACY
 
