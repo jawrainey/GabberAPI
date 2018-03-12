@@ -526,11 +526,11 @@ A list of sessions that have been recorded for a particular project.
                     "start": "0",
                     "text": "The first topic being discussed"
                 },
-                ...
+                "..."
             ],
             "user_annotations": []
         },
-        ...
+        "..."
     ]
 ```
 
@@ -695,7 +695,7 @@ All user annotations for a given session from a project
             "updated_on": "08-Mar-2018",
             "user_id": 1
         },
-        ...
+        "..."
     ]
 ```
 
@@ -954,7 +954,7 @@ Users who have created a comment can fetch, edit or delete them.
 
 - The comment as an object; `parent_id` is `null` if it is a comment
 
-
+```json
     {
         "annotation_id": 1,
         "content": "no you",
@@ -976,7 +976,7 @@ Users who have created a comment can fetch, edit or delete them.
         "session_id": "1cee9eca335b45bf82a6886e424c9e86",
         "updated_on": "09-Mar-2018"
     }
-
+```
 
 **Errors**
 
