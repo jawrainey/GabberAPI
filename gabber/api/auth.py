@@ -222,7 +222,7 @@ class UserRegistration(Resource):
         """
         data = helpers.jsonify_request_or_abort()
         helpers.abort_if_errors_in_validation(AuthRegisterSchema().validate(data))
-        db.session.add(User(data['email'], data['password'], data['fullname']))
+        db.session.add(User(fullname=data['fullname'], email=data['email'], password=data['password']))
         db.session.commit()
         return custom_response(201, data=create_jwt_access(data['email']))
 
