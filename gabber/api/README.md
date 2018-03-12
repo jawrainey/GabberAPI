@@ -455,8 +455,7 @@ it overrides all existing topics for the project; `text` and `is_active` is requ
 
 ## Project membership
 
-This is partially implemented as we have yet to decide on membership; this is for when users join/leave, rather than
-an admin adding/removing them, etc.  
+This is for when project members join (public) or leave, rather than an admin adding/removing them.  
 
 ### Endpoint: projects.members.create
 
@@ -645,57 +644,77 @@ All user annotations for a given session from a project
 
 ```json
     [
-        {
+      {
             "comments": [
                 {
-                    "connection": 1,
+                    "annotation_id": 1,
+                    "content": "beans",
                     "created_on": "03-Mar-2018",
+                    "creator": {
+                        "fullname": "jay",
+                        "user_id": 30
+                    },
                     "id": 1,
                     "parent_id": 1,
                     "replies": [
                         1,
-                        2
+                        2,
+                        8,
+                        9,
+                        10,
+                        11
                     ],
-                    "text": "Top comment",
-                    "updated_on": "03-Mar-2018",
-                    "user_id": 1
+                    "session_id": "1cee9eca335b45bf82a6886e424c9e86",
+                    "updated_on": "09-Mar-2018"
                 },
                 {
-                    "connection": 1,
+                    "annotation_id": 1,
+                    "content": "Responding to FC",
                     "created_on": "03-Mar-2018",
-                    "id": 3,
+                    "creator": {
+                        "fullname": "Jay Rainey",
+                        "user_id": 1
+                    },
+                    "id": 2,
                     "parent_id": 1,
-                    "replies": [],
-                    "text": "A respond to",
-                    "updated_on": "03-Mar-2018",
-                    "user_id": 1
-                }
+                    "replies": [
+                        3
+                    ],
+                    "session_id": "1cee9eca335b45bf82a6886e424c9e86",
+                    "updated_on": "03-Mar-2018"
+                },
+                ...
             ],
-            "content": "Hello world",
+            "content": "Hello world modified text",
             "created_on": "04-Mar-2018",
+            "creator": {
+                "fullname": "Jay Rainey",
+                "user_id": 1
+            },
             "end_interval": 10,
             "id": 1,
+            "is_active": true,
             "labels": [
                 {
                     "id": 1,
-                    "text": "tag one"
+                    "text": "lol"
                 },
                 {
                     "id": 2,
-                    "text": "tag two"
-                },
-                {
-                    "id": 3,
-                    "text": "faith"
+                    "text": "Smash"
                 }
+                ...
             ],
-            "tags": [1,2,3],
             "session_id": "1cee9eca335b45bf82a6886e424c9e86",
             "start_interval": 3,
-            "updated_on": "08-Mar-2018",
-            "user_id": 1
-        },
-        ...
+            "tags": [
+                1,
+                2,
+                3
+            ],
+            "updated_on": "08-Mar-2018"
+      },
+      ...
     ]
 ```
 
