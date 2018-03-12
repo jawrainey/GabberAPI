@@ -55,9 +55,9 @@ def send_project_member_invite_unregistered_user(admin, user, project):
     """
     The user exists (i.e. participated in a session) or was created above before sending the email
     """
-    from gabber.api.auth import RegisterFromKnownUser
-    token_register_url = RegisterFromKnownUser.generate_url(user.fullname, user.email, project.id, 'register')
-    token_login_url = RegisterFromKnownUser.generate_url(user.fullname, user.email, project.id, 'login')
+    from gabber.api.auth import RegisterInvitedUser
+    token_register_url = RegisterInvitedUser.generate_url(user.fullname, user.email, project.id, 'register')
+    token_login_url = RegisterInvitedUser.generate_url(user.fullname, user.email, project.id, 'login')
 
     send_email(
         receiver=user.email,

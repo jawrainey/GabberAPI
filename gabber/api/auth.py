@@ -239,7 +239,7 @@ class LoginInvitedUser(Resource):
         """
         data = helpers.jsonify_request_or_abort()
         helpers.abort_if_errors_in_validation(AuthLoginSchema().validate(data))
-        token_data = RegisterFromKnownUser.validate_token(token)
+        token_data = RegisterInvitedUser.validate_token(token)
         # The email did not changed, so the membership invite remains associated with the other member.
         if data['email'] == token_data['email']:
             return custom_response(201, data=create_jwt_access(data['email']))
@@ -263,7 +263,7 @@ class LoginInvitedUser(Resource):
         """
         Retrieves User/Project details associated with the invite token, e.g. fullname, email, project_id
         """
-        return custom_response(201, data=RegisterFromKnownUser.validate_token(token))
+        return custom_response(201, data=RegisterInvitedUser.validate_token(token))
 
 
 class UserLogin(Resource):
