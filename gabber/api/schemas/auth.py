@@ -70,7 +70,7 @@ class AuthLoginSchema(ma.Schema):
 
         if email_valid:
             validate_email(data['email'], validator.errors)
-        elif not validator.errors and data['email'] not in known_users():
+        if data['email'] not in known_users():
             validator.errors.append("USER_DOES_NOT_EXIST")
 
         validate_password(data, validator)
