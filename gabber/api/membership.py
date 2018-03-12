@@ -59,10 +59,7 @@ class ProjectInvites(Resource):
         helpers.abort_if_errors_in_validation(RemoveMemberSchema().validate(data))
         user = User.query.filter_by(email=data['email']).first()
         helpers.abort_if_not_project_member(user, pid)
-
         membership = Membership.query.filter_by(user_id=user.id, project_id=pid).first()
-        if membership and membership.deactivated:
-            return custom_response(400, errors=['USER_IS_NOT_MEMBER'])
         membership.deactivated = True
         db.session.commit()
         send_project_member_removal(admin, user, Project.query.get(pid))

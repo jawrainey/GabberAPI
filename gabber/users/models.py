@@ -68,7 +68,7 @@ class User(UserMixin, db.Model):
         :param pid: the project id to search for
         :return: True if this user is a member, otherwise False.
         """
-        match = [i.role_id for i in self.member_of if int(i.project_id) == int(pid)]
+        match = [i.role_id for i in self.member_of if int(i.project_id) == int(pid) if not i.deactivated]
         return True if match else False
 
     def role_for_project(self, pid):
