@@ -452,31 +452,122 @@ it overrides all existing topics for the project; `text` and `is_active` is requ
 
 ---
 
-## Project membership
+---
 
-This is for when project members join (public) or leave, rather than an admin adding/removing them.
+## Project membership: invites
 
-### Endpoint: projects.members.create
+Project administrators can _invite_ (add) or _remove_ members from a project.
 
-`POST: /api/projects/<int:pid>/membership/``
+### Endpoint: projects.members.invites.add
 
-**Description** join (i.e. become a member) of an existing public project
+`POST: /api/project/<int:id>/membership/invites/``
 
-**Returns** True if success, otherwise False within the `meta` object.
+> Adds a member to a project (or creates a user if not exists) and invites them to be part of a given project. If 
+the system knows the user and they are registered (i.e. active), then they are emailed to inform them that they were
+added to the project. Otherwise, a unique token is emailed to the participant where they can register if they do not
+have an account or login with a different account (i.e. because the email they received the invite to is personal).
+
+**Arguments** 
+
+```json
+    {
+      "fullname": "Jay Rainey",
+      "email": "membertoinvite@gmail.com"
+    }
+```
+
+**Actions** 
+
+This depends if the user is registered:
+
+1) If the user is registered, they are emailed to inform them that they were added to the project
+2) Otherwise, the email contains a unique `token` that will let the user create a new account or 
+login with an existing account, which is then associated with the membership invite.
 
 **Errors**
 
-- `PROJECT_UNKNOWN`: ??
+- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database.
+- `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
+- `GENERAL_UNKNOWN_USER`: The user in the JWT request does not exist.
+- `PROJECT_INVITE_MEMBER_UNAUTHORIZED`: You are unauthorized to remove a member from a project
+- `GENERAL_INVALID_JSON`: Your request contains invalid JSON.
+- `MEMBERSHIP_FULLNAME_KEY_REQUIRED`: The fullname of a user to add to the project.
+- `MEMBERSHIP_FULLNAME_IS_EMPTY`: The fullname of the user provided was empty.
+- `MEMBERSHIP_FULLNAME_IS_NOT_STRING`: The fullname of a user must be a string
+- `MEMBERSHIP_EMAIL_KEY_REQUIRED`: An email is required of the user to add from the project.
+- `MEMBERSHIP_EMAIL_IS_EMPTY`: The email provided for the user to add is empty.
+- `MEMBERSHIP_EMAIL_IS_NOT_STRING`: The email provided for the user to add is not a string.
+- `MEMBERSHIP_EMAIL_USER_404`: The user you are trying to add does not exist.
+- `PROJECT_MEMBER_EXISTS`: A user with that email is already a member of the project.
 
 ---
 
-### Endpoint: projects.members.destroy
+### Endpoint: projects.members.invites.remove
+
+`DELETE: /api/project/<int:id>/membership/invites/`
+
+> Removes a user and emails them that they have been removed from a project, when and by whom.
+
+**Arguments**
+
+```json
+    {
+      "email": "membertoremove@gmail.com"
+    }
+```
+
+**Returns** 
+
+- True if success, otherwise False within the `meta` object.
+
+**Actions** 
+
+- Emails the user that they have been removed from a project, when and by whom.
+
+**Errors**
+
+- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database.
+- `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
+- `GENERAL_UNKNOWN_USER`: The user in the JWT request does not exist.
+- `PROJECT_INVITE_MEMBER_UNAUTHORIZED`: You are unauthorized to remove a member from a project
+- `GENERAL_INVALID_JSON`: Your request contains invalid JSON.
+- `MEMBERSHIP_EMAIL_KEY_REQUIRED`: An email is required of the user to remove from the project.
+- `MEMBERSHIP_EMAIL_IS_EMPTY`: The email provided for the user to remove is empty.
+- `MEMBERSHIP_EMAIL_IS_NOT_STRING`: The email provided for the user to remove is not a string.
+- `MEMBERSHIP_EMAIL_USER_404`: The user you are trying to remove does not exist.
+- `USER_NOT_PROJECT_MEMBER`: The user you tried to remove is not a member of this project.
+    
+---
+
+## Project membership: join and leave
+
+This is for when project members join (public) or leave, rather than an admin adding/removing them.
+
+### Endpoint: projects.members.join
+
+`POST: /api/projects/<int:pid>/membership/``
+
+> Join (i.e. become a member) of an existing public project
+
+**Returns** 
+
+- True if success, otherwise False within the `meta` object.
+
+**Errors**
+
+- `TODO`: ??
+
+---
+
+### Endpoint: projects.members.leave
 
 `DELETE: /api/projects/<int:pid>/membership/`
 
-**Description** leaves a project that the user is a member of.
+> Leaves a project that the user is a member of.
 
-**Returns** True if success, otherwise False within the `meta` object.
+**Returns** 
+
+- True if success, otherwise False within the `meta` object.
 
 **Errors**
 
