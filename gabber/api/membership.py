@@ -36,7 +36,7 @@ class ProjectInvites(Resource):
             user = User.create_unregistered_user(data['fullname'], data['email'])
         # The user cannot be added to the same project multiple times
         if not user.is_project_member(pid):
-            membership = Membership(uid=user.id, pid=pid, rid=2, confirmed=True if user.registered else False)
+            membership = Membership(uid=user.id,  pid=pid, rid=Roles.user_role(), confirmed=user.registered)
             db.session.add(membership)
             db.session.commit()
 
@@ -83,25 +83,27 @@ class ProjectMembership(Resource):
     Mapped to: /api/project/<int:id>/membership/
     """
     @jwt_required
-    def post(self, pid=None):
+    def post(self, pid):
         """
         Joins a public project for a given user (determined through JWT token)
         """
-        _project = Project.query.get(pid)
-        helpers.abort_if_unknown_project(_project)
-        usr = User.query.filter_by(email=get_jwt_identity()).first()
-
-        if _project.is_public and not usr.is_project_member(pid):
-            user_role = Roles.query.filter_by(name='user').first().id
-            membership = Membership(uid=usr.id, pid=_project.id, rid=user_role)
-            _project.members.append(membership)
-            db.session.add(_project)
-            db.session.commit()
-        return '', 204
+        user = self.validate(pid)
+        helpers.abort_if_project_member(user, pid)
+        Membership.join_project(user.id, pid)
+        return custom_response(200)
 
     @jwt_required
-    def delete(self, pid=None):
+    def delete(self, pid):
         """
         Leaves a project for a given user (determined through JWT token)
         """
-        return '', 204
+        user = self.validate(pid)
+        if not user.is_project_member(pid):
+            helpers.abort_if_not_project_member(user, pid)
+        else:
+            Membership.leave_project(user.id, pid)
+        return custom_response(200)
+
+    @staticmethod
+    def validate(project_id):
+        return helpers.abort_if_unauthorized(Project.query.get(project_id))

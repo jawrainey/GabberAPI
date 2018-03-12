@@ -91,6 +91,18 @@ class Membership(db.Model):
         self.role_id = rid
         self.confirmed = confirmed
 
+    @staticmethod
+    def join_project(user_id, project_id):
+        membership = Membership(uid=user_id, pid=project_id, rid=Roles.user_role())
+        db.session.add(membership)
+        db.session.commit()
+
+    @staticmethod
+    def leave_project(user_id, project_id):
+        membership = Membership.query.filter_by(user_id=user_id, project_id=project_id).first()
+        membership.deactivated = True
+        db.session.commit()
+
 
 class Roles(db.Model):
     """
@@ -101,6 +113,10 @@ class Roles(db.Model):
     """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True)
+
+    @staticmethod
+    def user_role():
+        return Roles.query.filter_by(name='user').first().id
 
 
 class Project(db.Model):

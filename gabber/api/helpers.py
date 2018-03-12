@@ -31,6 +31,11 @@ def abort_if_not_project_member(user, project_id):
         raise CustomException(401, errors=['USER_NOT_PROJECT_MEMBER'])
 
 
+def abort_if_project_member(user, project_id):
+    if user.is_project_member(project_id):
+        raise CustomException(401, errors=['ALREADY_MEMBER'])
+
+
 def abort_if_unknown_project(project):
     if not project:
         raise CustomException(404, errors=['PROJECT_UNKNOWN'])

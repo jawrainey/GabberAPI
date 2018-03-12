@@ -545,7 +545,7 @@ This is for when project members join (public) or leave, rather than an admin ad
 
 ### Endpoint: projects.members.join
 
-`POST: /api/projects/<int:pid>/membership/``
+`POST: /api/projects/<int:pid>/membership/`
 
 > Join (i.e. become a member) of an existing public project
 
@@ -555,7 +555,9 @@ This is for when project members join (public) or leave, rather than an admin ad
 
 **Errors**
 
-- `TODO`: ??
+- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database.
+- `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
+- `ALREADY_MEMBER`: You have tried to join a project that you are already a member of.
 
 ---
 
@@ -571,7 +573,9 @@ This is for when project members join (public) or leave, rather than an admin ad
 
 **Errors**
 
-- `TODO`: ??
+- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database.
+- `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
+- `USER_NOT_PROJECT_MEMBER`: You are not a member of that project.
 
 ---
 
