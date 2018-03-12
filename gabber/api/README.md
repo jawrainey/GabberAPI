@@ -2,16 +2,15 @@
 
 All requests are returned in the following format where errors contains unique _keys_ to simplify frontend access:
 
-    {
-        "data": [],
-        "meta: {
-            errors: [
-            "AUTH_USER_UNKNOWN", 
-            "PROJECTS_TITLE_EXISTS"
-            ],
-            success: True/False
-        }
-    }
+```json
+{
+  "data": [],
+  "meta": {
+    "errors": [ "AUTH_USER_UNKNOWN", "PROJECTS_TITLE_EXISTS" ],
+    "success": true
+  }
+}
+```
 
 **Note:** all `POST/PUT` requests must be in `json` format.
 
@@ -20,29 +19,29 @@ The following are errors that can be returned across resources:
 - `GENERAL_INVALID_JSON`: The request made contains invalid JSON
 - `GENERAL_UNKNOWN_USER`: The user in the JWT request does not exist.
 
-### Authentication
+## Authentication
 
-#### Endpoint: /api/auth/register/`[POST]`
+### Endpoint: users.register
 
-**Description:** 
+`POST: /api/auth/register/`
 
-- Create a new user and returns a JWT
+> Create a new user and returns a JWT
 
 **Arguments**
 
-- `fullname`: the full name of a user, or what they consider their display name to be. This is **not** validated as 
+- `fullname`: the full name of a user, or what they consider their display name to be. This is **not** validated as
 fullname varies across countries, where some consider middle name, etc.
 - `email`: must be a valid email address and is used to uniquely identify a user.
 - `password`: must be at least 12 characters.
 
 **Returns:**
 
-
-    { 
-      "access_token": "",
-      "refresh_token": ""
-    }
-
+```json
+{
+  "access_token": "",
+  "refresh_token": ""
+}
+```
 
 **Errors**
 
@@ -57,11 +56,11 @@ fullname varies across countries, where some consider middle name, etc.
 
 ---
 
-#### Endpoint: /api/auth/login/`[POST]`
+### Endpoint: users.login
 
-**Description** 
+`POST: /api/auth/login/`
 
-- authenticates a known user and returns a JWT
+> authenticates a known user and returns a JWT
 
 **Arguments**
 
@@ -70,11 +69,12 @@ fullname varies across countries, where some consider middle name, etc.
 
 **Returns:**
 
-
-    { 
-      "access_token": "",
-      "refresh_token": ""
-    }
+```json
+{
+  "access_token": "",
+  "refresh_token": ""
+}
+```
 
 **Errors**
 
@@ -88,11 +88,11 @@ fullname varies across countries, where some consider middle name, etc.
 
 ---
 
-#### Endpoint: /api/auth/forgot/`[POST]`
+### Endpoint: users.forgot
 
-**Description** 
+`POST: /api/auth/forgot/`
 
-- Emails a user with a time serialized URL that can be used to reset their password
+> Emails a user with a time serialised URL that can be used to reset their password
 
 **Arguments**
 
@@ -102,7 +102,11 @@ fullname varies across countries, where some consider middle name, etc.
 
 The magic URL that is generated and sent in an email, which could be used on the client to simplify workflow:
 
-    "reset_url": "http://0.0.0.0:5000/api/auth/reset/Imphd3JhaW5leUBnbWFpbC5jb20i.DYWvEQ.A_ave4r-iQeCfnDaOnCblF3MsVo"
+```json
+{
+  "reset_url": "http://0.0.0.0:5000/api/auth/reset/Imphd3JhaW5leUBnbWFpbC5jb20i.DYWvEQ.A_ave4r-iQeCfnDaOnCblF3MsVo"
+}
+```
 
 **Actions**
 
@@ -118,14 +122,14 @@ The magic URL that is generated and sent in an email, which could be used on the
 - `AUTH_EMAIL_IS_NOT_STRING`: The attribute `email` must be a string.
 - `ISSUE_SENDING_EMAIL`: An error occurred when trying to send the email. If this continues, please get in touch.
 
-#### Endpoint: /api/auth/reset/<string:token>/`[GET]`
+### Endpoint: users.resetPassword
 
-**Description** 
+`GET: /api/auth/reset/<string:token>/`
 
-- Returns the email address associated with that token if a token is valid, which can be 
+> Returns the email address associated with that token if a token is valid, which can be
 used on the frontend to pre-populate fields, etc. This is _not_ used in the following `POST`.
 
-**Arguments** 
+**Arguments**
 
 - N/A
 
@@ -133,19 +137,21 @@ used on the frontend to pre-populate fields, etc. This is _not_ used in the foll
 
 The email address of the user who is visiting the reset page with the magic URL.
 
-    "email": "notjawrainey@gmail.com"
+```json
+{ "email": "notjawrainey@gmail.com" }
+```
 
 **Errors**:
 
 - `TOKEN_EXPIRED`: The token is invalid as it has expired.
 - `TOKEN_404:` The token does not exist.
-- `TOKEN_USED`: This token was previously used to reset the password. 
+- `TOKEN_USED`: This token was previously used to reset the password.
 
-#### Endpoint: /api/auth/reset/<string:token>/`[POST]`
+### Endpoint: users.resetPassword
 
-**Description** 
+`POST: /api/auth/reset/<string:token>/`
 
-- Changes the password of a given email if the token sent is also valid.
+> Changes the password of a given email if the token sent is also valid.
 
 **Arguments**
 
@@ -167,60 +173,61 @@ The email address of the user who is visiting the reset page with the magic URL.
 - `AUTH_PASSWORD_IS_NOT_STRING`: The password attribute must be a string.
 - `TOKEN_EXPIRED`: The token is invalid as it has expired.
 - `TOKEN_404:` The token does not exist.
-- `TOKEN_USED`: This token was previously used to reset the password. 
+- `TOKEN_USED`: This token was previously used to reset the password.
 
 ---
 
-### Projects
+## Projects
 
-#### Endpoint /api/projects/`[GET]`
+### Endpoint: projects.index
 
-**Description** 
+`GET: /api/projects/`
 
-- A dictionary of personal/public projects for a user. If the user is unauthenticated, then the private list is empty.
+> A dictionary of personal/public projects for a user. If the user is unauthenticated, then the private list is empty.
 
 **Returns**
 
-    {
-        "personal": [],
-        "public": [
-            {
-                "created_on": "04-Mar-2018",
-                "creator": {
-                    "user_id": 13,
-                    "fullname": "Jay Rainey"
+```json
+{
+    "personal": [],
+    "public": [
+        {
+            "created_on": "04-Mar-2018",
+            "creator": {
+                "user_id": 13,
+                "fullname": "Jay Rainey"
+            },
+            "description": "new desc",
+            "has_consent": false,
+            "id": 2,
+            "is_public": true,
+            "is_active": true,
+            "members": [
+                {
+                    "fullname": "Jay Rainey",
+                    "role": "admin",
+                    "user_id": 13
                 },
-                "description": "new desc",
-                "has_consent": false,
-                "id": 2,
-                "is_public": true,
-                "is_active": true,
-                "members": [
-                    {
-                        "fullname": "Jay Rainey",
-                        "role": "admin",
-                        "user_id": 13
-                    },
-                ],
-                "slug": "ni-oal",
-                "title": "ni oal",
-                "topics": [
-                    {
-                        "created_on": "04-Mar-2018",
-                        "id": 3,
-                        "is_active": 1,
-                        "project_id": 2,
-                        "text": "one topic lol",
-                        "updated_on": "04-Mar-2018"
-                    },
-                    ...
-                ],
-                "updated_on": "04-Mar-2018"
-            }
-        ]
-    }
-
-**Notes** 
+            ],
+            "slug": "ni-oal",
+            "title": "ni oal",
+            "topics": [
+                {
+                    "created_on": "04-Mar-2018",
+                    "id": 3,
+                    "is_active": 1,
+                    "project_id": 2,
+                    "text": "one topic lol",
+                    "updated_on": "04-Mar-2018"
+                },
+                "..."
+            ],
+            "updated_on": "04-Mar-2018"
+        }
+    ]
+}
+```
+**Notes**
 
 1) If a project is public and a user is a member then it appears in the personal list.
 4) `has_consent` and `is_public` are the configuration properties of a project
@@ -232,59 +239,63 @@ The email address of the user who is visiting the reset page with the magic URL.
 
 ---
 
-#### Endpoint /api/projects/`[POST]`
+### Endpoint: projects.create
 
-**Description** 
+`POST: /api/projects/`
 
-- Creates a new project
+> Creates a new project
 
 **Arguments**
 
-    {
-        "title": "The title of your neat project",
-        "creator": 10,
-        "description": "Describe your project ...",
-        "privacy": "public" or "private",
-        "topics": ["Topics must strings", "Otherwise madness occurs"]
-    }
+```json
+{
+  "title": "The title of your neat project",
+  "creator": 10,
+  "description": "Describe your project ...",
+  "privacy": "public | private",
+  "topics": ["Topics must strings", "Otherwise madness occurs"]
+}
+```
 
 **Returns**
 
 The same format as `/projects/`, but for the individual project the user just created
 
-    {
-        "created_on": "05-Mar-2018",
-        "creator": {
-            "user_id": 22,
-            "fullname": "jay rainey"
-        },
-        "description": "new desc",
-        "has_consent": false,
-        "id": 11,
-        "is_public": true,
-        "is_active": true,
-        "members": [
-            {
-                "id": 22,
-                "name": "jay rainey",
-                "role": "admin",
-                "user_id": 22
-            }
-        ],
-        "slug": "super-new-title",
-        "title": "Super new title",
-        "topics": [
-            {
-                "created_on": "05-Mar-2018",
-                "id": 14,
-                "is_active": 1,
-                "project_id": 11,
-                "text": "topics",
-                "updated_on": "05-Mar-2018"
-            }
-        ],
-        "updated_on": "05-Mar-2018"
-    }
+```json
+{
+    "created_on": "05-Mar-2018",
+    "creator": {
+        "user_id": 22,
+        "fullname": "jay rainey"
+    },
+    "description": "new desc",
+    "has_consent": false,
+    "id": 11,
+    "is_public": true,
+    "is_active": true,
+    "members": [
+        {
+            "id": 22,
+            "name": "jay rainey",
+            "role": "admin",
+            "user_id": 22
+        }
+    ],
+    "slug": "super-new-title",
+    "title": "Super new title",
+    "topics": [
+        {
+            "created_on": "05-Mar-2018",
+            "id": 14,
+            "is_active": 1,
+            "project_id": 11,
+            "text": "topics",
+            "updated_on": "05-Mar-2018"
+        }
+    ],
+    "updated_on": "05-Mar-2018"
+}
+```
 
 **Errors**:
 
@@ -300,25 +311,26 @@ The same format as `/projects/`, but for the individual project the user just cr
 - `PROJECTS_TOPIC_MUST_BE_LIST`: The topics parameter must be of type list.
 - `PROJECTS_TOPIC_IS_NOT_STRING`: The value for the privacy parameter must be a string.
 - `PROJECTS_TOPIC_IS_EMPTY`: A topic provided is empty.
-- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database. 
+- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database.
 - `GENERAL_INVALID_JSON`: The request made contains invalid JSON
 
 ---
 
 ### Project (individual project)
 
-Authorized JWT users can view, edit and delete a given project. Only creators of the project can edit or delete, 
+Authorized JWT users can view, edit and delete a given project. Only creators of the project can edit or delete,
 and only members of a project can view private projects
 
-#### Endpoint: /api/projects/<int:pid>/`[GET]`
+### Endpoint: projects.show
+
+`GET: /api/projects/<int:pid>/`
   
   
-**Description** 
+> Returns a project if it is public. If it is private, data is only returned if the JWT user is a member.
 
-- Returns a project if it is public. If it is private, data is only returned if the JWT user is a member.
+**Returns**
 
-**Returns** 
-    
+```json
     {
         "created_on": "03-Mar-2018",
         "creator": {
@@ -336,7 +348,7 @@ and only members of a project can view private projects
                 "role": "user",
                 "user_id": 1
             }
-            ...
+            "..."
         ],
         "topics": [
             {
@@ -347,37 +359,39 @@ and only members of a project can view private projects
                 "text": "Topics must be less than 280 words",
                 "updated_on": "03-Mar-2018"
             }
-            ...
+            "..."
         ],
         "slug": "the-title-of-your-a",
         "title": "The title of your a",
         "updated_on": "05-Mar-2018"
     }
+```
 
-**Errors** 
+**Errors**
 
-- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database. 
+- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database.
 - `PROJECT_DOES_NOT_EXIST`: The project you tried to view does not exist.
 - `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
 
 ---
 
-#### Endpoint: /api/projects/<int:pid>/`[PUT]`
+### Endpoint: projects.update
+
+`PUT: /api/projects/<int:pid>/`
   
   
-**Description** 
+> Updates attributes of an existing project
 
-- Updates attributes of an existing project
-
-**Arguments** 
+**Arguments**
 
 Same `object` as when getting, creating, etc, however, the `topics` field must include the following attributes as
 it overrides all existing topics for the project; `text` and `is_active` is required for all topics:
 
 **Create:** if no ID is provided, then a topic is created.
 **Update:** the `id`, `text` and `is_active` of the topic. The text is overridden for that topic ID.
-**Delete:** The topics list must include `is_active`, which if flagged as `false` will soft-delete a topic. 
+**Delete:** The topics list must include `is_active`, which if flagged as `false` will soft-delete a topic.
 
+```json
     {
         "id": 12,
         "title": "你好吗?",
@@ -396,12 +410,13 @@ it overrides all existing topics for the project; `text` and `is_active` is requ
             }
         ]
     }
+```
 
-**Returns** 
+**Returns**
 
 - The updated, serialized project as in `GET` containing the updated details.
 
-**Errors** 
+**Errors**
 
 - `ID_404`: The project ID provided in the request does not match the resource endpoint.
 - `UNAUTHORIZED`: You do not have the permission to edit this project.
@@ -418,19 +433,19 @@ it overrides all existing topics for the project; `text` and `is_active` is requ
 
 ---
 
-#### Endpoint: /api/projects/<int:pid>/`[DELETE]`
-  
-  
-**Description** 
+### Endpoint
 
-- Soft deletes an existing project. The JWT user must have the creator role of a project to delete it.
+`ELETE: /api/projects/<int:pid>/`[D`
+  
+  
+> Soft deletes an existing project. The JWT user must have the creator role of a project to delete it.
 
 **Arguments** N/A
-**Returns** 
+**Returns**
 
 - `meta.success` will be True if successful.
 
-**Errors** 
+**Errors**
 
 - `PROJECT_DOES_NOT_EXIST`: ??
 - `GENERAL_UNKNOWN_JWT_USER`: ??
@@ -438,30 +453,34 @@ it overrides all existing topics for the project; `text` and `is_active` is requ
 
 ---
 
-## Project membership 
+## Project membership
 
 This is partially implemented as we have yet to decide on membership; this is for when users join/leave, rather than
 an admin adding/removing them, etc.  
 
-#### Endpoint: /api/projects/<int:pid>/membership/`[POST]`
+### Endpoint: projects.members.create
+
+`POST: /api/projects/<int:pid>/membership/``
 
 **Description** join (i.e. become a member) of an existing public project
 
 **Returns** True if success, otherwise False within the `meta` object.
 
-**Errors** 
+**Errors**
 
 - `PROJECT_UNKNOWN`: ??
 
 ---
 
-#### Endpoint: /api/projects/<int:pid>/membership/`[DELETE]`
+### Endpoint
+
+`ELETE: /api/projects/<int:pid>/membership/`[D`
 
 **Description** leaves a project that the user is a member of.
 
 **Returns** True if success, otherwise False within the `meta` object.
 
-**Errors** 
+**Errors**
 
 - `TODO`: ??
 
@@ -471,15 +490,15 @@ an admin adding/removing them, etc.
 
 A list of sessions that have been recorded for a particular project.
 
-#### Endpoint: /api/projects/<int:pid>/sessions/`[GET]`
+### Endpoint: projects.sessions.index
 
-**Description** 
+`GET: /api/projects/<int:pid>/sessions/`
 
-- A list of all sessions for a given project
+> A list of all sessions for a given project
 
-**Returns** 
+**Returns**
 
-
+```json
     [
         {
             "created_on": "04-Mar-2018",
@@ -513,37 +532,37 @@ A list of sessions that have been recorded for a particular project.
         },
         ...
     ]
+```
 
+**Errors**
 
-**Errors** 
-
-- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database. 
+- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database.
 - `PROJECT_DOES_NOT_EXIST`: The project you tried to view does not exist.
 - `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
 - `SESSION_UNKNOWN`: The session you tried to view does not exist.
 
 ---
 
-#### Endpoint: /api/projects/<int:pid>/sessions/`[POST]`
+### Endpoint: projects.session.create
 
-#### MOBILE SUPPORT: LEGACY
+`POST: /api/projects/<int:pid>/sessions/``
 
-**Description** 
+### MOBILE SUPPORT: LEGACY
 
-- Creates a new session for a given project. **Note:** this is currently only used  on the mobile device, 
+> Creates a new session for a given project. **Note:** this is currently only used  on the mobile device,
 and is a `application/x-www-form-urlencoded` as it expects a `file` and `metadata` from a form.
 
-**Arguments** 
+**Arguments**
 
 - `recording`: An audio recording from the Gabber session
 - `creatorEmail`: The email address of the creator of the project; if not provided it is inferred from JWT.
-- `participants`: A dictionary of participants that were involved in the session [serialized here](https://github.com/jawrainey/GabberServer/blob/master/gabber/api/schemas/create_session.py#L39-L54), 
+- `participants`: A dictionary of participants that were involved in the session [serialized here](https://github.com/jawrainey/GabberServer/blob/master/gabber/api/schemas/create_session.py#L39-L54),
 which should be of the format: `{Name: Jay, Email: blah@jay.me, Role: 0 or 1}`. These should be uppercase and `Role` is a boolean
 that represents if the participant was the creator of the interview.
 - `prompts`: A dictionary of topics annotated during the discussion [serialized here](https://github.com/jawrainey/GabberServer/blob/master/gabber/api/schemas/create_session.py#L15-L36),
 which should be of the format: `{Start: 0, End: 10, PromptID: 21}`.
 
-**Note:** 
+**Note:**
 
 - The keys from the `prompts` and `particiapnts` are uppercase.
 - The errors and response returned from this request differ from other endpoints as they use an old return response.
@@ -554,57 +573,58 @@ which should be of the format: `{Start: 0, End: 10, PromptID: 21}`.
 
 A specific session from the set of sessions for a project
 
-#### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/`[GET]`
+### Endpoint: projects.sessions.show
 
-**Description** 
+`GET: /api/projects/<int:pid>/sessions/<string:sid>/`
 
-- An individual Gabber recorded session for a project
+> An individual Gabber recorded session for a project
 
 **Returns**
 
-
-        "created_on": "03-Mar-2018",
-        "creator": {
+```json
+    "created_on": "03-Mar-2018",
+    "creator": {
+        "name": "Jay",
+        "user_id": 6
+    },
+    "id": "1cee9eca335b45bf82a6886e424c9e86",
+    "participants": [
+        {
             "name": "Jay",
+            "role": "interviewer",
             "user_id": 6
         },
-        "id": "1cee9eca335b45bf82a6886e424c9e86",
-        "participants": [
-            {
-                "name": "Jay",
-                "role": "interviewer",
-                "user_id": 6
-            },
-            ...
-        ],
-        "topics": [
-            {
-                "end": "8",
-                "id": 1,
-                "start": "0",
-                "text": "Topics must be less than 280 words"
-            },
-            ...
-        ],
-        "user_annotations": [
-            {
-                "codes": [],
-                "comments": [],
-                "created_on": "04-Mar-2018",
-                "end_interval": 9,
-                "id": 1,
-                "justification": "first annotation",
-                "session_id": "1cee9eca335b45bf82a6886e424c9e86",
-                "start_interval": 0,
-                "updated_on": "04-Mar-2018",
-                "user_id": 1
-            },
-            ...
-        ]
+        "..."
+    ],
+    "topics": [
+        {
+            "end": "8",
+            "id": 1,
+            "start": "0",
+            "text": "Topics must be less than 280 words"
+        },
+        "..."
+    ],
+    "user_annotations": [
+        {
+            "codes": [],
+            "comments": [],
+            "created_on": "04-Mar-2018",
+            "end_interval": 9,
+            "id": 1,
+            "justification": "first annotation",
+            "session_id": "1cee9eca335b45bf82a6886e424c9e86",
+            "start_interval": 0,
+            "updated_on": "04-Mar-2018",
+            "user_id": 1
+        },
+        "..."
+    ]
+```
 
-**Errors** 
+**Errors**
   
-- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database. 
+- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database.
 - `PROJECT_DOES_NOT_EXIST`: The project you tried to view does not exist.
 - `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
 - `SESSION_UNKNOWN`: The session you tried to view does not exist.
@@ -615,68 +635,69 @@ A specific session from the set of sessions for a project
 
 All user annotations for a given session from a project
 
-#### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/`[GET]`
+### Endpoint: projects.sessions.annotations.index
 
-**Description** 
+`GET: /api/projects/<int:pid>/sessions/<string:sid>/annotations/`
 
-- A list of user annotations on a recording session
+> A list of user annotations on a recording session
 
-**Returns** 
+**Returns**
 
-
-        [
-            {
-                "comments": [
-                    {
-                        "connection": 1,
-                        "created_on": "03-Mar-2018",
-                        "id": 1,
-                        "parent_id": 1,
-                        "replies": [
-                            1,
-                            2
-                        ],
-                        "text": "Top comment",
-                        "updated_on": "03-Mar-2018",
-                        "user_id": 1
-                    },
-                    {
-                        "connection": 1,
-                        "created_on": "03-Mar-2018",
-                        "id": 3,
-                        "parent_id": 1,
-                        "replies": [],
-                        "text": "A respond to",
-                        "updated_on": "03-Mar-2018",
-                        "user_id": 1
-                    }
-                ],
-                "content": "Hello world",
-                "created_on": "04-Mar-2018",
-                "end_interval": 10,
-                "id": 1,
-                "labels": [
-                    {
-                        "id": 1,
-                        "text": "tag one"
-                    },
-                    {
-                        "id": 2,
-                        "text": "tag two"
-                    },
-                    {
-                        "id": 3,
-                        "text": "faith"
-                    }
-                ],
-                "tags": [1,2,3],
-                "session_id": "1cee9eca335b45bf82a6886e424c9e86",
-                "start_interval": 3,
-                "updated_on": "08-Mar-2018",
-                "user_id": 1
-            },
-            ...
-        ]
+```json
+    [
+        {
+            "comments": [
+                {
+                    "connection": 1,
+                    "created_on": "03-Mar-2018",
+                    "id": 1,
+                    "parent_id": 1,
+                    "replies": [
+                        1,
+                        2
+                    ],
+                    "text": "Top comment",
+                    "updated_on": "03-Mar-2018",
+                    "user_id": 1
+                },
+                {
+                    "connection": 1,
+                    "created_on": "03-Mar-2018",
+                    "id": 3,
+                    "parent_id": 1,
+                    "replies": [],
+                    "text": "A respond to",
+                    "updated_on": "03-Mar-2018",
+                    "user_id": 1
+                }
+            ],
+            "content": "Hello world",
+            "created_on": "04-Mar-2018",
+            "end_interval": 10,
+            "id": 1,
+            "labels": [
+                {
+                    "id": 1,
+                    "text": "tag one"
+                },
+                {
+                    "id": 2,
+                    "text": "tag two"
+                },
+                {
+                    "id": 3,
+                    "text": "faith"
+                }
+            ],
+            "tags": [1,2,3],
+            "session_id": "1cee9eca335b45bf82a6886e424c9e86",
+            "start_interval": 3,
+            "updated_on": "08-Mar-2018",
+            "user_id": 1
+        },
+        ...
+    ]
+```
 
 - `replies` currently returns a list of IDs of other comments on this comment. I will update
 this once I get recursive serialization working as comments are self referential.
@@ -684,7 +705,7 @@ this once I get recursive serialization working as comments are self referential
 simplifies updating the model.
 
 
-**Errors** 
+**Errors**
 
 - `PROJECT_DOES_NOT_EXIST`: ??
 - `SESSION_UNKNOWN`: ??
@@ -692,30 +713,31 @@ simplifies updating the model.
 - `GENERAL_UNKNOWN_JWT_USER`: ??
 - `PROJECT_UNAUTHORIZED`: ??
 
-#### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/`[POST]`
+### Endpoint: projects.sessions.annotations.create
 
-**Description** 
+`POST: /api/projects/<int:pid>/sessions/<string:sid>/annotations/``
 
-- Creates a new user annotation on a session recording
+> Creates a new user annotation on a session recording
 
-**Arguments** 
+**Arguments**
 
+```json
     {
         "content": "Now updating",
         "start_interval": 20,
         "end_interval": 20,
         "tags": [1,2]
     }
-
+```
 
 Note: the `tags` argument is currently optional (so can be not sent in the request); if an empty list is sent, then all tags are
 removed.
 
-**Returns** 
+**Returns**
 
 - The created annotation object, e.g.
 
-
+```json
     {
         "comments": [],
         "content": "Hello world",
@@ -742,7 +764,7 @@ removed.
         "updated_on": "09-Mar-2018",
         "user_id": 30
     }
-    
+```
 
 **Errors**  
 
@@ -769,32 +791,37 @@ removed.
 
 A specific annotation for a given session from a project
 
-#### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/`[GET]`
+### Endpoint: projects.sessions.annotations.show
+
+`GET: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/`
 
 - **NOT IMPLEMENTED:** is this endpoint useful?
 
-#### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/`[PUT]`
+### Endpoint: projects.sessions.annotations.update
 
-**Description** 
+`PUT: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/`
 
-- Updates an annotation on a session recording
+> Updates an annotation on a session recording
 
-**Arguments** 
+**Arguments**
 
+```json
     {
         "content": "Now updating",
         "start_interval": 20,
         "end_interval": 20,
         "tags": []
     }
+```
 
 Note: the `tags` argument is currently optional (so can be not sent in the request); if an empty list is sent, then all tags are
 removed.
 
-**Returns** 
+**Returns**
 
 The modified annotation object:
 
+```json
     {
         "comments": [],
         "content": "Now updating",
@@ -808,6 +835,7 @@ The modified annotation object:
         "updated_on": "08-Mar-2018",
         "user_id": 30
     }
+```
 
 **Errors**  
 
@@ -831,17 +859,17 @@ The modified annotation object:
 - `TAGS_IS_NOT_LIST`: ??
 - `TAG_IS_NOT_INT`: ??
 
-#### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/`[DELETE]`
+### Endpoint
 
-**Description** 
+`ELETE: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/`[D`
 
-- Deletes a users annotation on a session recording. Only users who created the annotation can delete it.
+> Deletes a users annotation on a session recording. Only users who created the annotation can delete it.
 
-**Returns** 
+**Returns**
 
 - Custom response where `meta.success` is True if the annotation was deleted, otherwise an error below is provided.
 
-**Errors** 
+**Errors**
 
 - `PROJECT_DOES_NOT_EXIST`: ??
 - `SESSION_UNKNOWN`: ??
@@ -857,31 +885,33 @@ The modified annotation object:
 
 User comments on other (or their own) annotations on a recording
 
-#### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/`[GET]`
+### Endpoint: projects.sessions.annotations.comments.index
+
+`GET: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/`
 
 - **NOT IMPLEMENTED:** if you want comments for an annotation see `/annotations/<int:aid>/[GET]`
 
-#### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/`[POST]`
+### Endpoint: projects.sessions.annotations.comments.create
 
-**Description** 
+`POST: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/``
 
-- Create a **new** comment on an annotation
+> Create a **new** comment on an annotation
 
 **Arguments**
 
 The content of the comment
 
-
+```json
     {
         "content": "The content of the comment"
     }
-
+```
 
 **Returns**
 
 - The comment as an object; `parent_id` is `null` if it is a comment
 
-
+```json
     {
         "annotation_id": 1,
         "created_on": "09-Mar-2018",
@@ -896,9 +926,9 @@ The content of the comment
         "session_id": "1cee9eca335b45bf82a6886e424c9e86",
         "updated_on": "09-Mar-2018"
     }
+```
 
-
-**Errors** 
+**Errors**
 
 - `PROJECT_DOES_NOT_EXIST`: ??
 - `SESSION_UNKNOWN`: ??
@@ -914,13 +944,13 @@ The content of the comment
 
 Users who have created a comment can fetch, edit or delete them.
 
-#### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/`[GET]`
+### Endpoint: projects.sessions.annotations.comments.show
 
-**Description**
+`GET: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/`
 
-- Retrieves a specific comment of an annotation.
+> Retrieves a specific comment of an annotation.
 
-**Returns** 
+**Returns**
 
 - The comment as an object; `parent_id` is `null` if it is a comment
 
@@ -948,7 +978,7 @@ Users who have created a comment can fetch, edit or delete them.
     }
 
 
-**Errors** 
+**Errors**
 
 - `PROJECT_DOES_NOT_EXIST`: ??
 - `SESSION_UNKNOWN`: ??
@@ -958,17 +988,17 @@ Users who have created a comment can fetch, edit or delete them.
 - `COMMENT_404`: ??
 - `COMMENT_NOT_IN_SESSION`: ??
         
-#### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/`[PUT]`
+### Endpoint: projects.sessions.annotations.comments.update
 
-**Description**
+`PUT: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/`
 
-- Update the content of a comment, i.e. via an `edit` feature
+> Update the content of a comment, i.e. via an `edit` feature
 
-**Arguments** 
+**Arguments**
 
 - `content` the same argument as `POST` for a comment to an annotation above.
 
-**Returns** 
+**Returns**
 
 - The updated comment object as above.
 
@@ -986,17 +1016,17 @@ Users who have created a comment can fetch, edit or delete them.
 - `USER_COMMENT_CONTENT_KEY_REQUIRED`: ??
 - `USER_COMMENT_IS_NOT_STRING`: ??
 
-#### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/`[POST]`
+### Endpoint: projects.sessions.annotations.comments.create
 
-**Description**
+`POST: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/`
 
-- Creates a new comment on another comment, e.g. nested comments.
+> Creates a new comment on another comment, e.g. nested comments.
 
-**Returns** 
+**Returns**
 
 - The new comment resource.
 
-**Errors** 
+**Errors**
 
 - `PROJECT_DOES_NOT_EXIST`: ??
 - `SESSION_UNKNOWN`: ??
@@ -1006,13 +1036,13 @@ Users who have created a comment can fetch, edit or delete them.
 - `COMMENT_404`: ??
 - `COMMENT_NOT_IN_SESSION`: ??
 
-#### Endpoint: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/`[DELETE]`
+### Endpoint: project.sessions.annotations.comments.destroy
 
-**Description**
+`DELETE: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/`
 
-- Soft-deletes the entire comment, i.e. via an `delete` feature
+> Soft-deletes the entire comment, i.e. via an `delete` feature
 
-**Returns** 
+**Returns**
 
 - `204` no content status code
 
