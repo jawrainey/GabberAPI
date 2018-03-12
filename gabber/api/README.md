@@ -324,8 +324,8 @@ and only members of a project can view private projects
 ### Endpoint: projects.show
 
 `GET: /api/projects/<int:pid>/`
-  
-  
+
+
 > Returns a project if it is public. If it is private, data is only returned if the JWT user is a member.
 
 **Returns**
@@ -378,8 +378,8 @@ and only members of a project can view private projects
 ### Endpoint: projects.update
 
 `PUT: /api/projects/<int:pid>/`
-  
-  
+
+
 > Updates attributes of an existing project
 
 **Arguments**
@@ -436,8 +436,8 @@ it overrides all existing topics for the project; `text` and `is_active` is requ
 ### Endpoint
 
 `ELETE: /api/projects/<int:pid>/`[D`
-  
-  
+
+
 > Soft deletes an existing project. The JWT user must have the creator role of a project to delete it.
 
 **Arguments** N/A
@@ -455,7 +455,7 @@ it overrides all existing topics for the project; `text` and `is_active` is requ
 
 ## Project membership
 
-This is for when project members join (public) or leave, rather than an admin adding/removing them.  
+This is for when project members join (public) or leave, rather than an admin adding/removing them.
 
 ### Endpoint: projects.members.create
 
@@ -525,11 +525,11 @@ A list of sessions that have been recorded for a particular project.
                     "start": "0",
                     "text": "The first topic being discussed"
                 },
-                ...
+                "..."
             ],
             "user_annotations": []
         },
-        ...
+        "..."
     ]
 ```
 
@@ -622,7 +622,7 @@ A specific session from the set of sessions for a project
 ```
 
 **Errors**
-  
+
 - `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database.
 - `PROJECT_DOES_NOT_EXIST`: The project you tried to view does not exist.
 - `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
@@ -714,7 +714,7 @@ All user annotations for a given session from a project
             ],
             "updated_on": "08-Mar-2018"
       },
-      ...
+      "..."
     ]
 ```
 
@@ -785,7 +785,7 @@ removed.
     }
 ```
 
-**Errors**  
+**Errors**
 
 - `PROJECT_DOES_NOT_EXIST`: ??
 - `SESSION_UNKNOWN`: ??
@@ -801,7 +801,7 @@ removed.
 - `START_INTERVAL_MUST_BE_POSITIVE_INT`: ??
 - `END_INTERVAL_REQUIRED`: ??
 - `END_INTERVAL_IS_NOT_INT`: ??
-- `END_INTERVAL_MUST_BE_POSITIVE_INT`: ??    
+- `END_INTERVAL_MUST_BE_POSITIVE_INT`: ??
 - `START_BEFORE_END`: ??
 - `TAGS_IS_NOT_LIST`: ??
 - `TAG_IS_NOT_INT`: ??
@@ -856,7 +856,7 @@ The modified annotation object:
     }
 ```
 
-**Errors**  
+**Errors**
 
 - `PROJECT_DOES_NOT_EXIST`: ?
 - `SESSION_UNKNOWN`: ?
@@ -873,7 +873,7 @@ The modified annotation object:
 - `START_INTERVAL_MUST_BE_POSITIVE_INT`: ??
 - `END_INTERVAL_REQUIRED`: ??
 - `END_INTERVAL_IS_NOT_INT`: ??
-- `END_INTERVAL_MUST_BE_POSITIVE_INT`: ??    
+- `END_INTERVAL_MUST_BE_POSITIVE_INT`: ??
 - `START_BEFORE_END`: ??
 - `TAGS_IS_NOT_LIST`: ??
 - `TAG_IS_NOT_INT`: ??
@@ -973,7 +973,7 @@ Users who have created a comment can fetch, edit or delete them.
 
 - The comment as an object; `parent_id` is `null` if it is a comment
 
-
+```json
     {
         "annotation_id": 1,
         "content": "no you",
@@ -995,7 +995,7 @@ Users who have created a comment can fetch, edit or delete them.
         "session_id": "1cee9eca335b45bf82a6886e424c9e86",
         "updated_on": "09-Mar-2018"
     }
-
+```
 
 **Errors**
 
@@ -1006,7 +1006,7 @@ Users who have created a comment can fetch, edit or delete them.
 - `PROJECT_UNAUTHORIZED`: ??
 - `COMMENT_404`: ??
 - `COMMENT_NOT_IN_SESSION`: ??
-        
+
 ### Endpoint: projects.sessions.annotations.comments.update
 
 `PUT: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/`
