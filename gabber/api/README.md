@@ -458,16 +458,16 @@ it overrides all existing topics for the project; `text` and `is_active` is requ
 
 Project administrators can _invite_ (add) or _remove_ members from a project.
 
-### Endpoint: projects.members.invites.add
+### Endpoint: projects.members.invites.create
 
-`POST: /api/project/<int:id>/membership/invites/``
+`POST: /api/project/<int:id>/membership/invites/`
 
-> Adds a member to a project (or creates a user if not exists) and invites them to be part of a given project. If 
+> Adds a member to a project (or creates a user if not exists) and invites them to be part of a given project. If
 the system knows the user and they are registered (i.e. active), then they are emailed to inform them that they were
 added to the project. Otherwise, a unique token is emailed to the participant where they can register if they do not
 have an account or login with a different account (i.e. because the email they received the invite to is personal).
 
-**Arguments** 
+**Arguments**
 
 ```json
     {
@@ -476,12 +476,12 @@ have an account or login with a different account (i.e. because the email they r
     }
 ```
 
-**Actions** 
+**Actions**
 
 This depends if the user is registered:
 
 1) If the user is registered, they are emailed to inform them that they were added to the project
-2) Otherwise, the email contains a unique `token` that will let the user create a new account or 
+2) Otherwise, the email contains a unique `token` that will let the user create a new account or
 login with an existing account, which is then associated with the membership invite.
 
 **Errors**
@@ -502,7 +502,7 @@ login with an existing account, which is then associated with the membership inv
 
 ---
 
-### Endpoint: projects.members.invites.remove
+### Endpoint: projects.members.invites.destroy
 
 `DELETE: /api/project/<int:id>/membership/invites/`
 
@@ -516,11 +516,11 @@ login with an existing account, which is then associated with the membership inv
     }
 ```
 
-**Returns** 
+**Returns**
 
 - True if success, otherwise False within the `meta` object.
 
-**Actions** 
+**Actions**
 
 - Emails the user that they have been removed from a project, when and by whom.
 
@@ -549,7 +549,7 @@ This is for when project members join (public) or leave, rather than an admin ad
 
 > Join (i.e. become a member) of an existing public project
 
-**Returns** 
+**Returns**
 
 - True if success, otherwise False within the `meta` object.
 
@@ -567,7 +567,7 @@ This is for when project members join (public) or leave, rather than an admin ad
 
 > Leaves a project that the user is a member of.
 
-**Returns** 
+**Returns**
 
 - True if success, otherwise False within the `meta` object.
 
@@ -828,7 +828,7 @@ simplifies updating the model.
 
 ### Endpoint: projects.sessions.annotations.create
 
-`POST: /api/projects/<int:pid>/sessions/<string:sid>/annotations/``
+`POST: /api/projects/<int:pid>/sessions/<string:sid>/annotations/`
 
 > Creates a new user annotation on a session recording
 
@@ -1006,7 +1006,7 @@ User comments on other (or their own) annotations on a recording
 
 ### Endpoint: projects.sessions.annotations.comments.create
 
-`POST: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/``
+`POST: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/`
 
 > Create a **new** comment on an annotation
 
