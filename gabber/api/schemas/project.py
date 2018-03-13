@@ -191,8 +191,9 @@ class ProjectModelSchema(ma.ModelSchema):
                             validator.errors.append('TOPICS_IS_ACTIVE_MUST_BE_INT')
                         elif item['is_active'] not in [0, 1]:
                             validator.errors.append('TOPICS_IS_ACTIVE_MUST_BE_0_OR_1')
-
-                    if item.get('id') and (item['id'] not in [i.id for i in Project.query.get(data['id']).prompts.all()]):
+                    # Note: the ID will not appear as we implemented a primary join for only active sessions ...
+                    all_project_topics = [i.id for i in ProjectPrompt.query.filter_by(project_id=data['id']).all()]
+                    if item.get('id') and (item['id'] not in all_project_topics):
                         validator.errors.append('TOPICS_ID_NOT_PROJECT')
 
                     # We do not check for ID as if it does not exist then a topic will be created
