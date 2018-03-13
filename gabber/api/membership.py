@@ -5,6 +5,7 @@ These actions are notified to users once carried out.
 """
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from gabber.api.schemas.project import ProjectMember
 from gabber.api.schemas.membership import AddMemberSchema, RemoveMemberSchema
 from gabber.projects.models import Project
 from gabber.projects.models import Membership, Roles
@@ -48,7 +49,7 @@ class ProjectInvites(Resource):
                 send_project_member_invite_unregistered_user(admin, user, project)
         else:
             return custom_response(400, errors=['PROJECT_MEMBER_EXISTS'])
-        return custom_response(200)
+        return custom_response(200, data=ProjectMember().dump(membership))
 
     @jwt_required
     def delete(self, pid):
@@ -63,7 +64,7 @@ class ProjectInvites(Resource):
         membership.deactivated = True
         db.session.commit()
         send_project_member_removal(admin, user, Project.query.get(pid))
-        return custom_response(200)
+        return custom_response(200, data=ProjectMember().dump(membership))
 
     @staticmethod
     def validate_and_get_data(project_id):
