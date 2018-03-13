@@ -4,6 +4,7 @@ from gabber import ma
 
 
 class RecordingTopicSchema(ma.ModelSchema):
+    topic_id = ma.String(attribute="prompt_id")
     text = ma.Method('_topic')
     start = ma.String(attribute="start_interval")
     end = ma.String(attribute="end_interval")
@@ -14,7 +15,8 @@ class RecordingTopicSchema(ma.ModelSchema):
 
     class Meta:
         model = InterviewPrompts
-        exclude = ['interview', 'start_interval', 'end_interval']
+        include_fk = True
+        exclude = ['interview', 'start_interval', 'end_interval', 'interview_id', 'prompt_id', 'id']
 
 
 class RecordingParticipantsSchema(ma.ModelSchema):

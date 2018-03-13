@@ -51,9 +51,10 @@ class Project(Resource):
         current_user = get_jwt_identity()
         user = User.query.filter_by(email=current_user).first()
         helpers.abort_if_unknown_user(user)
-
         json_data = request.get_json(force=True, silent=True)
         helpers.abort_if_invalid_json(json_data)
+        # TODO: have to have prompts to validate; must remove later
+        json_data['prompts'] = json_data['topics']
 
         schema = ProjectModelSchema()
         errors = schema.validate(json_data)
@@ -67,7 +68,6 @@ class Project(Resource):
         # then manually invalidate them. This issue may also relate to how I have setup the models.
         project = ProjectModel.query.get(pid)
         topics = project.prompts.all()
-
         # Deserialize data to internal ORM representation thereby overriding the data and then save it
         data = schema.load(json_data, instance=project)
         # Store the updates and therefore invalidating the previous topics and remove their project_id

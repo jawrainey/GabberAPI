@@ -199,7 +199,7 @@ class ProjectModelSchema(ma.ModelSchema):
                     if not item.get('text'):
                         validator.errors.append('TOPICS_TEXT_KEY_404')
                     else:
-                        if not isinstance(item['text_prompt'], basestring):
+                        if not isinstance(item['text'], basestring):
                             validator.errors.append('TOPICS_TEXT_IS_NOT_STRING')
 
                 # TODO: Rather than the user passing the creator to each topic, it is passed as a parent
