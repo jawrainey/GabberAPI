@@ -65,8 +65,8 @@ class ForgotPassword(Resource):
         db.session.commit()
 
         url = app.config['WEB_HOST'] + '/reset/' + token
-        email_client.send_forgot_password(email, url)
-        return custom_response(204)
+        send_forgot_password(email, url)
+        return custom_response(200)
 
 
 class ResetPassword(Resource):
