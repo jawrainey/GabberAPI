@@ -73,20 +73,20 @@ class ResetPassword(Resource):
     """
     Given a magic-URL generates from /forgot/, lets a user reset their password if the token is active.
 
-    Mapped to: /api/auth/reset/<string:token>/
+    Mapped to: /api/auth/reset/
     """
-    def post(self, token):
+    def post(self):
         """
         Update a password for a user if the token is valid.
         """
-        json_data = helpers.jsonify_request_or_abort()
-        helpers.abort_if_errors_in_validation(ResetPasswordSchema().validate(json_data))
+        data = helpers.jsonify_request_or_abort()
+        helpers.abort_if_errors_in_validation(ResetPasswordSchema().validate(data))
 
-        email = self.serialize_token_or_abort(token)
+        email = self.serialize_token_or_abort(data['token'])
         user = User.query.filter_by(email=email).first()
-        reset_token = self.abort_if_invalid_token(token, user.id)
+        reset_token = self.abort_if_invalid_token(data['token'], user.id)
 
-        user.set_password(json_data['password'])
+        user.set_password(data['password'])
         invalidate_other_user_tokens(email)
 
         reset_token.is_active = False

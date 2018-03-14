@@ -46,11 +46,13 @@ class ForgotPasswordSchema(ma.Schema):
 
 
 class ResetPasswordSchema(ma.Schema):
+    token = ma.String()
     password = ma.String()
 
     @pre_load()
     def __validate(self, data):
         validator = HelperSchemaValidator('AUTH')
+        token_valid = validator.validate('token', 'str', data)
         # TODO: VALIDATE PASSWORD LENGTH: currently there is no upper/lower limit
         validate_password(data, validator)
         validator.raise_if_errors()
