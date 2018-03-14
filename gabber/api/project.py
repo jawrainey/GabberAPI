@@ -55,12 +55,12 @@ class Project(Resource):
         helpers.abort_if_invalid_json(json_data)
         # TODO: have to have prompts to validate; must remove later
         json_data['prompts'] = json_data['topics']
+        json_data['id'] = pid
+        json_data['creator'] = user.id
 
         schema = ProjectModelSchema()
         errors = schema.validate(json_data)
         helpers.abort_if_errors_in_validation(errors)
-        # Otherwise the update will fail
-        helpers.abort_if_data_pid_not_route_pid(json_data['id'], pid)
         # TODO: When schema.load updates the model it does not invalidate the previous rows, and
         # (1) sets the FK to NULL and (2) does not update the is_active property.
         # I cannot figure out how to do that from within the schema and instead retrieve the

@@ -17,7 +17,7 @@ class ValidationErrorWithCustomErrorFormat(ValidationError):
 
 
 def validate_length(item, length, attribute, validator):
-    if item and len(item) <= length:
+    if item and len(item) >= length:
         validator.errors.append('%s_LENGTH_TOO_LONG' % attribute)
 
 
