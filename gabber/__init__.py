@@ -62,7 +62,7 @@ restful_api.add_resource(UserLogin, '/api/auth/login/')
 restful_api.add_resource(ForgotPassword, '/api/auth/forgot/')
 restful_api.add_resource(RegisterInvitedUser, '/api/auth/register/<string:token>/', endpoint="api.register")
 restful_api.add_resource(LoginInvitedUser, '/api/auth/login/<string:token>/', endpoint="api.login")
-restful_api.add_resource(ResetPassword, '/api/auth/reset/<string:token>', endpoint="api.reset")
+restful_api.add_resource(ResetPassword, '/api/auth/reset/', endpoint="api.reset")
 
 # The existing API is confusing because methods are separate ...
 from gabber.api.playlists import UserPlaylists, RegionsListForPlaylist, RegionsListByProject, RegionNote
