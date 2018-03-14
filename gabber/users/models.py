@@ -37,10 +37,11 @@ class User(UserMixin, db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
-    def __init__(self, fullname, email, password):
+    def __init__(self, fullname, email, password, registered=False):
         self.fullname = fullname
         self.email = email
         self.set_password(password)
+        self.registered = registered
 
     @staticmethod
     def create_unregistered_user(fullname, email):
