@@ -15,6 +15,7 @@ templates = os.path.join(os.pardir, 'frontend/templates')
 static_path = os.path.join(os.pardir, 'frontend/static')
 app = Flask(__name__, template_folder=templates, static_folder=static_path)
 
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'mysql+pymysql://user:secret@localhost/gabber?charset=utf8mb4')
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET', 'top_secret')
 app.config['SECRET_KEY'] = os.environ.get('SECRET', 'really_secret')
