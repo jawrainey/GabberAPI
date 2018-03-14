@@ -61,16 +61,6 @@ class ResetPassword(Resource):
 
     Mapped to: /api/auth/reset/<string:token>/
     """
-    def get(self, token):
-        """
-        This validates the token and returns meta-data about the user, which can
-        be used to populate a form to improve or simplify the user experience.
-        """
-        email = self.serialize_token_or_abort(token)
-        user = User.query.filter_by(email=email).first()
-        self.abort_if_invalid_token(token, user.id)
-        return custom_response(201, data={'email': email})
-
     def post(self, token):
         """
         Update a password for a user if the token is valid.

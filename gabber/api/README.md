@@ -122,30 +122,6 @@ The magic URL that is generated and sent in an email, which could be used on the
 - `AUTH_EMAIL_IS_NOT_STRING`: The attribute `email` must be a string.
 - `ISSUE_SENDING_EMAIL`: An error occurred when trying to send the email. If this continues, please get in touch.
 
-### Endpoint: users.resetPassword
-
-`GET: /api/auth/reset/<string:token>/`
-
-> Returns the email address associated with that token if a token is valid, which can be
-used on the frontend to pre-populate fields, etc. This is _not_ used in the following `POST`.
-
-**Arguments**
-
-- N/A
-
-**Returns**
-
-The email address of the user who is visiting the reset page with the magic URL.
-
-```json
-{ "email": "notjawrainey@gmail.com" }
-```
-
-**Errors**:
-
-- `TOKEN_EXPIRED`: The token is invalid as it has expired.
-- `TOKEN_404:` The token does not exist.
-- `TOKEN_USED`: This token was previously used to reset the password.
 
 ### Endpoint: users.resetPassword
 
