@@ -199,7 +199,7 @@ class ProjectModelSchema(ma.ModelSchema):
                     validator.errors.append('TOPICS_IS_NOT_DICT')
                 else:
                     if item.get('id'):
-                        if not item.get('is_active'):
+                        if 'is_active' not in item:
                             validator.errors.append('TOPICS_IS_ACTIVE_KEY_404')
                         else:
                             if not isinstance(item.get('is_active'), int):
