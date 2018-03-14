@@ -133,6 +133,7 @@ class ProjectModelSchema(ma.ModelSchema):
     topics = ma.Nested(ProjectTopicSchema, many=True, attribute="prompts")
     members = ma.Nested(ProjectMember, many=True, attribute="members")
     creator = ma.Method("_creator")
+    privacy = ma.Function(lambda obj: "public" if obj.is_public else "private")
 
     @staticmethod
     def _creator(data):
@@ -145,7 +146,7 @@ class ProjectModelSchema(ma.ModelSchema):
         include_fk = True
         dateformat = "%d-%b-%Y"
         # TODO: remove other attributes as necessary, i.e. isConsentEnabled and isProjectPublic?
-        exclude = ['codebook', 'prompts']
+        exclude = ['codebook', 'prompts', 'is_public']
 
     @pre_load()
     def __validate(self, data):
