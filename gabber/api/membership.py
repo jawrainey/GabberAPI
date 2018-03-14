@@ -9,14 +9,11 @@ from gabber.api.schemas.project import ProjectMember
 from gabber.api.schemas.membership import AddMemberSchema, RemoveMemberSchema
 from gabber.projects.models import Project
 from gabber.projects.models import Membership, Roles
-from gabber.utils.email import \
-    send_project_member_invite_registered_user, \
-    send_project_member_invite_unregistered_user, \
-    send_project_member_removal
 from gabber.users.models import User
 from gabber.utils.general import custom_response
 from gabber import db
 import gabber.api.helpers as helpers
+import gabber.utils.email as email_client
 
 
 class ProjectInvites(Resource):
@@ -44,9 +41,9 @@ class ProjectInvites(Resource):
             project = Project.query.get(pid)
 
             if user.registered:
-                send_project_member_invite_registered_user(admin, user, project)
+                email_client.send_project_member_invite_registered_user(admin, user, project)
             else:
-                send_project_member_invite_unregistered_user(admin, user, project)
+                email_client.send_project_member_invite_unregistered_user(admin, user, project)
         else:
             return custom_response(400, errors=['PROJECT_MEMBER_EXISTS'])
         return custom_response(200, data=ProjectMember().dump(membership))
@@ -63,7 +60,7 @@ class ProjectInvites(Resource):
         membership = Membership.query.filter_by(user_id=user.id, project_id=pid).first()
         membership.deactivated = True
         db.session.commit()
-        send_project_member_removal(admin, user, Project.query.get(pid))
+        email_client.send_project_member_removal(admin, user, Project.query.get(pid))
         return custom_response(200, data=ProjectMember().dump(membership))
 
     @staticmethod
@@ -88,23 +85,23 @@ class ProjectMembership(Resource):
         """
         Joins a public project for a given user (determined through JWT token)
         """
-        user = self.validate(pid)
+        project = Project.query.get(pid)
+        user = helpers.abort_if_unauthorized(project)
         helpers.abort_if_project_member(user, pid)
-        Membership.join_project(user.id, pid)
-        return custom_response(200)
+        membership = Membership.join_project(user.id, pid)
+        email_client.send_project_member_joined(user, project)
+        return custom_response(200, data=ProjectMember().dump(membership))
 
     @jwt_required
     def delete(self, pid):
         """
         Leaves a project for a given user (determined through JWT token)
         """
-        user = self.validate(pid)
+        project = Project.query.get(pid)
+        user = helpers.abort_if_unauthorized(project)
         if not user.is_project_member(pid):
             helpers.abort_if_not_project_member(user, pid)
         else:
-            Membership.leave_project(user.id, pid)
-        return custom_response(200)
-
-    @staticmethod
-    def validate(project_id):
-        return helpers.abort_if_unauthorized(Project.query.get(project_id))
+            email_client.send_project_member_left(user, project)
+            membership = Membership.leave_project(user.id, pid)
+        return custom_response(200, data=ProjectMember().dump(membership))

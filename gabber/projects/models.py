@@ -96,12 +96,14 @@ class Membership(db.Model):
         membership = Membership(uid=user_id, pid=project_id, rid=Roles.user_role())
         db.session.add(membership)
         db.session.commit()
+        return membership
 
     @staticmethod
     def leave_project(user_id, project_id):
         membership = Membership.query.filter_by(user_id=user_id, project_id=project_id).first()
         membership.deactivated = True
         db.session.commit()
+        return membership
 
 
 class Roles(db.Model):
