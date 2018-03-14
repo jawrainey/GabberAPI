@@ -38,9 +38,19 @@ fullname varies across countries, where some consider middle name, etc.
 
 ```json
 {
-  "access_token": "",
-  "refresh_token": ""
-}
+        "tokens": {
+            "access_token": "",
+            "refresh_token": ""
+        },
+        "user": {
+            "created_on": "14-Mar-2018",
+            "email": "hello@me.com",
+            "fullname": "Jay Rainey",
+            "id": 102,
+            "registered": false,
+            "updated_on": "14-Mar-2018"
+        }
+    }
 ```
 
 **Errors**
@@ -69,12 +79,7 @@ fullname varies across countries, where some consider middle name, etc.
 
 **Returns:**
 
-```json
-{
-  "access_token": "",
-  "refresh_token": ""
-}
-```
+- Same as registration
 
 **Errors**
 
@@ -135,7 +140,7 @@ The magic URL that is generated and sent in an email, which could be used on the
 
 **Returns**
 
-- The same response as login/register, e.g. the access and refresh tokens.
+- Same as registration
 
 **Actions**
 
