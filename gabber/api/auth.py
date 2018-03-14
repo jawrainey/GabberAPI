@@ -9,7 +9,7 @@ from flask_jwt_extended import create_access_token, \
 from gabber import db, app
 from gabber.api import helpers
 from gabber.api.schemas.auth import AuthRegisterSchema, AuthLoginSchema, AuthRegisterWithTokenSchema, \
-    ResetPasswordSchema, ForgotPasswordSchema
+    ResetPasswordSchema, ForgotPasswordSchema, UserSchema
 from gabber.projects.models import Membership
 from gabber.users.models import User, ResetTokens
 from gabber.utils.email import send_forgot_password, send_password_changed
@@ -280,6 +280,9 @@ def create_jwt_access(username):
     :return: a dictionary containing JWT access/refresh tokens
     """
     return {
-        'access_token': create_access_token(identity=username),
-        'refresh_token': create_refresh_token(identity=username)
+        'user': UserSchema().dump(User.query.filter_by(email=username).first()),
+        'tokens': {
+            'access_token': create_access_token(identity=username),
+            'refresh_token': create_refresh_token(identity=username)
+        }
     }
