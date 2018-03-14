@@ -198,17 +198,18 @@ class ProjectModelSchema(ma.ModelSchema):
                 if not isinstance(item, dict):
                     validator.errors.append('TOPICS_IS_NOT_DICT')
                 else:
-                    if item.get('id') and not item.get('is_active'):
-                        validator.errors.append('TOPICS_IS_ACTIVE_KEY_404')
-                    else:
-                        if not isinstance(item.get('is_active'), int):
-                            validator.errors.append('TOPICS_IS_ACTIVE_MUST_BE_INT')
-                        elif item['is_active'] not in [0, 1]:
-                            validator.errors.append('TOPICS_IS_ACTIVE_MUST_BE_0_OR_1')
-                    # Note: the ID will not appear as we implemented a primary join for only active sessions ...
-                    all_project_topics = [i.id for i in ProjectPrompt.query.filter_by(project_id=data['id']).all()]
-                    if item.get('id') and (item['id'] not in all_project_topics):
-                        validator.errors.append('TOPICS_ID_NOT_PROJECT')
+                    if item.get('id'):
+                        if not item.get('is_active'):
+                            validator.errors.append('TOPICS_IS_ACTIVE_KEY_404')
+                        else:
+                            if not isinstance(item.get('is_active'), int):
+                                validator.errors.append('TOPICS_IS_ACTIVE_MUST_BE_INT')
+                            elif item['is_active'] not in [0, 1]:
+                                validator.errors.append('TOPICS_IS_ACTIVE_MUST_BE_0_OR_1')
+                        # Note: the ID will not appear as we implemented a primary join for only active sessions ...
+                        all_project_topics = [i.id for i in ProjectPrompt.query.filter_by(project_id=data['id']).all()]
+                        if item.get('id') and (item['id'] not in all_project_topics):
+                            validator.errors.append('TOPICS_ID_NOT_PROJECT')
 
                     # We do not check for ID as if it does not exist then a topic will be created
                     if not item.get('text'):
