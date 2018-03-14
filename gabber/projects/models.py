@@ -155,8 +155,7 @@ class Project(db.Model):
     prompts = db.relationship(
         'ProjectPrompt',
         backref='project',
-        lazy='dynamic',
-        primaryjoin="and_(Project.id==ProjectPrompt.project_id, ProjectPrompt.is_active)"
+        lazy='dynamic'
     )
     members = db.relationship("Membership", back_populates="project")
 
