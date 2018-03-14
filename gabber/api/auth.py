@@ -5,7 +5,7 @@ JWT configuration and authentication (registration, login and logout).
 from flask import url_for
 from flask_restful import Resource
 from flask_jwt_extended import create_access_token, \
-    create_refresh_token, jwt_refresh_token_required, get_jwt_identity
+    create_refresh_token, jwt_refresh_token_required, get_jwt_identity, jwt_optional
 from gabber import db, app
 from gabber.api import helpers
 from gabber.api.schemas.auth import AuthRegisterSchema, AuthLoginSchema, AuthRegisterWithTokenSchema, \
@@ -27,6 +27,20 @@ def invalidate_other_user_tokens(email):
     for token in user_tokens:
         token.is_active = False
     db.session.commit()
+
+
+class UserAsMe(Resource):
+    """
+    Mapped to: /api/me/
+    """
+    @jwt_optional
+    def get(self):
+        """
+        Returns the user details, such as fullname.
+        If no user is logged in then data is empty.
+        """
+        user = User.query.filter_by(email=get_jwt_identity()).first()
+        return custom_response(200, data=UserSchema().dump(user))
 
 
 class ForgotPassword(Resource):
