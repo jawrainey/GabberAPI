@@ -64,7 +64,7 @@ class Projects(Resource):
             visibility=1 if data['privacy'] == 'public' else 0)
 
         admin_role = Roles.query.filter_by(name='admin').first().id
-        membership = Membership(uid=user.id, pid=project.id, rid=admin_role)
+        membership = Membership(uid=user.id, pid=project.id, rid=admin_role, confirmed=True)
         project.members.append(membership)
 
         project.prompts.extend([ProjectPrompt(creator=user.id, text_prompt=topic) for topic in data['topics']])
