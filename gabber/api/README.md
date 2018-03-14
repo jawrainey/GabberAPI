@@ -39,8 +39,8 @@ fullname varies across countries, where some consider middle name, etc.
 ```json
 {
         "tokens": {
-            "access_token": "",
-            "refresh_token": ""
+            "access": "",
+            "refresh": ""
         },
         "user": {
             "created_on": "14-Mar-2018",

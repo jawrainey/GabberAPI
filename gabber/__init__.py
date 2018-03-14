@@ -57,10 +57,10 @@ from gabber.api.auth import LoginInvitedUser, RegisterInvitedUser
 restful_api.add_resource(TokenRefresh, '/api/auth/token/refresh/')
 restful_api.add_resource(UserAsMe, '/api/auth/me/')
 restful_api.add_resource(UserRegistration, '/api/auth/register/')
-restful_api.add_resource(RegisterInvitedUser, '/api/auth/register/<string:token>/', endpoint="api.register")
 restful_api.add_resource(UserLogin, '/api/auth/login/')
-restful_api.add_resource(LoginInvitedUser, '/api/auth/login/<string:token>/', endpoint="api.login")
 restful_api.add_resource(ForgotPassword, '/api/auth/forgot/')
+restful_api.add_resource(RegisterInvitedUser, '/api/auth/register/<string:token>/', endpoint="api.register")
+restful_api.add_resource(LoginInvitedUser, '/api/auth/login/<string:token>/', endpoint="api.login")
 restful_api.add_resource(ResetPassword, '/api/auth/reset/<string:token>', endpoint="api.reset")
 
 # The existing API is confusing because methods are separate ...
