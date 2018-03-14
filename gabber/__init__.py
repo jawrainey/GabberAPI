@@ -15,6 +15,7 @@ templates = os.path.join(os.pardir, 'frontend/templates')
 static_path = os.path.join(os.pardir, 'frontend/static')
 app = Flask(__name__, template_folder=templates, static_folder=static_path)
 
+app.config['WEB_HOST'] = os.environ.get('WEB_HOST', 'http://localhost:8080')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'mysql+pymysql://user:secret@localhost/gabber?charset=utf8mb4')
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET', 'top_secret')
@@ -122,8 +123,7 @@ def after_request(response):
     """
     Log every request that has been made to the server.
     """
-    webHost = os.environ.get('WEB_HOST', 'http://localhost:8080')
-    response.headers.add('Access-Control-Allow-Origin', webHost)
+    response.headers.add('Access-Control-Allow-Origin', app.config['WEB_HOST'])
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
     logging.log_request()

@@ -64,7 +64,7 @@ class ForgotPassword(Resource):
         db.session.add(ResetTokens(token=token, user_id=user.id))
         db.session.commit()
 
-        url = url_for('api.reset', token=token, _external=True)
+        url = app.config['WEB_HOST'] + '/reset/' + token
         email_client.send_forgot_password(email, url)
         return custom_response(204)
 
