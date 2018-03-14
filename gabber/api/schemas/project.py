@@ -16,6 +16,11 @@ class ValidationErrorWithCustomErrorFormat(ValidationError):
         return self.messages
 
 
+def validate_length(item, length, attribute, validator):
+    if item and len(item) <= length:
+        validator.errors.append('%s_LENGTH_TOO_LONG' % attribute)
+
+
 class HelperSchemaValidator:
     """
     Contains general validation shared across schema: required, is empty, and type validation.
@@ -79,6 +84,9 @@ class ProjectPostSchema(ma.Schema):
 
         validator.validate('description', 'str', data)
 
+        validate_length(data.get('title'), 64, 'TITLE', validator)
+        validate_length(data.get('description'), 256, 'DESCRIPTION', validator)
+
         privacy_valid = validator.validate('privacy', 'str', data)
         if privacy_valid and data['privacy'] not in ['private', 'public']:
             validator.errors.append('PRIVACY_INVALID')
@@ -91,6 +99,8 @@ class ProjectPostSchema(ma.Schema):
                     validator.errors.append('TOPIC_IS_NOT_STRING')
                 if not topic:
                     validator.errors.append('TOPIC_IS_EMPTY')
+                if topic:
+                    validate_length(data.get('text'), 260, 'TOPIC', validator)
 
         validator.raise_if_errors()
 
@@ -161,6 +171,9 @@ class ProjectModelSchema(ma.ModelSchema):
         title_valid = validator.validate('title', 'str', data)
         title_as_slug = slugify(data['title'])
 
+        validate_length(data.get('title'), 64, 'TITLE', validator)
+        validate_length(data.get('description'), 256, 'DESCRIPTION', validator)
+
         if pid_valid and title_valid:
             # The title is different from the previous one, hence it changed.
             if Project.query.get(data['id']).slug != title_as_slug:
@@ -202,6 +215,8 @@ class ProjectModelSchema(ma.ModelSchema):
                     else:
                         if not isinstance(item['text'], basestring):
                             validator.errors.append('TOPICS_TEXT_IS_NOT_STRING')
+                        else:
+                            validate_length(data.get('text'), 260, 'TOPIC', validator)
 
                 # TODO: Rather than the user passing the creator to each topic, it is passed as a parent
                 # and we manually add it here as the relationship between these schemas is void.

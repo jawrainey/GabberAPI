@@ -4,9 +4,8 @@ from gabber.projects.models import \
     Connection as UserAnnotations, \
     Code as Tags, \
     ConnectionComments as Comments
-from gabber.users.models import User
 from marshmallow import pre_load
-from gabber.api.schemas.project import HelperSchemaValidator
+from gabber.api.schemas.project import HelperSchemaValidator, validate_length
 
 
 class UserAnnotationTagSchema(ma.ModelSchema):
@@ -35,6 +34,7 @@ class UserAnnotationCommentSchema(ma.ModelSchema):
     def __validate(self, data):
         validator = HelperSchemaValidator('USER_COMMENT')
         validator.validate('content', 'str', data)
+        validate_length(data.get('content'), 1024, 'content', validator)
         validator.raise_if_errors()
 
 
@@ -76,6 +76,7 @@ class UserAnnotationSchema(ma.ModelSchema):
         validator = HelperSchemaValidator('USER_ANNOTATIONS')
 
         validator.validate('content', 'str', data)
+        validate_length(data.get('content'), 1024, 'CONTENT', validator)
         valid_start = self.validate_intervals('start_interval', data, validator)
         valid_end = self.validate_intervals('end_interval', data, validator)
 

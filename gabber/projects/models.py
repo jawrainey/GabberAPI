@@ -463,7 +463,7 @@ class Connection(db.Model):
     # TODO: this should be renamed to UserAnnotation as connection is outdated
     id = db.Column(db.Integer, primary_key=True)
     # Although many are chosen, a general justification by the user must be provided.
-    content = db.Column(db.String(1120))
+    content = db.Column(db.String(1024))
     # Where in the interview this connection starts and ends
     start_interval = db.Column(db.Integer)
     end_interval = db.Column(db.Integer, default=0)
@@ -532,7 +532,7 @@ class ConnectionComments(db.Model):
     __tablename__ = 'connection_comments'
 
     id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String(1120), default=None)
+    content = db.Column(db.String(1024), default=None)
 
     # If this is NULL, then it is a response to the root, e.g. the annotation itself.
     parent_id = db.Column(db.Integer, db.ForeignKey('connection_comments.id'), nullable=True)
