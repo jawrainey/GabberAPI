@@ -161,13 +161,13 @@ class Project(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
-    def __init__(self, title, description, creator, visibility):
+    def __init__(self, title, description, creator, is_public):
         from slugify import slugify
         self.title = title
         self.slug = slugify(title)
         self.description = description
         self.creator = creator
-        self.is_public = visibility
+        self.is_public = is_public
 
     @staticmethod
     def __flatten(_):
