@@ -13,7 +13,8 @@ services:
       - .env
     environment:
       WEB_HOST: http://localhost:8080
-  
+      DATABASE_URL: mysql+pymysql://user:secret@mysql/gabber?charset=utf8mb4
+
   mysql:
     image: mysql
     restart: unless-stopped
