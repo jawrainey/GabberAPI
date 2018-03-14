@@ -65,8 +65,8 @@ class ForgotPassword(Resource):
         db.session.commit()
 
         url = url_for('api.reset', token=token, _external=True)
-        send_forgot_password(email, url)
-        return custom_response(200, data={'reset_url': url})
+        email_client.send_forgot_password(email, url)
+        return custom_response(204)
 
 
 class ResetPassword(Resource):

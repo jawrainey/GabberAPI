@@ -105,13 +105,7 @@ fullname varies across countries, where some consider middle name, etc.
 
 **Returns**
 
-The magic URL that is generated and sent in an email, which could be used on the client to simplify workflow:
-
-```json
-{
-  "reset_url": "http://0.0.0.0:5000/api/auth/reset/Imphd3JhaW5leUBnbWFpbC5jb20i.DYWvEQ.A_ave4r-iQeCfnDaOnCblF3MsVo"
-}
-```
+- N/A
 
 **Actions**
 
@@ -120,7 +114,6 @@ The magic URL that is generated and sent in an email, which could be used on the
 **Errors**:
 
 - `GENERAL_INVALID_JSON`: The request you made contains invalid JSON.
-- `USER_DOES_NOT_EXIST`: The email provided is not associated with a known user.
 - `AUTH_INVALID_EMAIL`: You have not provided a valid email address.
 - `AUTH_EMAIL_KEY_REQUIRED`: The attribute `email` is required in your request body.
 - `AUTH_EMAIL_IS_EMPTY`: The attribute `email` must not be empty.
@@ -231,7 +224,6 @@ The magic URL that is generated and sent in an email, which could be used on the
 ```json
 {
   "title": "The title of your neat project",
-  "creator": 10,
   "description": "Describe your project ...",
   "privacy": "public | private",
   "topics": ["Topics must strings", "Otherwise madness occurs"]
