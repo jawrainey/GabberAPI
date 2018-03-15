@@ -146,7 +146,7 @@ class ProjectModelSchema(ma.ModelSchema):
         include_fk = True
         dateformat = "%d-%b-%Y"
         # TODO: remove other attributes as necessary, i.e. isConsentEnabled and isProjectPublic?
-        exclude = ['codebook', 'prompts', 'is_public']
+        exclude = ['codebook', 'prompts']
 
     @pre_load()
     def __validate(self, data):
