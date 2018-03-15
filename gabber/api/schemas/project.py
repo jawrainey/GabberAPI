@@ -106,6 +106,7 @@ class ProjectPostSchema(ma.Schema):
 
 
 class ProjectMember(ma.ModelSchema):
+    id = ma.Function(lambda member: member.id)
     fullname = ma.Function(lambda member: User.query.get(member.user_id).fullname)
     role = ma.Function(lambda member: Roles.query.get(member.role_id).name)
     user_id = ma.Function(lambda member: member.user_id)
