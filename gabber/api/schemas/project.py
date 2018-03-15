@@ -113,7 +113,6 @@ class ProjectMember(ma.ModelSchema):
 
     class Meta:
         model = Membership
-        dateformat = "%d-%b-%Y"
         exclude = ['project', 'user']
 
 
@@ -126,7 +125,6 @@ class ProjectTopicSchema(ma.ModelSchema):
     class Meta:
         model = ProjectPrompt
         include_fk = True
-        dateformat = "%d-%b-%Y"
         exclude = ['text_prompt', 'image_path', 'project', 'creator']
 
 
@@ -145,8 +143,6 @@ class ProjectModelSchema(ma.ModelSchema):
         model = Project
         # We include FKs so that to gain access to Topics, Creator and Members
         include_fk = True
-        dateformat = "%d-%b-%Y"
-        # TODO: remove other attributes as necessary, i.e. isConsentEnabled and isProjectPublic?
         exclude = ['codebook', 'prompts']
 
     @pre_load()

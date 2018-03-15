@@ -11,7 +11,6 @@ from gabber.api.schemas.project import HelperSchemaValidator, validate_length
 class UserAnnotationTagSchema(ma.ModelSchema):
     class Meta:
         model = Tags
-        dateformat = "%d-%b-%Y"
         exclude = ['codebook', 'connections']
 
 
@@ -33,7 +32,6 @@ class UserAnnotationCommentSchema(ma.ModelSchema):
 
     class Meta:
         model = Comments
-        dateformat = "%d-%b-%Y"
         exclude = ['user', 'connection', 'parent']
 
     @pre_load()
@@ -63,7 +61,6 @@ class UserAnnotationSchema(ma.ModelSchema):
     class Meta:
         model = UserAnnotations
         include_fk = True
-        dateformat = "%d-%b-%Y"
         exclude = ['interview', 'user', 'user_id']
 
     @staticmethod

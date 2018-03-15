@@ -37,7 +37,6 @@ class SessionAnnotationSchema(ma.ModelSchema):
     class Meta:
         model = Connection
         exclude = ['user', 'interview']
-        dateformat = "%d-%b-%Y"
 
 
 class RecordingSessionSchema(ma.ModelSchema):
@@ -57,4 +56,3 @@ class RecordingSessionSchema(ma.ModelSchema):
         model = InterviewSession
         include_fk = True
         exclude = ['prompts', 'creator_id', 'connections']
-        dateformat = "%d-%b-%Y"
