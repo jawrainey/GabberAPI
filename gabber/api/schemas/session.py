@@ -21,7 +21,7 @@ class RecordingTopicSchema(ma.ModelSchema):
 
 class RecordingParticipantsSchema(ma.ModelSchema):
     user_id = ma.Function(lambda obj: User.query.get(obj.user_id).id)
-    name = ma.Function(lambda obj: User.query.get(obj.user_id).fullname)
+    fullname = ma.Function(lambda obj: User.query.get(obj.user_id).fullname)
     # NOTE/TODO: not sure how best to represent the role of a participant in a Gabber
     role = ma.Function(lambda obj: "interviewer" if obj.role else "interviewee")
 
