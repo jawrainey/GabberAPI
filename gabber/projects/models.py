@@ -158,7 +158,12 @@ class Project(db.Model):
         backref='project',
         lazy='dynamic'
     )
-    members = db.relationship("Membership", back_populates="project")
+
+    members = db.relationship(
+        "Membership",
+        back_populates="project",
+        primaryjoin="and_(Project.id==Membership.project_id, Membership.deactivated == False)"
+    )
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
