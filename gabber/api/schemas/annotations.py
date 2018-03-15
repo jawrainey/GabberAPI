@@ -20,6 +20,12 @@ class UserAnnotationCommentSchema(ma.ModelSchema):
     parent_id = ma.Function(lambda data: data.parent_id)
     annotation_id = ma.Function(lambda data: data.connection.id)
     session_id = ma.Function(lambda data: data.connection.session_id)
+    replies = ma.Method("_replies")
+
+    @staticmethod
+    def _replies(data):
+        # TODO: this should be performed on the Model side, but due to self-ref nature is different.
+        return [i.id for i in data.replies.all() if i.is_active and i.id != data.id]
 
     @staticmethod
     def _creator(data):
