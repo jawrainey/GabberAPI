@@ -93,6 +93,22 @@ fullname varies across countries, where some consider middle name, etc.
 
 ---
 
+### Endpoint: users.me
+
+`POST: /api/auth/me/`
+
+> Provides access to the user object.
+
+**Arguments**
+
+N/A, but a JWT must be provided.
+
+**Returns:**
+
+- The user object if a JWT is provided, otherwise data is empty.
+
+---
+
 ### Endpoint: users.forgot
 
 `POST: /api/auth/forgot/`
