@@ -190,6 +190,9 @@ class ProjectModelSchema(ma.ModelSchema):
         privacy_valid = validator.validate('privacy', 'str', data)
         if privacy_valid and data['privacy'] not in ['private', 'public']:
             validator.errors.append('PRIVACY_INVALID')
+        else:
+            # TODO: because the name is different, it does not update the model.
+            data['is_public'] = 1 if data['privacy'] == 'public' else 0
 
         topics_valid = validator.validate('topics', 'list', data)
 

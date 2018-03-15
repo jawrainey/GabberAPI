@@ -57,8 +57,6 @@ class Project(Resource):
         json_data['prompts'] = json_data['topics']
         json_data['id'] = pid
         json_data['creator'] = user.id
-        # TODO: because the name is different, it does not update.
-        json_data['is_public'] = json_data['privacy']
 
         schema = ProjectModelSchema()
         errors = schema.validate(json_data)
