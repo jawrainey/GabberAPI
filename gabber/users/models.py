@@ -85,30 +85,6 @@ class User(UserMixin, db.Model):
         match = [i.role_id for i in self.member_of if i.project_id == pid]
         return Roles.query.get(match[0]).name if match else None
 
-    def projects(self):
-        """
-        The available projects for this user.
-
-        :return: A list of public and private projects for this user
-        """
-        from gabber.projects.models import Project
-
-        is_member = []
-        not_member_and_public = []
-
-        memberships = [i.project_id for i in self.member_of]
-
-        for project in Project.query.order_by(Project.id.desc()).all():
-            if project.id in memberships:
-                is_member.append(project)
-            if project.id not in memberships and project.is_public:
-                not_member_and_public.append(project)
-
-        return {
-            'personal': is_member,
-            'public': not_member_and_public
-        }
-
 
 class Anonymous(AnonymousUserMixin, User):
     """

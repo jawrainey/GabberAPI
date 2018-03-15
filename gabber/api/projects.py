@@ -10,6 +10,7 @@ from gabber.projects.models import Membership, Project as ProjectModel, ProjectP
 from gabber.api.schemas.project import ProjectPostSchema, ProjectModelSchema
 from gabber.utils.general import custom_response
 from gabber import db
+from sqlalchemy import or_
 import gabber.api.helpers as helpers
 
 
@@ -32,12 +33,12 @@ class Projects(Resource):
         if current_user:
             user = User.query.filter_by(email=current_user).first()
             helpers.abort_if_unknown_user(user)
-            projects = user.projects()
+            projects = ProjectModel.query.join(Membership).filter(
+                or_(Membership.user_id == user.id, ProjectModel.is_public)
+            ).order_by(ProjectModel.id.desc()).all()
         else:
-            projects = ProjectModel.all_public_projects()
-        schema = ProjectModelSchema(many=True)
-        projects = {'personal': schema.dump(projects['personal']), 'public': schema.dump(projects['public'])}
-        return custom_response(201, data=projects)
+            projects = ProjectModel.query.filter_by(is_public=True).order_by(ProjectModel.id.desc()).all()
+        return custom_response(201, data=ProjectModelSchema(many=True).dump(projects))
 
     @jwt_required
     def post(self):

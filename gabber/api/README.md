@@ -157,55 +157,87 @@ fullname varies across countries, where some consider middle name, etc.
 
 `GET: /api/projects/`
 
-> A dictionary of personal/public projects for a user. If the user is unauthenticated, then the private list is empty.
+> Returns a list of available projects for that user; if no JWT provided then public projects are returned.
 
 **Returns**
 
 ```json
-{
-    "personal": [],
-    "public": [
-        {
-            "created_on": "04-Mar-2018",
-            "creator": {
-                "user_id": 13,
-                "fullname": "Jay Rainey"
+[
+    {
+        "created_on": "04-Mar-2018",
+        "creator": {
+            "fullname": "Jay Rainey",
+            "user_id": 13
+        },
+        "description": "now now",
+        "has_consent": false,
+        "id": 7,
+        "is_active": true,
+        "members": [
+            {
+                "confirmed": true,
+                "date_accepted": "13-Mar-2018",
+                "date_sent": "13-Mar-2018",
+                "deactivated": false,
+                "fullname": "jay",
+                "role": "user",
+                "user_id": 102
+            }
+        ],
+        "privacy": "private",
+        "slug": "new",
+        "title": "new",
+        "topics": [
+            {
+                "created_on": "04-Mar-2018",
+                "id": 10,
+                "is_active": 1,
+                "project_id": 7,
+                "text": "lol",
+                "updated_on": "04-Mar-2018"
+            }
+        ],
+        "updated_on": "04-Mar-2018"
+    },
+    {
+        "created_on": "04-Mar-2018",
+        "creator": {
+            "fullname": "Jay Rainey",
+            "user_id": 13
+        },
+        "description": "new desc",
+        "has_consent": false,
+        "id": 2,
+        "is_active": true,
+        "members": [
+            {
+                "confirmed": true,
+                "date_accepted": "12-Mar-2018",
+                "date_sent": "12-Mar-2018",
+                "deactivated": false,
+                "fullname": "jay",
+                "role": "admin",
+                "user_id": 30
+            }
+        ],
+        "privacy": "public",
+        "slug": "ni-oal",
+        "title": "ni oal",
+        "topics": [
+            {
+                "created_on": "04-Mar-2018",
+                "id": 3,
+                "is_active": 1,
+                "project_id": 2,
+                "text": "one topic lol",
+                "updated_on": "04-Mar-2018"
             },
-            "description": "new desc",
-            "has_consent": false,
-            "id": 2,
-            "is_public": true,
-            "is_active": true,
-            "members": [
-                {
-                    "fullname": "Jay Rainey",
-                    "role": "admin",
-                    "user_id": 13
-                },
-            ],
-            "slug": "ni-oal",
-            "title": "ni oal",
-            "topics": [
-                {
-                    "created_on": "04-Mar-2018",
-                    "id": 3,
-                    "is_active": 1,
-                    "project_id": 2,
-                    "text": "one topic lol",
-                    "updated_on": "04-Mar-2018"
-                },
-                "..."
-            ],
-            "updated_on": "04-Mar-2018"
-        }
-    ]
-}
+            "..."
+        ],
+        "updated_on": "04-Mar-2018"
+    }
+]
 ```
-**Notes**
-
-1) If a project is public and a user is a member then it appears in the personal list.
-4) `has_consent` and `is_public` are the configuration properties of a project
-
 
 **Errors**:
 

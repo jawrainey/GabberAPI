@@ -175,13 +175,6 @@ class Project(db.Model):
         import itertools
         return list(itertools.chain.from_iterable(_))
 
-    @staticmethod
-    def all_public_projects():
-        return {
-            'public': [project for project in Project.query.filter(Project.is_public).all()],
-            'personal': []
-        }
-
     def members_json(self):
         """
         Used on the frontend to determine if a given user can view actions for a given project.
