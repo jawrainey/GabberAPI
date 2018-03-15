@@ -55,5 +55,5 @@ class RecordingSessionSchema(ma.ModelSchema):
     class Meta:
         model = InterviewSession
         include_fk = True
-        exclude = ['prompts', 'project_id', 'creator_id', 'connections']
+        exclude = ['prompts', 'creator_id', 'connections']
         dateformat = "%d-%b-%Y"
