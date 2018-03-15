@@ -509,7 +509,7 @@ login with an existing account, which is then associated with the membership inv
 
 ### Endpoint: projects.members.invites.destroy
 
-`DELETE: /api/project/<int:id>/membership/invites/`
+`DELETE: /api/projects/<int:id>/membership/invites/`
 
 > Removes a user and emails them that they have been removed from a project, when and by whom.
 
@@ -588,7 +588,7 @@ This is for when project members join (public) or leave, rather than an admin ad
 
 A list of sessions that have been recorded for a particular project.
 
-### Endpoint: projects.sessions.index
+### Endpoint: `projects.sessions.index`
 
 `GET: /api/projects/<int:pid>/sessions/`
 
