@@ -67,7 +67,7 @@ class Comment(Resource):
         helpers.abort_if_invalid_parameters(pid, sid)
         helpers.abort_if_unauthorized(Project.query.get(pid))
         helpers.abort_if_unknown_comment(cid, aid)
-        return custom_response(200, data=UserAnnotationCommentSchema().dump(CommentsModel.query.get(cid)))
+        return custom_response(200, data=UserAnnotationCommentSchema().dump(CommentsModel.query.filter_by(id=cid).all()))
 
     @jwt_required
     def put(self, pid, sid, aid, cid):
@@ -96,5 +96,5 @@ class Comment(Resource):
         helpers.abort_if_unknown_comment(cid, aid)
         comment = CommentsModel.query.filter_by(id=cid)
         helpers.abort_if_not_user_made_comment(user.id, comment.first().user_id)
-        # comment.update({'is_active': False})
-        return custom_response(204)
+        comment.update({'is_active': False})
+        return custom_response(200)

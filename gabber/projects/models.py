@@ -530,9 +530,13 @@ class ConnectionComments(db.Model):
         A comment can refer to the connection its associated with via 'connection'
     """
     __tablename__ = 'connection_comments'
+    
+    query_class = QueryWithSoftDelete
 
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(1024), default=None)
+
+    is_active = db.Column(db.Boolean, default=True)
 
     # If this is NULL, then it is a response to the root, e.g. the annotation itself.
     parent_id = db.Column(db.Integer, db.ForeignKey('connection_comments.id'), nullable=True)

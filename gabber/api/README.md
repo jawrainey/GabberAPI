@@ -986,9 +986,9 @@ The modified annotation object:
 - `TAGS_IS_NOT_LIST`: ??
 - `TAG_IS_NOT_INT`: ??
 
-### Endpoint
+### Endpoint: projects.sessions.annotations.destroy
 
-`ELETE: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/`[D`
+`DELETE: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/`
 
 > Deletes a users annotation on a session recording. Only users who created the annotation can delete it.
 
