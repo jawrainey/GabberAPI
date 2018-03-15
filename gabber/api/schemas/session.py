@@ -44,6 +44,7 @@ class RecordingSessionSchema(ma.ModelSchema):
     topics = ma.Nested(RecordingTopicSchema, many=True, attribute="prompts")
     participants = ma.Nested(RecordingParticipantsSchema, many=True, attribute="participants")
     user_annotations = ma.Nested(SessionAnnotationSchema, many=True, attribute="connections")
+    audio_url = ma.Function(lambda s: s.generate_signed_url_for_recording())
     creator = ma.Method("_creator")
 
     @staticmethod
