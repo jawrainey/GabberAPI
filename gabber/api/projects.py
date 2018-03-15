@@ -38,7 +38,7 @@ class Projects(Resource):
             ).order_by(ProjectModel.id.desc()).all()
         else:
             projects = ProjectModel.query.filter_by(is_public=True).order_by(ProjectModel.id.desc()).all()
-        return custom_response(201, data=ProjectModelSchema(many=True).dump(projects))
+        return custom_response(200, data=ProjectModelSchema(many=True).dump(projects))
 
     @jwt_required
     def post(self):
