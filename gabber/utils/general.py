@@ -21,7 +21,7 @@ def custom_response(status_code, data=None, errors=None):
     """
     response = jsonify(
         {
-            "data": data or None,
+            "data": data,
             "meta": {
                 "success": status_code in [200, 201, 204],
                 "messages": errors or []
