@@ -6,24 +6,23 @@ These actions are notified to users once carried out.
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from gabber.api.schemas.project import ProjectMember
-from gabber.api.schemas.membership import AddMemberSchema, RemoveMemberSchema
+from gabber.api.schemas.membership import AddMemberSchema
 from gabber.projects.models import Project
 from gabber.projects.models import Membership, Roles
 from gabber.users.models import User
-from gabber.utils.general import custom_response
+from gabber.utils.general import custom_response, CustomException
 from gabber import db
 import gabber.api.helpers as helpers
 import gabber.utils.email as email_client
 
 
 class ProjectInvites(Resource):
-    """
-    Mapped to: /api/project/<int:id>/membership/invites/
-    """
     @jwt_required
     def post(self, pid):
         """
         An administrator or staff member of a project invited a user
+
+        Mapped to: /api/project/<int:id>/membership/invites/
         """
         admin, data = self.validate_and_get_data(pid)
         helpers.abort_if_errors_in_validation(AddMemberSchema().validate(data))
@@ -49,18 +48,24 @@ class ProjectInvites(Resource):
         return custom_response(200, data=ProjectMember().dump(membership))
 
     @jwt_required
-    def delete(self, pid):
+    def delete(self, pid, mid):
         """
         Removes a user and emails them that they have been removed from a project and by whom.
+
+        Mapped to: /api/project/<int:id>/membership/invites/<int:mid>
         """
-        admin, data = self.validate_and_get_data(pid)
-        helpers.abort_if_errors_in_validation(RemoveMemberSchema().validate(data))
-        user = User.query.filter_by(email=data['email']).first()
-        helpers.abort_if_not_project_member(user, pid)
-        membership = Membership.query.filter_by(user_id=user.id, project_id=pid).first()
+        helpers.abort_if_unauthorized(Project.query.get(pid))
+        admin = User.query.filter_by(email=get_jwt_identity()).first()
+        helpers.abort_if_unknown_user(admin)
+        helpers.abort_if_not_admin_or_staff(admin, pid, "INVITE_MEMBER")
+        membership = Membership.query.filter_by(id=mid).first()
+        if not membership:
+            raise CustomException(400, errors=['UNKNOWN_MEMBERSHIP'])
+        elif membership.deactivated:
+            raise CustomException(400, errors=['USER_ALREADY_DELETED'])
         membership.deactivated = True
         db.session.commit()
-        email_client.send_project_member_removal(admin, user, Project.query.get(pid))
+        email_client.send_project_member_removal(admin, User.query.get(membership.user_id), Project.query.get(pid))
         return custom_response(200, data=ProjectMember().dump(membership))
 
     @staticmethod
@@ -101,7 +106,6 @@ class ProjectMembership(Resource):
         user = helpers.abort_if_unauthorized(project)
         if not user.is_project_member(pid):
             helpers.abort_if_not_project_member(user, pid)
-        else:
-            email_client.send_project_member_left(user, project)
-            membership = Membership.leave_project(user.id, pid)
+        email_client.send_project_member_left(user, project)
+        membership = Membership.leave_project(user.id, pid)
         return custom_response(200, data=ProjectMember().dump(membership))

@@ -5,6 +5,7 @@ All emails send through sendgrid on behalf of Gabber through user-actions.
 import os
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Mail
+from gabber import app
 
 
 def send_email(receiver, subject, content, sender="noreply@gabber.audio"):
@@ -63,10 +64,13 @@ def send_project_member_invite_registered_user(admin, user, project):
     :param project: The User model object for the user to email.
     """
     # TODO: temporary content; will change once templates on sendgrid are used.
+
+    url = app.config['WEB_HOST'] + '/projects/' + project.id + '/'
+
     content = "Hi %s, Let's listen and annotate! " \
               "%s invites you to join the project: %s. " \
               "Login to view the project: %s" \
-              % (user.fullname, admin.fullname, project.title, 'https://gabber.audio/login/')
+              % (user.fullname, admin.fullname, project.title, url)
     subject = '%s invited you to join the project "%s" on Gabber' % (admin.fullname, project.title)
     send_email(receiver=user.email, subject=subject, content=content)
 

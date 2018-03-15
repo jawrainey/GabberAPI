@@ -93,6 +93,22 @@ fullname varies across countries, where some consider middle name, etc.
 
 ---
 
+### Endpoint: users.me
+
+`POST: /api/auth/me/`
+
+> Provides access to the user object.
+
+**Arguments**
+
+N/A, but a JWT must be provided.
+
+**Returns:**
+
+- The user object if a JWT is provided, otherwise data is empty.
+
+---
+
 ### Endpoint: users.forgot
 
 `POST: /api/auth/forgot/`
@@ -509,21 +525,17 @@ login with an existing account, which is then associated with the membership inv
 
 ### Endpoint: projects.members.invites.destroy
 
-`DELETE: /api/projects/<int:id>/membership/invites/`
+DELETE: /api/project/<int:id>/membership/invites/<int:member_id>
 
 > Removes a user and emails them that they have been removed from a project, when and by whom.
 
 **Arguments**
 
-```json
-    {
-      "email": "membertoremove@gmail.com"
-    }
-```
+N/A
 
 **Returns**
 
-- True if success, otherwise False within the `meta` object.
+- The member object for the deleted member.
 
 **Actions**
 
@@ -535,13 +547,10 @@ login with an existing account, which is then associated with the membership inv
 - `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
 - `GENERAL_UNKNOWN_USER`: The user in the JWT request does not exist.
 - `PROJECT_INVITE_MEMBER_UNAUTHORIZED`: You are unauthorized to remove a member from a project
-- `GENERAL_INVALID_JSON`: Your request contains invalid JSON.
-- `MEMBERSHIP_EMAIL_KEY_REQUIRED`: An email is required of the user to remove from the project.
-- `MEMBERSHIP_EMAIL_IS_EMPTY`: The email provided for the user to remove is empty.
-- `MEMBERSHIP_EMAIL_IS_NOT_STRING`: The email provided for the user to remove is not a string.
-- `MEMBERSHIP_EMAIL_USER_404`: The user you are trying to remove does not exist.
 - `USER_NOT_PROJECT_MEMBER`: The user you tried to remove is not a member of this project.
-    
+- `UNKNOWN_MEMBERSHIP`: The user you tried to remove is not a project member.
+- `USER_ALREADY_DELETED`: The user you tried to remove has already been deleted.
+ 
 ---
 
 ## Project membership: join and leave

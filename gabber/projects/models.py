@@ -70,8 +70,9 @@ class Membership(db.Model):
         many-to-many: a project can have many members
         one-to-one: each membership must have one role
     """
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), primary_key=True)
+    id = db.Column(db.Integer, autoincrement=True, index=True, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     # Used to determine if a user has confirmed their membership
     confirmed = db.Column(db.Boolean, default=False)

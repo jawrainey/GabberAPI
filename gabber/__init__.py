@@ -45,7 +45,9 @@ from gabber.api.comments import Comments, Comment
 restful_api.add_resource(Projects, '/api/projects/')
 restful_api.add_resource(Project, '/api/projects/<int:pid>/')
 restful_api.add_resource(ProjectMembership, '/api/projects/<int:pid>/membership/')
-restful_api.add_resource(ProjectInvites, '/api/projects/<int:pid>/membership/invites/')
+restful_api.add_resource(ProjectInvites,
+                         '/api/projects/<int:pid>/membership/invites/',
+                         '/api/projects/<int:pid>/membership/invites/<int:mid>/')
 restful_api.add_resource(ProjectSessions, '/api/projects/<int:pid>/sessions/')
 restful_api.add_resource(ProjectSession, '/api/projects/<int:pid>/sessions/<string:sid>/')
 restful_api.add_resource(UserAnnotations, '/api/projects/<int:pid>/sessions/<string:sid>/annotations/')
