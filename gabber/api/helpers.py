@@ -13,7 +13,7 @@ def abort_if_not_admin_or_staff(user, project_id, action="UPDATE"):
 
 def abort_on_unknown_project_id(pid):
     if pid not in [p.id for p in Project.query.all()]:
-        raise CustomException(404, errors=['PROJECT_DOES_NOT_EXIST'])
+        raise CustomException(400, errors=['PROJECT_DOES_NOT_EXIST'])
 
 
 def abort_if_session_not_in_project(session, pid):
@@ -38,7 +38,7 @@ def abort_if_project_member(user, project_id):
 
 def abort_if_unknown_project(project):
     if not project:
-        raise CustomException(404, errors=['PROJECT_UNKNOWN'])
+        raise CustomException(400, errors=['PROJECT_UNKNOWN'])
 
 
 def abort_if_unknown_session(session):
