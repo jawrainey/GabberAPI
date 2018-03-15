@@ -50,7 +50,7 @@ class RecordingSessionSchema(ma.ModelSchema):
     def _creator(data):
         # TODO: method is the same as ProjectSchema
         user = User.query.get(data.creator_id)
-        return {'user_id': user.id, 'name': user.fullname}
+        return {'user_id': user.id, 'fullname': user.fullname}
 
     class Meta:
         model = InterviewSession
