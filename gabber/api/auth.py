@@ -12,9 +12,9 @@ from gabber.api.schemas.auth import AuthRegisterSchema, AuthLoginSchema, AuthReg
     ResetPasswordSchema, ForgotPasswordSchema, UserSchema
 from gabber.projects.models import Membership
 from gabber.users.models import User, ResetTokens
-from gabber.utils.email import send_forgot_password, send_password_changed
 from gabber.utils.general import CustomException, custom_response
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+import gabber.utils.email as email_client
 
 
 def invalidate_other_user_tokens(email):
@@ -65,7 +65,7 @@ class ForgotPassword(Resource):
         db.session.commit()
 
         url = app.config['WEB_HOST'] + '/reset/' + token
-        send_forgot_password(email, url)
+        email_client.send_forgot_password(email, url)
         return custom_response(200)
 
 
@@ -93,7 +93,7 @@ class ResetPassword(Resource):
         db.session.add(user)
         db.session.commit()
 
-        send_password_changed(email)
+        email_client.send_password_changed(email)
         return custom_response(201, data=create_jwt_access(email))
 
     @staticmethod
@@ -185,7 +185,7 @@ class RegisterInvitedUser(Resource):
             member.confirmed = True
 
         db.session.commit()
-
+        email_client.send_welcome_after_registration(data['email'])
         return custom_response(201, data=create_jwt_access(data['email']))
 
     @staticmethod
@@ -226,8 +226,9 @@ class UserRegistration(Resource):
         """
         data = helpers.jsonify_request_or_abort()
         helpers.abort_if_errors_in_validation(AuthRegisterSchema().validate(data))
-        db.session.add(User(fullname=data['fullname'], email=data['email'], password=data['password']), registered=True)
+        db.session.add(User(fullname=data['fullname'], email=data['email'], password=data['password'], registered=True))
         db.session.commit()
+        email_client.send_welcome_after_registration(data['email'])
         return custom_response(201, data=create_jwt_access(data['email']))
 
 

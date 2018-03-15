@@ -18,12 +18,24 @@ def send_email(receiver, subject, content, sender="noreply@gabber.audio"):
     _sendgrid.client.mail.send.post(request_body=mail.get())
 
 
+def welcome_after_account_creation(email):
+    send_email(receiver=email, subject="Welcome to Gabber", content="You can create an account using this magic URL")
+
+
 def send_welcome_after_registration(email):
-    pass
+    send_email(receiver=email, subject="Welcome to Gabber", content="Welcome")
 
 
-def send_welcome_and_consent_after_session(participants):
-    pass
+def request_consent(participants, project):
+    from gabber.users.models import User
+    # Email each client to request individual consent on the recorded session.
+    for participant in participants:
+        user = User.query.filter_by(email=participant['Email']).first()
+        subject = "Share your Gabber session by providing consent"
+        content = "Thanks for taking part in a Gabber on the project %s." % project.title
+        if not user.registered:
+            content = "You can create an account using this magic URL <url>"
+        send_email(receiver=user.email, subject=subject, content=content)
 
 
 def send_forgot_password(email, url):
@@ -31,7 +43,15 @@ def send_forgot_password(email, url):
 
 
 def send_password_changed(email):
-    send_email(receiver=email, subject="Your Gabber password was updated", content="Password successfully updated")
+    send_email(receiver=email, subject="Gabber password successfully updated", content="Password successfully updated")
+
+
+def send_project_member_joined(user, project):
+    send_email(receiver=user.email, subject="Welcome to %s on Gabber" % project.title, content="Sorry that you left")
+
+
+def send_project_member_left(user, project):
+    send_email(receiver=user.email, subject="Gabber: sorry you left %s" % project.title, content="Sorry that you left")
 
 
 def send_project_member_invite_registered_user(admin, user, project):

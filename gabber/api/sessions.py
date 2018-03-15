@@ -11,6 +11,7 @@ from gabber.api.schemas.session import RecordingSessionSchema
 from gabber.api.schemas.helpers import is_not_empty
 import json
 from gabber.utils.general import custom_response
+import gabber.utils.email as email_client
 
 
 class ProjectSessions(Resource):
@@ -56,7 +57,7 @@ class ProjectSessions(Resource):
         helpers.abort_if_unknown_project(project)
         helpers.abort_if_not_a_member_and_private(user, project)
 
-        # TODO:NOTE The request is a multi-form request from the mobile device, and hence data needs
+        # NOTE The request is a multi-form request from the mobile device, and hence data needs
         # to be validated through RequestParser and converted to JSON before serializing.
 
         from werkzeug.datastructures import FileStorage
@@ -83,14 +84,13 @@ class ProjectSessions(Resource):
         creator_id = creator.id if creator else user.id
 
         interview_session = InterviewSession(id=interview_session_id, creator_id=creator_id, project_id=pid)
-
-        # TODO: what if an error occurs during uploading to S3?
         self.__upload_interview_recording(args['recording'], interview_session_id, pid)
-        interview_session.participants.extend(self.__add_participants(participants, interview_session_id))
         interview_session.prompts.extend(self.__add_structural_prompts(prompts, interview_session_id))
+        interview_session.participants.extend(self.__add_participants(participants, interview_session_id))
 
         db.session.add(interview_session)
         db.session.commit()
+        email_client.request_consent(participants, project)
         return interview_session.serialize(), 201
 
     @staticmethod
@@ -101,9 +101,9 @@ class ProjectSessions(Resource):
             is_not_empty(json_data, message="The %s list should not be empty" % message)
             return scheme.load(json_data)
         except ValueError:
-            abort(404, message={'errors': ['The content for the %s argument is invalid JSON.' % message]})
+            abort(400, message={'errors': ['The content for the %s argument is invalid JSON.' % message]})
         except ValidationError as err:
-            abort(404, message={'errors': err.messages})
+            abort(400, message={'errors': err.messages})
 
     @staticmethod
     def __upload_interview_recording(recording, session_id, project_id):
@@ -141,20 +141,13 @@ class ProjectSessions(Resource):
             known_user = User.query.filter_by(email=p['Email']).first()
             # e.g. someone interviewed a person who is not a Gabber user
             if not known_user:
-                known_user = User(fullname=p['Name'], email=p['Email'], password=uuid4().hex)
-                # TODO: should they be made a member of the project once participated? -> YES
-                db.session.add(known_user)
-                db.session.commit()
-                # TODO: if the new user was created, send a welcome email with a password reset.
-            # TODO: ask the user to verify that they were involved in this Gabber and to provide consent.
-            new_participant = InterviewParticipants(
-                user_id=known_user.id,
-                interview_id=session_id,
-                role=p['Role'])
-            _participants_to_add.append(new_participant)
+                known_user = User.create_unregistered_user(p['Name'], p['Email'])
+            participant = InterviewParticipants(known_user.id, session_id, p['Role'])
+            _participants_to_add.append(participant)
         return _participants_to_add
 
-    def __add_structural_prompts(self, prompts, session_id):
+    @staticmethod
+    def __add_structural_prompts(prompts, session_id):
         """
         The prompts that were selected during an interview to structure the conversation
         :param prompts: The prompts, including the ID (what was discussed), and Start/End of the region annotated.

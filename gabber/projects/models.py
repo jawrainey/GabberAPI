@@ -438,6 +438,11 @@ class InterviewParticipants(db.Model):
     # Although this could be inferred through interview.creator, this simplifies queries
     role = db.Column(db.Boolean, default=False)
 
+    def __init__(self, user_id, session_id, role):
+        self.user_id = user_id
+        self.interview_id = session_id
+        self.role = role
+
     def fullname(self):
         """
         The project associated with this interview

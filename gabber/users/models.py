@@ -1,6 +1,7 @@
 from gabber import db, bcrypt
 from flask_login import UserMixin, AnonymousUserMixin
 from uuid import uuid4
+import gabber.utils.email as email_client
 
 
 class ResetTokens(db.Model):
@@ -48,6 +49,7 @@ class User(UserMixin, db.Model):
         user = User(fullname, email, uuid4().hex)
         db.session.add(user)
         db.session.commit()
+        email_client.welcome_after_account_creation(email)
         return user
 
     def set_password(self, plaintext):
