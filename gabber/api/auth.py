@@ -40,7 +40,7 @@ class UserAsMe(Resource):
         If no user is logged in then data is empty.
         """
         user = User.query.filter_by(email=get_jwt_identity()).first()
-        return custom_response(200, data=UserSchema().dump(user))
+        return custom_response(200, data=UserSchema().dump(user) if user else None)
 
 
 class ForgotPassword(Resource):
