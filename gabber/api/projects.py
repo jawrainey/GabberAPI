@@ -29,15 +29,14 @@ class Projects(Resource):
         :return: A dictionary of public (i.e. available to all users) and private (user specific) projects.
         """
         current_user = get_jwt_identity()
+        projects = ProjectModel.query.filter_by(is_public=True).order_by(ProjectModel.id.desc()).all()
 
         if current_user:
             user = User.query.filter_by(email=current_user).first()
             helpers.abort_if_unknown_user(user)
-            projects = ProjectModel.query.join(Membership).filter(
-                or_(Membership.user_id == user.id, ProjectModel.is_public)
-            ).order_by(ProjectModel.id.desc()).all()
-        else:
-            projects = ProjectModel.query.filter_by(is_public=True).order_by(ProjectModel.id.desc()).all()
+            projects = ProjectModel.query.filter(or_(
+                ProjectModel.members.any(Membership.user_id == user.id),
+                ProjectModel.is_public)).all()
         return custom_response(200, data=ProjectModelSchema(many=True).dump(projects))
 
     @jwt_required
