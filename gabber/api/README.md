@@ -918,74 +918,6 @@ removed.
 
 A specific annotation for a given session from a project
 
-### Endpoint: projects.sessions.annotations.show
-
-`GET: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/`
-
-- **NOT IMPLEMENTED:** is this endpoint useful?
-
-### Endpoint: projects.sessions.annotations.update
-
-`PUT: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/`
-
-> Updates an annotation on a session recording
-
-**Arguments**
-
-```json
-    {
-        "content": "Now updating",
-        "start_interval": 20,
-        "end_interval": 20,
-        "tags": []
-    }
-```
-
-Note: the `tags` argument is currently optional (so can be not sent in the request); if an empty list is sent, then all tags are
-removed.
-
-**Returns**
-
-The modified annotation object:
-
-```json
-    {
-        "comments": [],
-        "content": "Now updating",
-        "created_on": "08-Mar-2018",
-        "end_interval": 20,
-        "id": 6,
-        "labels": [],
-        "session_id": "1cee9eca335b45bf82a6886e424c9e86",
-        "start_interval": 20,
-        "tags": [],
-        "updated_on": "08-Mar-2018",
-        "user_id": 30
-    }
-```
-
-**Errors**
-
-- `PROJECT_DOES_NOT_EXIST`: ?
-- `SESSION_UNKNOWN`: ?
-- `SESSION_NOT_IN_PROJECT`: ?
-- `GENERAL_UNKNOWN_JWT_USER`: ?
-- `PROJECT_UNAUTHORIZED`: ?
-- `ANNOTATION_404`: ?
-- `GENERAL_INVALID_JSON`:?
-- `CONTENT_REQUIRED`: ??
-- `CONTENT_IS_NOT_STRING`: ??
-- `CONTENT_IS_EMPTY`: ??
-- `START_INTERVAL_REQUIRED`: ??
-- `START_INTERVAL_IS_NOT_INT`: ??
-- `START_INTERVAL_MUST_BE_POSITIVE_INT`: ??
-- `END_INTERVAL_REQUIRED`: ??
-- `END_INTERVAL_IS_NOT_INT`: ??
-- `END_INTERVAL_MUST_BE_POSITIVE_INT`: ??
-- `START_BEFORE_END`: ??
-- `TAGS_IS_NOT_LIST`: ??
-- `TAG_IS_NOT_INT`: ??
-
 ### Endpoint: projects.sessions.annotations.destroy
 
 `DELETE: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/`
@@ -1011,12 +943,6 @@ The modified annotation object:
 ## Comments on an Annotation
 
 User comments on other (or their own) annotations on a recording
-
-### Endpoint: projects.sessions.annotations.comments.index
-
-`GET: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/`
-
-- **NOT IMPLEMENTED:** if you want comments for an annotation see `/annotations/<int:aid>/[GET]`
 
 ### Endpoint: projects.sessions.annotations.comments.create
 
@@ -1070,78 +996,6 @@ The content of the comment
 ## ACTIONS on comments
 
 Users who have created a comment can fetch, edit or delete them.
-
-### Endpoint: projects.sessions.annotations.comments.show
-
-`GET: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/`
-
-> Retrieves a specific comment of an annotation.
-
-**Returns**
-
-- The comment as an object; `parent_id` is `null` if it is a comment
-
-```json
-    {
-        "annotation_id": 1,
-        "content": "no you",
-        "created_on": "03-Mar-2018",
-        "creator": {
-            "fullname": "Jay Rainey",
-            "user_id": 1
-        },
-        "id": 1,
-        "parent_id": 1,
-        "replies": [
-            1,
-            2,
-            8,
-            9,
-            10,
-            11
-        ],
-        "session_id": "1cee9eca335b45bf82a6886e424c9e86",
-        "updated_on": "09-Mar-2018"
-    }
-```
-
-**Errors**
-
-- `PROJECT_DOES_NOT_EXIST`: ??
-- `SESSION_UNKNOWN`: ??
-- `SESSION_NOT_IN_PROJECT`: ??
-- `GENERAL_UNKNOWN_JWT_USER`: ??
-- `PROJECT_UNAUTHORIZED`: ??
-- `COMMENT_404`: ??
-- `COMMENT_NOT_IN_SESSION`: ??
-
-### Endpoint: projects.sessions.annotations.comments.update
-
-`PUT: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/`
-
-> Update the content of a comment, i.e. via an `edit` feature
-
-**Arguments**
-
-- `content` the same argument as `POST` for a comment to an annotation above.
-
-**Returns**
-
-- The updated comment object as above.
-
-**Errors**
-
-- `PROJECT_DOES_NOT_EXIST`: ??
-- `SESSION_UNKNOWN`: ??
-- `SESSION_NOT_IN_PROJECT`: ??
-- `GENERAL_UNKNOWN_JWT_USER`: ??
-- `PROJECT_UNAUTHORIZED`: ??
-- `COMMENT_404`: ??
-- `COMMENT_NOT_IN_SESSION`: ??
-- `GENERAL_INVALID_JSON`: ??
-- `NOT_COMMENT_CREATOR`: ??
-- `USER_COMMENT_CONTENT_KEY_REQUIRED`: ??
-- `USER_COMMENT_IS_NOT_STRING`: ??
 
 ### Endpoint: projects.sessions.annotations.comments.create
 

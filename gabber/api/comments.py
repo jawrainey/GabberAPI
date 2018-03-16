@@ -79,34 +79,6 @@ class Comment(Resource):
         return create_comment(pid, sid, aid, cid)
 
     @jwt_required
-    def get(self, pid, sid, aid, cid):
-        """
-        READ a comment an session annotation
-        """
-        helpers.abort_if_invalid_parameters(pid, sid)
-        helpers.abort_if_unauthorized(Project.query.get(pid))
-        helpers.abort_if_unknown_comment(cid, aid)
-        comment = CommentsModel.query.filter_by(id=cid).first()
-        return custom_response(200, data=UserAnnotationCommentSchema().dump(comment))
-
-    @jwt_required
-    def put(self, pid, sid, aid, cid):
-        """
-        UPDATE a comment an session annotation
-        """
-        helpers.abort_if_invalid_parameters(pid, sid)
-        user = helpers.abort_if_unauthorized(Project.query.get(pid))
-        helpers.abort_if_unknown_comment(cid, aid)
-        comment = CommentsModel.query.filter_by(id=cid)
-        helpers.abort_if_not_user_made_comment(user.id, comment.first().user_id)
-
-        data = helpers.jsonify_request_or_abort()
-        schema = UserAnnotationCommentSchema()
-        helpers.abort_if_errors_in_validation(schema.validate(data))
-        comment.update({'content': data['content']})
-        return custom_response(200, data=schema.dump(comment.first()))
-
-    @jwt_required
     def delete(self, pid, sid, aid, cid):
         """
         DELETE a comment an session annotation

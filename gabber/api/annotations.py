@@ -64,33 +64,6 @@ class UserAnnotation(Resource):
     Mapped to: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/
     """
     @jwt_required
-    def put(self, pid, sid, aid):
-        """
-        Update an existing annotation
-
-        Notes:
-            (1) tags are currently optional
-            (2) only the user who created the annotation can edit.
-        """
-        helpers.abort_if_invalid_parameters(pid, sid)
-        user = helpers.abort_if_unauthorized(Project.query.get(pid))
-
-        annotation = UserAnnotationModel.query.get(aid)
-        helpers.abort_if_unknown_annotation(annotation)
-        helpers.abort_if_not_user_made(user.id, annotation.user_id)
-
-        json_data = request.get_json(force=True, silent=True)
-        helpers.abort_if_invalid_json(json_data)
-
-        schema = UserAnnotationSchema()
-        helpers.abort_if_errors_in_validation(schema.validate(json_data))
-
-        data = schema.load(json_data, instance=annotation)
-        db.session.commit()
-
-        return custom_response(200, data=schema.dump(data))
-
-    @jwt_required
     def delete(self, pid, sid, aid):
         """
         Soft delete an existing annotation
