@@ -14,7 +14,7 @@ class RecordingTopicSchema(ma.ModelSchema):
     class Meta:
         model = InterviewPrompts
         include_fk = True
-        exclude = ['interview', 'start_interval', 'end_interval', 'interview_id', 'prompt_id', 'id']
+        exclude = ['interview', 'interview_id', 'prompt_id']
 
 
 class RecordingParticipantsSchema(ma.ModelSchema):
