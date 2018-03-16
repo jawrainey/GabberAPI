@@ -26,8 +26,6 @@ class ProjectSession(Resource):
         :return: A serialized interview session
         """
         user = User.query.filter_by(email=get_jwt_identity()).first()
-        helpers.abort_if_unknown_user(user)
-
         helpers.abort_on_unknown_project_id(pid)
         project = Project.query.get(pid)
 

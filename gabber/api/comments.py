@@ -3,7 +3,7 @@
 READ a list of the comments for an annotation or CREATE a new comment.
 """
 from flask_restful import Resource
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, jwt_optional
 from gabber.projects.models import ConnectionComments as CommentsModel, Project
 from gabber.api.schemas.annotations import UserAnnotationCommentSchema
 from gabber.utils.general import custom_response
@@ -53,7 +53,7 @@ class CommentsReplies(Resource):
     Mapped to: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/children/
     """
     @staticmethod
-    @jwt_required
+    @jwt_optional
     def get(pid, sid, aid, cid):
         """
         READ a comment an session annotation

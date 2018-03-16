@@ -94,7 +94,7 @@ class Membership(db.Model):
 
     @staticmethod
     def join_project(user_id, project_id):
-        membership = Membership(uid=user_id, pid=project_id, rid=Roles.user_role())
+        membership = Membership(uid=user_id, pid=project_id, rid=Roles.user_role(), confirmed=True)
         db.session.add(membership)
         db.session.commit()
         return membership

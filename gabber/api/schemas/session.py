@@ -4,7 +4,7 @@ from gabber import ma
 
 
 class RecordingTopicSchema(ma.ModelSchema):
-    topic_id = ma.String(attribute="prompt_id")
+    topic_id = ma.Int(attribute="prompt_id")
     text = ma.Method('_topic')
 
     @staticmethod

@@ -23,9 +23,13 @@ class UserAnnotations(Resource):
         Returns a list of all annotations for an existing session
         """
         helpers.abort_if_invalid_parameters(pid, sid)
-        helpers.abort_if_unauthorized(Project.query.get(pid))
+        project = Project.query.get(pid)
         annotations = UserAnnotationModel.query.filter_by(session_id=sid).all()
-        return custom_response(200, data=UserAnnotationSchema(many=True).dump(annotations))
+        annotations = UserAnnotationSchema(many=True).dump(annotations)
+        if project.is_public:
+            return custom_response(200, data=annotations)
+        helpers.abort_if_unauthorized(project)
+        return custom_response(200, data=annotations)
 
     @jwt_required
     def post(self, pid, sid):
