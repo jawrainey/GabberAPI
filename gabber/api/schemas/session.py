@@ -6,8 +6,6 @@ from gabber import ma
 class RecordingTopicSchema(ma.ModelSchema):
     topic_id = ma.String(attribute="prompt_id")
     text = ma.Method('_topic')
-    start = ma.String(attribute="start_interval")
-    end = ma.String(attribute="end_interval")
 
     @staticmethod
     def _topic(data):
