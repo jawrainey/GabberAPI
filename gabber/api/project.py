@@ -58,7 +58,6 @@ class Project(Resource):
         json_data['id'] = pid
         json_data['creator'] = user.id
 
-
         for topic in json_data['topics']:
             topic.pop('created_on')
             topic.pop('updated_on')

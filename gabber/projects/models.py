@@ -101,7 +101,13 @@ class Membership(db.Model):
 
     @staticmethod
     def leave_project(user_id, project_id):
-        membership = Membership.query.filter_by(user_id=user_id, project_id=project_id).first()
+        # Given we store all the history of project joins/leaves,
+        # when a user requests to leave only their most recent record is presented
+        membership = Membership.query.filter_by(
+            user_id=user_id,
+            project_id=project_id,
+            deactivated=False
+        ).order_by(Membership.id.desc()).first()
         membership.deactivated = True
         db.session.commit()
         return membership
