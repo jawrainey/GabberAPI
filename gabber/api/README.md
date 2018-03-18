@@ -1,6 +1,6 @@
-# API Documentation: work in progress
+# Gabber API
 
-All requests are returned in the following format where errors contains unique _keys_ to simplify frontend access:
+All requests are returned in the following format where errors contains unique _keys_ for lookup:
 
 ```json
 {
@@ -11,13 +11,6 @@ All requests are returned in the following format where errors contains unique _
   }
 }
 ```
-
-**Note:** all `POST/PUT` requests must be in `json` format.
-
-The following are errors that can be returned across resources:
-
-- `GENERAL_INVALID_JSON`: The request made contains invalid JSON
-- `GENERAL_UNKNOWN_USER`: The user in the JWT request does not exist.
 
 ## Authentication
 
@@ -352,15 +345,11 @@ The same format as `/projects/`, but for the individual project the user just cr
 
 ### Project (individual project)
 
-Authorized JWT users can view, edit and delete a given project. Only creators of the project can edit or delete,
-and only members of a project can view private projects
-
 <details>
 <summary>projects.show</summary>
 <br>
   
 `GET: /api/projects/<int:pid>/`
-
 
 > Returns a project if it is public. If it is private, data is only returned if the JWT user is a member.
 
@@ -416,7 +405,6 @@ and only members of a project can view private projects
 <br>
   
 `PUT: /api/projects/<int:pid>/`
-
 
 > Updates attributes of an existing project
 
@@ -493,8 +481,6 @@ it overrides all existing topics for the project; `text` and `is_active` is requ
 </details>
 
 ## Project membership
-
-Project administrators can _invite_ (add) or _remove_ members from a project.
 
 <details>
 <summary>projects.members.invites.create</summary>
@@ -577,8 +563,6 @@ N/A
 
 ## User membership
 
-This is for when project members join (public) or leave, rather than an admin adding/removing them.
-
 <details>
 <summary>projects.members.join</summary>
 <br>
@@ -620,8 +604,6 @@ This is for when project members join (public) or leave, rather than an admin ad
 </details>
 
 ## Sessions
-
-A list of sessions that have been recorded for a particular project.
 
 <details>
 <summary>projects.sessions.index</summary>
@@ -706,9 +688,7 @@ which should be of the format: `{Start: 0, End: 10, PromptID: 21}`.
 
 </details>
 
-## Session (individual session)
-
-A specific session from the set of sessions for a project
+### Session
 
 <details>
 <summary>projects.session.show</summary>
@@ -771,8 +751,6 @@ A specific session from the set of sessions for a project
 </details>
 
 ## Annotations
-
-All user annotations for a given session from a project
 
 <details>
 <summary>projects.sessions.annotations.index</summary>
@@ -954,10 +932,6 @@ removed.
 
 </details>
 
-## ACTIONS on an annotation
-
-A specific annotation for a given session from a project
-
 <details>
 <summary>projects.sessions.annotations.destroy</summary>
 <br>
@@ -983,8 +957,6 @@ A specific annotation for a given session from a project
 </details>
 
 ## Comments on an Annotation
-
-User comments on other (or their own) annotations on a recording
 
 <details>
 <summary>projects.sessions.annotations.comments.create</summary>
@@ -1037,12 +1009,9 @@ The content of the comment
 
 </details>
 
-## ACTIONS on comments
-
-Users who have created a comment can fetch, edit or delete them.
 
 <details>
-<summary>projects.sessions.annotations.comments.create</summary>
+<summary>projects.sessions.annotations.comments.create.self</summary>
 <br>
   
 `POST: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/`
