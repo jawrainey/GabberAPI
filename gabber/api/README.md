@@ -1,6 +1,6 @@
-# API Documentation: work in progress
+# Gabber API
 
-All requests are returned in the following format where errors contains unique _keys_ to simplify frontend access:
+All requests are returned in the following format where errors contains unique _keys_ for lookup:
 
 ```json
 {
@@ -12,19 +12,13 @@ All requests are returned in the following format where errors contains unique _
 }
 ```
 
-**Note:** all `POST/PUT` requests must be in `json` format.
-
-The following are errors that can be returned across resources:
-
-- `GENERAL_INVALID_JSON`: The request made contains invalid JSON
-- `GENERAL_UNKNOWN_USER`: The user in the JWT request does not exist.
-
 ## Authentication
 
-### Endpoint: users.register
-
+<details>
+<summary>users.register</summary>
+<br>
 `POST: /api/auth/register/`
-
+  
 > Create a new user and returns a JWT
 
 **Arguments**
@@ -62,11 +56,11 @@ fullname varies across countries, where some consider middle name, etc.
 - `AUTH_INVALID_EMAIL`: The email address provided is invalid.
 - `AUTH_PASSWORD_REQUIRED`: A password is required to register
 - `AUTH_PASSWORD_LENGTH`: The password must be at least 12 characters long
+</details>
 
-
----
-
-### Endpoint: users.login
+<details>
+<summary>users.login</summary>
+<br>
 
 `POST: /api/auth/login/`
 
@@ -90,10 +84,11 @@ fullname varies across countries, where some consider middle name, etc.
 - `AUTH_PASSWORD_REQUIRED`: A password is required to register
 - `AUTH_INCORRECT_PASSWORD`: An incorrect password was provided for this email address.
 - `AUTH_PASSWORD_LENGTH`: The password must be at least 12 characters long
+</details>
 
----
-
-### Endpoint: users.me
+<details>
+<summary>users.me</summary>
+<br>
 
 `POST: /api/auth/me/`
 
@@ -107,10 +102,12 @@ N/A, but a JWT must be provided.
 
 - The user object if a JWT is provided, otherwise data is empty.
 
----
+</details>
 
-### Endpoint: users.forgot
-
+<details>
+<summary>users.forgot</summary>
+<br>
+ 
 `POST: /api/auth/forgot/`
 
 > Emails a user with a time serialised URL that can be used to reset their password
@@ -136,8 +133,11 @@ N/A, but a JWT must be provided.
 - `AUTH_EMAIL_IS_NOT_STRING`: The attribute `email` must be a string.
 - `ISSUE_SENDING_EMAIL`: An error occurred when trying to send the email. If this continues, please get in touch.
 
+</details>
 
-### Endpoint: users.resetPassword
+<details>
+<summary>users.resetPassword</summary>
+<br>
 
 `POST: /api/auth/reset/<string:token>/`
 
@@ -164,13 +164,17 @@ N/A, but a JWT must be provided.
 - `TOKEN_EXPIRED`: The token is invalid as it has expired.
 - `TOKEN_404:` The token does not exist.
 - `TOKEN_USED`: This token was previously used to reset the password.
+  
+</details>
 
 ---
 
 ## Projects
 
-### Endpoint: projects.index
-
+<details>
+<summary>projects.index</summary>
+<br>
+  
 `GET: /api/projects/`
 
 > Returns a list of available projects for that user; if no JWT provided then public projects are returned.
@@ -259,10 +263,12 @@ N/A, but a JWT must be provided.
 
 - `GENERAL.UNKNOWN_USER:` The user making the request does not exist, i.e. they are JWT user but unknown to our system.
 
----
+</details>
 
-### Endpoint: projects.create
-
+<details>
+<summary>projects.create</summary>
+<br>
+  
 `POST: /api/projects/`
 
 > Creates a new project
@@ -335,17 +341,15 @@ The same format as `/projects/`, but for the individual project the user just cr
 - `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database.
 - `GENERAL_INVALID_JSON`: The request made contains invalid JSON
 
----
+</details>
 
-### Project (individual project)
+### Project
 
-Authorized JWT users can view, edit and delete a given project. Only creators of the project can edit or delete,
-and only members of a project can view private projects
-
-### Endpoint: projects.show
-
+<details>
+<summary>projects.show</summary>
+<br>
+  
 `GET: /api/projects/<int:pid>/`
-
 
 > Returns a project if it is public. If it is private, data is only returned if the JWT user is a member.
 
@@ -394,12 +398,13 @@ and only members of a project can view private projects
 - `PROJECT_DOES_NOT_EXIST`: The project you tried to view does not exist.
 - `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
 
----
+</details>
 
-### Endpoint: projects.update
-
+<details>
+<summary>projects.update</summary>
+<br>
+  
 `PUT: /api/projects/<int:pid>/`
-
 
 > Updates attributes of an existing project
 
@@ -452,9 +457,11 @@ it overrides all existing topics for the project; `text` and `is_active` is requ
 - `TOPICS_TEXT_KEY_404`: A text key is missing from your topics array.
 - `TOPICS_TEXT_IS_NOT_STRING`: The value of a text must be a string.
 
----
+</details>
 
-### Endpoint: projects.destroy
+<details>
+<summary>projects.destroy</summary>
+<br>
 
 `DELETE: /api/projects/<int:pid>/`
 
@@ -471,16 +478,14 @@ it overrides all existing topics for the project; `text` and `is_active` is requ
 - `GENERAL_UNKNOWN_JWT_USER`: ??
 - `PROJECT_DELETE_UNAUTHORIZED`: ??
 
----
+</details>
 
----
+## Project membership
 
-## Project membership: invites
-
-Project administrators can _invite_ (add) or _remove_ members from a project.
-
-### Endpoint: projects.members.invites.create
-
+<details>
+<summary>projects.members.invites.create</summary>
+<br>
+  
 `POST: /api/project/<int:id>/membership/invites/`
 
 > Adds a member to a project (or creates a user if not exists) and invites them to be part of a given project. If
@@ -521,11 +526,13 @@ login with an existing account, which is then associated with the membership inv
 - `MEMBERSHIP_EMAIL_USER_404`: The user you are trying to add does not exist.
 - `PROJECT_MEMBER_EXISTS`: A user with that email is already a member of the project.
 
----
+</details>
 
-### Endpoint: projects.members.invites.destroy
-
-DELETE: /api/project/<int:id>/membership/invites/<int:member_id>
+<details>
+<summary>projects.members.invites.destroy</summary>
+<br>
+  
+`DELETE: /api/project/<int:id>/membership/invites/<int:member_id>`
 
 > Removes a user and emails them that they have been removed from a project, when and by whom.
 
@@ -551,14 +558,15 @@ N/A
 - `UNKNOWN_MEMBERSHIP`: The user you tried to remove is not a project member.
 - `USER_ALREADY_DELETED`: The user you tried to remove has already been deleted.
  
----
+</details>
 
-## Project membership: join and leave
 
-This is for when project members join (public) or leave, rather than an admin adding/removing them.
+## User membership
 
-### Endpoint: projects.members.join
-
+<details>
+<summary>projects.members.join</summary>
+<br>
+  
 `POST: /api/projects/<int:pid>/membership/`
 
 > Join (i.e. become a member) of an existing public project
@@ -573,9 +581,11 @@ This is for when project members join (public) or leave, rather than an admin ad
 - `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
 - `ALREADY_MEMBER`: You have tried to join a project that you are already a member of.
 
----
+</details>
 
-### Endpoint: projects.members.leave
+<details>
+<summary>projects.members.leave</summary>
+<br>
 
 `DELETE: /api/projects/<int:pid>/membership/`
 
@@ -591,14 +601,14 @@ This is for when project members join (public) or leave, rather than an admin ad
 - `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
 - `USER_NOT_PROJECT_MEMBER`: You are not a member of that project.
 
----
+</details>
 
 ## Sessions
 
-A list of sessions that have been recorded for a particular project.
-
-### Endpoint: `projects.sessions.index`
-
+<details>
+<summary>projects.sessions.index</summary>
+<br>
+  
 `GET: /api/projects/<int:pid>/sessions/`
 
 > A list of all sessions for a given project
@@ -648,10 +658,12 @@ A list of sessions that have been recorded for a particular project.
 - `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
 - `SESSION_UNKNOWN`: The session you tried to view does not exist.
 
----
+</details>
 
-### Endpoint: projects.session.create
-
+<details>
+<summary>projects.sessions.create</summary>
+<br>
+  
 `POST: /api/projects/<int:pid>/sessions/`
 
 ### MOBILE SUPPORT: LEGACY
@@ -674,14 +686,14 @@ which should be of the format: `{Start: 0, End: 10, PromptID: 21}`.
 - The keys from the `prompts` and `particiapnts` are uppercase.
 - The errors and response returned from this request differ from other endpoints as they use an old return response.
 
----
+</details>
 
-## Session (individual session)
+### Session
 
-A specific session from the set of sessions for a project
-
-### Endpoint: projects.sessions.show
-
+<details>
+<summary>projects.session.show</summary>
+<br>
+  
 `GET: /api/projects/<int:pid>/sessions/<string:sid>/`
 
 > An individual Gabber recorded session for a project
@@ -736,14 +748,14 @@ A specific session from the set of sessions for a project
 - `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
 - `SESSION_UNKNOWN`: The session you tried to view does not exist.
 
----
+</details>
 
 ## Annotations
 
-All user annotations for a given session from a project
-
-### Endpoint: projects.sessions.annotations.index
-
+<details>
+<summary>projects.sessions.annotations.index</summary>
+<br>
+  
 `GET: /api/projects/<int:pid>/sessions/<string:sid>/annotations/`
 
 > A list of user annotations on a recording session
@@ -840,7 +852,11 @@ simplifies updating the model.
 - `GENERAL_UNKNOWN_JWT_USER`: ??
 - `PROJECT_UNAUTHORIZED`: ??
 
-### Endpoint: projects.sessions.annotations.create
+</details>
+
+<details>
+<summary>projects.sessions.annotations.create</summary>
+<br>
 
 `POST: /api/projects/<int:pid>/sessions/<string:sid>/annotations/`
 
@@ -914,12 +930,12 @@ removed.
 - `TAGS_IS_NOT_LIST`: ??
 - `TAG_IS_NOT_INT`: ??
 
-## ACTIONS on an annotation
+</details>
 
-A specific annotation for a given session from a project
-
-### Endpoint: projects.sessions.annotations.destroy
-
+<details>
+<summary>projects.sessions.annotations.destroy</summary>
+<br>
+  
 `DELETE: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/`
 
 > Deletes a users annotation on a session recording. Only users who created the annotation can delete it.
@@ -938,14 +954,14 @@ A specific annotation for a given session from a project
 - `ANNOTATION_404`: ??
 - `NOT_ANNOTATION_CREATOR`: ??
 
----
+</details>
 
-## Comments on an Annotation
+## Comments
 
-User comments on other (or their own) annotations on a recording
-
-### Endpoint: projects.sessions.annotations.comments.create
-
+<details>
+<summary>projects.sessions.annotations.comments.create</summary>
+<br>
+  
 `POST: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/`
 
 > Create a **new** comment on an annotation
@@ -991,14 +1007,13 @@ The content of the comment
 - `COMMENT_404`: ??
 - `COMMENT_NOT_IN_SESSION`: ??
 
----
+</details>
 
-## ACTIONS on comments
 
-Users who have created a comment can fetch, edit or delete them.
-
-### Endpoint: projects.sessions.annotations.comments.create
-
+<details>
+<summary>projects.sessions.annotations.comments.create.self</summary>
+<br>
+  
 `POST: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/`
 
 > Creates a new comment on another comment, e.g. nested comments.
@@ -1017,15 +1032,19 @@ Users who have created a comment can fetch, edit or delete them.
 - `COMMENT_404`: ??
 - `COMMENT_NOT_IN_SESSION`: ??
 
-### Endpoint: project.sessions.annotations.comments.destroy
+</details>
 
+<details>
+<summary>projects.sessions.annotations.comments.destroy</summary>
+<br>
+  
 `DELETE: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/`
 
 > Soft-deletes the entire comment, i.e. via an `delete` feature
 
 **Returns**
 
-- `204` no content status code
+- N/A
 
 **Errors**
 
@@ -1037,3 +1056,5 @@ Users who have created a comment can fetch, edit or delete them.
 - `COMMENT_404`: ??
 - `COMMENT_NOT_IN_SESSION`: ??
 - `NOT_COMMENT_CREATOR`: ??
+
+</details>
