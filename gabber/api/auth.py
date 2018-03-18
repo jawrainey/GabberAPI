@@ -31,7 +31,7 @@ def invalidate_other_user_tokens(email):
 
 class UserAsMe(Resource):
     """
-    Mapped to: /api/me/
+    Mapped to: /api/auth/me/
     """
     @jwt_optional
     def get(self):
@@ -178,6 +178,7 @@ class RegisterInvitedUser(Resource):
             return custom_response(400, errors=['ALREADY_REGISTERED'])
         user.fullname = data['fullname']
         user.email = data['email']
+        user.set_password(data['password'])
         user.registered = True
 
         # Better to ask for forgiveness: users can leave projects from the main page.

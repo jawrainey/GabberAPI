@@ -17,6 +17,7 @@ All requests are returned in the following format where errors contains unique _
 <details>
 <summary>users.register</summary>
 <br>
+
 `POST: /api/auth/register/`
   
 > Create a new user and returns a JWT
@@ -59,6 +60,83 @@ fullname varies across countries, where some consider middle name, etc.
 </details>
 
 <details>
+<summary>users.register.withToken.show</summary>
+<br>
+
+`GET: /api/auth/register/<token>/`
+  
+> Provides the API consumer with metadata associated with the token, namely the associated users Full Name and Email.
+
+**Arguments**
+
+- `token`: a valid `TimedSerializer` url token.
+
+**Returns:**
+
+```json
+  {
+    "fullname": "Jay Rainey",
+    "email": "jay@jawrainey.me"
+  }
+```
+
+**Errors**
+
+- `TOKEN_EXPIRED`: The token provided has expired; default length is one week.
+- `TOKEN_404`: The token provided is invalid.
+
+</details>
+
+<details>
+<summary>users.register.withToken.create</summary>
+<br>
+
+`PUT: /api/auth/register/<token>/`
+  
+> Updates details of a non-registered user, i.e. one created through the system, such as by participating in a session.
+The user will receive an email with a magic link to this URL after participating in a session.
+
+**Arguments**
+
+- `fullname`: the full name of a user, or what they consider their display name to be.
+- `email`: must be a valid email address and is used to uniquely identify a user.
+- `password`: the password for their account.
+
+**Returns:**
+
+The user object:
+
+```json
+{
+        "tokens": {
+            "access": "",
+            "refresh": ""
+        },
+        "user": {
+            "created_on": "14-Mar-2018",
+            "email": "hello@me.com",
+            "fullname": "Jay Rainey",
+            "id": 102,
+            "registered": false,
+            "updated_on": "14-Mar-2018"
+        }
+    }
+```
+
+**Errors**
+
+- `TOKEN_EXPIRED`: The token provided has expired; default length is one week.
+- `TOKEN_404`: The token provided is invalid.
+- `GENERAL_INVALID_JSON`: The request is not valid JSON.
+- `AUTH_FULLNAME_REQUIRED`: A full name is required to register. This is for others to identify you.
+- `AUTH_EMAIL_DOES_NOT_EXIST`: A user with that account does not exist.
+- `AUTH_EMAIL_REQUIRED`: An email address is required to register. This is your username.
+- `AUTH_INVALID_EMAIL`: The email address provided is invalid.
+- `ALREADY_REGISTERED`: the account has already been confirmed and registered
+
+</details>
+
+<details>
 <summary>users.login</summary>
 <br>
 
@@ -84,6 +162,84 @@ fullname varies across countries, where some consider middle name, etc.
 - `AUTH_PASSWORD_REQUIRED`: A password is required to register
 - `AUTH_INCORRECT_PASSWORD`: An incorrect password was provided for this email address.
 - `AUTH_PASSWORD_LENGTH`: The password must be at least 12 characters long
+</details>
+
+<details>
+<summary>users.login.withToken.show</summary>
+<br>
+
+`GET: /api/auth/login/<token>/`
+  
+> Provides the API consumer with metadata associated with the token, namely the associated users Full Name and Email.
+
+**Arguments**
+
+- `token`: a valid `TimedSerializer` url token.
+
+**Returns:**
+
+```json
+  {
+    "fullname": "Jay Rainey",
+    "email": "jay@jawrainey.me"
+  }
+```
+
+**Errors**
+
+- `TOKEN_EXPIRED`: The token provided has expired; default length is one week.
+- `TOKEN_404`: The token provided is invalid.
+
+</details>
+
+<details>
+<summary>users.login.withToken.create</summary>
+<br>
+
+`PUT: /api/auth/login/<token>/`
+  
+> When a user receives a membership invite to a project, they may have received that to a different email address
+to their main one (such as their work address); this lets users login using a different email, which is then
+associated with the project_id of the membership invite embedded within the token.
+
+**Arguments**
+
+- `email`: must be an email address of a known user
+- `password`: the password for their account.
+
+**Returns:**
+
+The user object:
+
+```json
+{
+        "tokens": {
+            "access": "",
+            "refresh": ""
+        },
+        "user": {
+            "created_on": "14-Mar-2018",
+            "email": "hello@me.com",
+            "fullname": "Jay Rainey",
+            "id": 102,
+            "registered": false,
+            "updated_on": "14-Mar-2018"
+        }
+    }
+```
+
+**Errors**
+
+- `TOKEN_EXPIRED`: The token provided has expired; default length is one week.
+- `TOKEN_404`: The token provided is invalid.
+- `GENERAL_INVALID_JSON`: The request is not valid JSON.
+- `AUTH_INCORRECT_PASSWORD`: The password you provided for that email is invalid.
+- `AUTH_EMAIL_EXISTS`: A user with that account does not exist.
+- `AUTH_EMAIL_REQUIRED`: An email address is required to register. This is your username.
+- `AUTH_INVALID_EMAIL`: The email address provided is invalid.
+- `AUTH_PASSWORD_REQUIRED`: A password is required to register
+- `AUTH_INCORRECT_PASSWORD`: An incorrect password was provided for this email address.
+
 </details>
 
 <details>
