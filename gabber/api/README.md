@@ -343,7 +343,7 @@ The same format as `/projects/`, but for the individual project the user just cr
 
 </details>
 
-### Project (individual project)
+### Project
 
 <details>
 <summary>projects.show</summary>
@@ -956,7 +956,7 @@ removed.
 
 </details>
 
-## Comments on an Annotation
+## Comments
 
 <details>
 <summary>projects.sessions.annotations.comments.create</summary>
