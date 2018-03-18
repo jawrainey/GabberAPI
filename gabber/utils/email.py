@@ -4,55 +4,85 @@ All emails send through sendgrid on behalf of Gabber through user-actions.
 """
 import os
 import sendgrid
-from sendgrid.helpers.mail import Email, Content, Mail
+from sendgrid.helpers.mail import Email, Content, Mail, Substitution
 from gabber import app
 
-
-def send_email(receiver, subject, content, sender="noreply@gabber.audio"):
-    _sendgrid = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY', 'secret'))
-    mail = Mail(
-      from_email=Email(email=sender, name="Gabber"),
-      subject=subject,
-      content=Content("text/plain", content),
-      to_email=Email(receiver)
-    )
-    _sendgrid.client.mail.send.post(request_body=mail.get())
+SEND_GRID = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY', ''))
 
 
-def welcome_after_account_creation(email):
-    send_email(receiver=email, subject="Welcome to Gabber", content="You can create an account using this magic URL")
+def __construct_email(receiver, subject):
+    return Mail(
+        from_email=Email(email="noreply@gabber.audio", name="Gabber"),
+        to_email=Email(receiver),
+        subject=subject,
+        content=Content("text/html", "."))
 
 
-def send_welcome_after_registration(email):
-    send_email(receiver=email, subject="Welcome to Gabber", content="Welcome")
+def __send_email(mail):
+    try:
+        SEND_GRID.client.mail.send.post(request_body=mail.get())
+    except Exception as e:
+        print("TODO: log details of error %s" % e)
+
+
+def send_email_message(receiver, data):
+    mail = __construct_email(receiver, data['subject'])
+    mail.personalizations[0].add_substitution(Substitution("{{name}}", data['name']))
+    mail.personalizations[0].add_substitution(Substitution("{{main}}", data['body']))
+    mail.template_id = "2e018c30-0b95-4abe-a8d0-ba9148ac5dd3"
+    __send_email(mail)
+
+
+def send_email_action(receiver, data):
+    mail = __construct_email(receiver, data['subject'])
+    mail.personalizations[0].add_substitution(Substitution("{{name}}", data['name']))
+    mail.personalizations[0].add_substitution(Substitution("{{top_body}}", data['top_body']))
+    mail.personalizations[0].add_substitution(Substitution("{{button_url}}", data['button_url']))
+    mail.personalizations[0].add_substitution(Substitution("{{button_label}}", data['button_label']))
+    mail.personalizations[0].add_substitution(Substitution("{{bottom_body}}", data['bottom_body']))
+    mail.template_id = "63ccd557-7e50-4447-9c38-c52646b6fe8a"
+    __send_email(mail)
+
+
+def send_welcome_after_registration(user):
+    data = dict(subject="Welcome to Gabber, what's next?", name=user.fullname)
+    data['body'] = 'Thanks for registering ... TODO: content/images to describe Gabber process.'
+    send_email_message(user.email, data)
 
 
 def request_consent(participants, project):
     from gabber.users.models import User
+
+    subject = "Provide Consent to your Gabber recording"
+    content = "Thanks for taking part in a Gabber on the project %s. " \
+              "<br><br>" \
+              "You can now review the content and provide consent <TODO:URL>" % project.title
+    bottom_body = "You can create an account using this magic URL <URL>"
+
     # Email each client to request individual consent on the recorded session.
     for participant in participants:
         user = User.query.filter_by(email=participant['Email']).first()
-        subject = "Share your Gabber session by providing consent"
-        content = "Thanks for taking part in a Gabber on the project %s." % project.title
-        if not user.registered:
-            content = "You can create an account using this magic URL <url>"
-        send_email(receiver=user.email, subject=subject, content=content)
+        send_email_action(user.email, dict(
+            subject=subject,
+            name=user.fullname,
+            top_body=content,
+            button_url='/',
+            button_label='Provide Consent',
+            bottom_body=bottom_body if not user.registered else ''))
 
 
-def send_forgot_password(email, url):
-    send_email(receiver=email, subject="Gabber password reset", content=url)
-
-
-def send_password_changed(email):
-    send_email(receiver=email, subject="Gabber password successfully updated", content="Password successfully updated")
-
-
-def send_project_member_joined(user, project):
-    send_email(receiver=user.email, subject="Welcome to %s on Gabber" % project.title, content="Sorry that you left")
-
-
-def send_project_member_left(user, project):
-    send_email(receiver=user.email, subject="Gabber: sorry you left %s" % project.title, content="Sorry that you left")
+def send_forgot_password(user, url):
+    data = dict()
+    data['subject'] = "Gabber password reset"
+    data['name'] = user.fullname
+    data['top_body'] = "You recently requested to reset your password for your Gabber account. " \
+                       "Click the button below to reset your it:"
+    data['button_url'] = url
+    data['button_label'] = "Reset your password"
+    data['bottom_body'] = "If you did not request a password reset, " \
+                          "then please ignore this email or contact us and let us know. " \
+                          "This password reset is only valid for the next 30 minutes."
+    send_email_action(user.email, data)
 
 
 def send_project_member_invite_registered_user(admin, user, project):
@@ -63,16 +93,14 @@ def send_project_member_invite_registered_user(admin, user, project):
     :param user: The User model object for the user to email.
     :param project: The User model object for the user to email.
     """
-    # TODO: temporary content; will change once templates on sendgrid are used.
-
     url = app.config['WEB_HOST'] + '/projects/' + project.id + '/'
-
+    subject = '%s invited you to join the project "%s" on Gabber' % (admin.fullname, project.title)
     content = "Hi %s, Let's listen and annotate! " \
               "%s invites you to join the project: %s. " \
               "Login to view the project: %s" \
               % (user.fullname, admin.fullname, project.title, url)
-    subject = '%s invited you to join the project "%s" on Gabber' % (admin.fullname, project.title)
-    send_email(receiver=user.email, subject=subject, content=content)
+
+    send_email_action(user.email, dict(subject=subject, body=content))
 
 
 def send_project_member_invite_unregistered_user(admin, user, project):
@@ -80,16 +108,23 @@ def send_project_member_invite_unregistered_user(admin, user, project):
     The user exists (i.e. participated in a session) or was created above before sending the email
     """
     from gabber.api.auth import RegisterInvitedUser
+
     token_register_url = RegisterInvitedUser.generate_url(user.fullname, user.email, project.id, 'register')
     token_login_url = RegisterInvitedUser.generate_url(user.fullname, user.email, project.id, 'login')
 
-    send_email(
-        receiver=user.email,
-        subject='%s invited you to join the project "%s" on Gabber' % (admin.fullname, project.title),
-        content="Let's listen and annotate! %s invites you to join the project: %s "
-                "HOWEVER, if you already have an account with us, then login: %s" %
-                (admin.fullname, token_register_url, token_login_url),
-    )
+    data = dict()
+    data['subject'] = '%s invited you to join the project %s on Gabber' % (admin.fullname, project.title)
+    data['name'] = user.fullname
+    data['top_body'] = "%s invites you to join the project <b>%s</b>.</br>" \
+                       "Register by clicking the button below and the account you create will be part of the project " \
+                       "where you can begin listening to and annotating Gabbers." \
+                       "" % (admin.fullname, project.title)
+    data['button_url'] = token_register_url
+    data['button_label'] = "Join the project"
+    data['bottom_body'] = 'If you already have a Gabber account, ' \
+                          'then login using <a href="%s">this url</a>.' % token_login_url
+
+    send_email_action(user.email, data)
 
 
 def send_project_member_removal(admin, user, project):
@@ -97,8 +132,9 @@ def send_project_member_removal(admin, user, project):
     Once a user has been removed from a project they're notified
     (1) when (time), (2) where (project) and (3) who (admin) performed the action.
     """
-    send_email(
-        receiver=user.email,
-        subject="%s removed you from %s on Gabber" % (admin.fullname, project.title),
-        content="There are %s other projects that you can annotate and get involved with."
-    )
+    data = dict()
+    data['subject'] = "%s removed you from %s on Gabber" % (admin.fullname, project.title),
+    data['name'] = user.fullname
+    data['body'] = "There are %s other projects that you can annotate and get involved with."
+    send_email_message(user.email, data)
+

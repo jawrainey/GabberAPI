@@ -65,7 +65,7 @@ class ForgotPassword(Resource):
         db.session.commit()
 
         url = app.config['WEB_HOST'] + '/reset/' + token
-        email_client.send_forgot_password(email, url)
+        email_client.send_forgot_password(user, url)
         return custom_response(200)
 
 
@@ -185,7 +185,7 @@ class RegisterInvitedUser(Resource):
             member.confirmed = True
 
         db.session.commit()
-        email_client.send_welcome_after_registration(data['email'])
+        email_client.send_welcome_after_registration(user)
         return custom_response(201, data=create_jwt_access(data['email']))
 
     @staticmethod
@@ -197,7 +197,7 @@ class RegisterInvitedUser(Resource):
         properties = {'fullname': user_fullname, 'email': user_email, 'project_id': project_id}
         token = URLSafeTimedSerializer(app.config["SECRET_KEY"]).dumps(properties, app.config['SALT'])
         # Do not store tokens as (1) when the user registers we have confirmation of that, and (2) token expires.
-        return url_for('api.%s' % url, token=token, _external=True)
+        return app.config['WEB_HOST'] + '/' + url + '/' + token
 
     @staticmethod
     def validate_token(token):
@@ -226,9 +226,10 @@ class UserRegistration(Resource):
         """
         data = helpers.jsonify_request_or_abort()
         helpers.abort_if_errors_in_validation(AuthRegisterSchema().validate(data))
-        db.session.add(User(fullname=data['fullname'], email=data['email'], password=data['password'], registered=True))
+        user = User(fullname=data['fullname'], email=data['email'], password=data['password'], registered=True)
+        db.session.add(user)
         db.session.commit()
-        email_client.send_welcome_after_registration(data['email'])
+        email_client.send_welcome_after_registration(user)
         return custom_response(201, data=create_jwt_access(data['email']))
 
 

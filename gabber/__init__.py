@@ -102,7 +102,7 @@ app.register_blueprint(project, url_prefix='/project/')
 from gabber.consent.views import consent
 app.register_blueprint(consent, url_prefix='/')
 
-from gabber.utils import logging
+from gabber.utils import logging, email
 
 # Model meta-data required to create db correctly
 db.create_all()

@@ -49,7 +49,6 @@ class User(UserMixin, db.Model):
         user = User(fullname, email, uuid4().hex)
         db.session.add(user)
         db.session.commit()
-        email_client.welcome_after_account_creation(email)
         return user
 
     def set_password(self, plaintext):

@@ -18,12 +18,15 @@ import gabber.utils.email as email_client
 
 class ProjectInvites(Resource):
     @jwt_required
-    def post(self, pid):
+    def post(self, pid, mid=None):
         """
         An administrator or staff member of a project invited a user
 
-        Mapped to: /api/project/<int:id>/membership/invites/
+        Mapped to: /api/projects/<int:id>/membership/invites/
         """
+        if mid:
+            raise CustomException(400, errors=['MEMBERSHIP_ID_NOT_REQUIRED'])
+
         admin, data = self.validate_and_get_data(pid)
         helpers.abort_if_errors_in_validation(AddMemberSchema().validate(data))
         user = User.query.filter_by(email=data['email']).first()
@@ -48,17 +51,21 @@ class ProjectInvites(Resource):
         return custom_response(200, data=ProjectMember().dump(membership))
 
     @jwt_required
-    def delete(self, pid, mid):
+    def delete(self, pid, mid=None):
         """
         Removes a user and emails them that they have been removed from a project and by whom.
 
         Mapped to: /api/project/<int:id>/membership/invites/<int:mid>
         """
+        if not mid:
+            raise CustomException(400, errors=['MEMBERSHIP_ID_NOT_PROVIDED'])
+
         helpers.abort_if_unauthorized(Project.query.get(pid))
         admin = User.query.filter_by(email=get_jwt_identity()).first()
         helpers.abort_if_unknown_user(admin)
         helpers.abort_if_not_admin_or_staff(admin, pid, "INVITE_MEMBER")
         membership = Membership.query.filter_by(id=mid).first()
+
         if not membership:
             raise CustomException(400, errors=['UNKNOWN_MEMBERSHIP'])
         elif membership.deactivated:
@@ -94,7 +101,6 @@ class ProjectMembership(Resource):
         user = helpers.abort_if_unauthorized(project)
         helpers.abort_if_project_member(user, pid)
         membership = Membership.join_project(user.id, pid)
-        email_client.send_project_member_joined(user, project)
         return custom_response(200, data=ProjectMember().dump(membership))
 
     @jwt_required
@@ -106,6 +112,5 @@ class ProjectMembership(Resource):
         user = helpers.abort_if_unauthorized(project)
         if not user.is_project_member(pid):
             helpers.abort_if_not_project_member(user, pid)
-        email_client.send_project_member_left(user, project)
         membership = Membership.leave_project(user.id, pid)
         return custom_response(200, data=ProjectMember().dump(membership))
