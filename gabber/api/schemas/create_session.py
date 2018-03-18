@@ -29,7 +29,7 @@ class RecordingAnnotationSchema(ma.Schema):
 
     @validates_schema
     def validate_region_range(self, data):
-        if data['Start'] >= data['End']:
+        if data['Start'] > data['End']:
             raise ValidationError('The start interval is greater than the end for topic (%s).' % data['PromptID'])
 
     class Meta:
