@@ -93,7 +93,7 @@ class ResetPassword(Resource):
         db.session.add(user)
         db.session.commit()
 
-        email_client.send_password_changed(email)
+        #email_client.send_password_changed(email)
         return custom_response(201, data=create_jwt_access(email))
 
     @staticmethod

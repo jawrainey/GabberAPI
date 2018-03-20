@@ -34,6 +34,24 @@ ma = Marshmallow(app)
 mail = Mail(app)
 migrate = Migrate(app, db)
 
+from gabber.utils import logging, email, general
+
+
+@jwt.expired_token_loader
+def my_expired_token_callback(callback):
+    return general.custom_response(400, errors=['TOKEN_EXPIRED'])
+
+
+@jwt.invalid_token_loader
+def invalid_token_loader(callback):
+    return general.custom_response(400, errors=['TOKEN_INVALID'])
+
+
+@jwt.unauthorized_loader
+def unauthorized(callback):
+    return general.custom_response(400, errors=['TOKEN_UNAUTHORIZED'])
+
+
 from gabber.api.projects import Projects
 from gabber.api.project import Project
 from gabber.api.membership import ProjectMembership, ProjectInvites
@@ -102,16 +120,12 @@ app.register_blueprint(project, url_prefix='/project/')
 from gabber.consent.views import consent
 app.register_blueprint(consent, url_prefix='/')
 
-from gabber.utils import logging, email
-
 # Model meta-data required to create db correctly
 db.create_all()
 
 from gabber.users.models import Anonymous
 login_manager.anonymous_user = Anonymous
 
-
-import gabber.utils.general
 
 @app.errorhandler(Exception)
 def exceptions(error):
