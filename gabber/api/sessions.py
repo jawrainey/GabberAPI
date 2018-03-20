@@ -7,7 +7,7 @@ from uuid import uuid4
 import gabber.api.helpers as helpers
 from marshmallow import ValidationError
 from gabber.api.schemas.create_session import ParticipantScheme, RecordingAnnotationSchema
-from gabber.api.schemas.session import RecordingSessionSchema
+from gabber.api.schemas.session import RecordingSessionsSchema
 from gabber.api.schemas.helpers import is_not_empty
 import json
 from gabber.utils.general import custom_response
@@ -31,7 +31,7 @@ class ProjectSessions(Resource):
 
         if project.is_public:
             sessions = InterviewSession.query.filter_by(project_id=pid).all()
-            return custom_response(200, data=RecordingSessionSchema(many=True).dump(sessions))
+            return custom_response(200, data=RecordingSessionsSchema(many=True).dump(sessions))
 
         current_user = get_jwt_identity()
         user = User.query.filter_by(email=current_user).first()
@@ -40,7 +40,7 @@ class ProjectSessions(Resource):
 
         if current_user:
             sessions = InterviewSession.query.filter_by(project_id=pid).all()
-            return custom_response(200, data=RecordingSessionSchema(many=True).dump(sessions))
+            return custom_response(200, data=RecordingSessionsSchema(many=True).dump(sessions))
 
     @jwt_required
     def post(self, pid):

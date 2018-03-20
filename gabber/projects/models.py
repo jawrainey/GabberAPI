@@ -317,12 +317,12 @@ class InterviewSession(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     created_on = db.Column(db.DateTime, default=db.func.now())
 
-    prompts = db.relationship('InterviewPrompts', backref='interview', lazy='dynamic')
-    participants = db.relationship('InterviewParticipants', backref='interview', lazy='dynamic')
+    prompts = db.relationship('InterviewPrompts', backref='interview', lazy='joined')
+    participants = db.relationship('InterviewParticipants', backref='interview', lazy='joined')
     connections = db.relationship(
         'Connection',
         backref='interview',
-        lazy='dynamic',
+        lazy='joined',
         primaryjoin="and_(InterviewSession.id==Connection.session_id, Connection.is_active)"
     )
 
@@ -337,14 +337,6 @@ class InterviewSession(db.Model):
         # e.g. something similar to consent.helper.consented
         return amazon.signed_url(str(self.project_id) + "/" + str(self.id))
 
-    def creator(self):
-        """
-        ??
-
-        :returns ??
-        """
-        from gabber.users.models import User
-        return User.query.get(self.creator_id)
 
     def project(self):
         """
@@ -398,8 +390,7 @@ class InterviewPrompts(db.Model):
     start_interval = db.Column(db.Integer)
     end_interval = db.Column(db.Integer, default=0)
 
-    def topic(self):
-        return ProjectPrompt.query.get(self.prompt_id).text_prompt.encode('utf-8')
+    topic = db.relationship("ProjectPrompt", lazy='joined')
 
     def serialize(self):
         """
@@ -443,6 +434,8 @@ class InterviewParticipants(db.Model):
     # Although this could be inferred through interview.creator, this simplifies queries
     role = db.Column(db.Boolean, default=False)
 
+    user = db.relationship("User", back_populates="participant_of")
+
     def __init__(self, user_id, session_id, role):
         self.user_id = user_id
         self.interview_id = session_id
@@ -482,7 +475,7 @@ class Connection(db.Model):
 
     # A connection can be associated with many codes
     tags = db.relationship("Code", secondary=codes_for_connections, backref="connections")
-    comments = db.relationship('ConnectionComments', backref='connection', lazy='dynamic')
+    comments = db.relationship('ConnectionComments', backref='connection', lazy='joined')
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     session_id = db.Column(db.String(260), db.ForeignKey('interview_session.id'))

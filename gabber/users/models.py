@@ -31,6 +31,7 @@ class User(UserMixin, db.Model):
     # this is changed so that we can identify between registers/unregistered users.
     registered = db.Column(db.Boolean, default=False)
 
+    participant_of = db.relationship("InterviewParticipants", lazy='joined')
     member_of = db.relationship("Membership", back_populates="user", lazy='dynamic')
     connections = db.relationship('Connection', backref='user', lazy='dynamic')
     connection_comments = db.relationship('ConnectionComments', backref='user', lazy='dynamic')

@@ -1,15 +1,10 @@
-from gabber.projects.models import InterviewSession, InterviewParticipants, Connection, InterviewPrompts, ProjectPrompt
-from gabber.users.models import User
+from gabber.projects.models import InterviewSession, InterviewParticipants, Connection, InterviewPrompts
 from gabber import ma
 
 
 class RecordingTopicSchema(ma.ModelSchema):
     topic_id = ma.Int(attribute="prompt_id")
-    text = ma.Method('_topic')
-
-    @staticmethod
-    def _topic(data):
-        return ProjectPrompt.query.get(data.prompt_id).text_prompt
+    text = ma.String(attribute='topic.text_prompt')
 
     class Meta:
         model = InterviewPrompts
@@ -18,39 +13,34 @@ class RecordingTopicSchema(ma.ModelSchema):
 
 
 class RecordingParticipantsSchema(ma.ModelSchema):
-    user_id = ma.Function(lambda obj: User.query.get(obj.user_id).id)
-    fullname = ma.Function(lambda obj: User.query.get(obj.user_id).fullname)
-    # NOTE/TODO: not sure how best to represent the role of a participant in a Gabber
-    role = ma.Function(lambda obj: "interviewer" if obj.role else "interviewee")
+    user_id = ma.String(attribute='user.id')
+    fullname = ma.String(attribute='user.fullname')
+    role = ma.String(attribute='role_type')
 
     class Meta:
         model = InterviewParticipants
-        exclude = ['id', 'interview', 'consent_type']
+        exclude = ['id', 'interview', 'consent_type', 'user']
 
 
 class SessionAnnotationSchema(ma.ModelSchema):
-    user_id = ma.Function(lambda annotation: annotation.user_id)
-    session_id = ma.Function(lambda annotation: annotation.session_id)
+    user_id = ma.String(attribute='annotation.user_id')
+    session_id = ma.String(attribute='annotation.session_id')
 
     class Meta:
         model = Connection
         exclude = ['user', 'interview']
 
 
-class RecordingSessionSchema(ma.ModelSchema):
+class RecordingSessionsSchema(ma.ModelSchema):
     topics = ma.Nested(RecordingTopicSchema, many=True, attribute="prompts")
     participants = ma.Nested(RecordingParticipantsSchema, many=True, attribute="participants")
-    user_annotations = ma.Nested(SessionAnnotationSchema, many=True, attribute="connections")
-    audio_url = ma.Function(lambda s: s.generate_signed_url_for_recording())
-    creator = ma.Method("_creator")
-
-    @staticmethod
-    def _creator(data):
-        # TODO: method is the same as ProjectSchema
-        user = User.query.get(data.creator_id)
-        return {'user_id': user.id, 'fullname': user.fullname}
+    num_user_annotations = ma.Function(lambda data: len(data.connections))
 
     class Meta:
         model = InterviewSession
         include_fk = True
         exclude = ['prompts', 'creator_id', 'connections']
+
+
+class RecordingSessionSchema(RecordingSessionsSchema):
+    audio_url = ma.Function(lambda s: s.generate_signed_url_for_recording())
