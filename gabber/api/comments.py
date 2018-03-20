@@ -50,7 +50,7 @@ class CommentsReplies(Resource):
     """
     Read all the children (i.e. replies) of a parent comment.
 
-    Mapped to: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/children/
+    Mapped to: /api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/replies/
     """
     @staticmethod
     @jwt_optional
@@ -59,8 +59,6 @@ class CommentsReplies(Resource):
         READ a comment an session annotation
         """
         helpers.abort_if_invalid_parameters(pid, sid)
-        helpers.abort_if_unauthorized(Project.query.get(pid))
-        helpers.abort_if_unknown_comment(cid, aid)
         children = CommentsModel.query.filter_by(parent_id=cid).all()
         return custom_response(200, data=UserAnnotationCommentSchema(many=True).dump(children))
 

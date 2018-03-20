@@ -475,7 +475,12 @@ class Connection(db.Model):
 
     # A connection can be associated with many codes
     tags = db.relationship("Code", secondary=codes_for_connections, backref="connections")
-    comments = db.relationship('ConnectionComments', backref='connection', lazy='joined')
+    comments = db.relationship(
+        'ConnectionComments',
+        backref='connection',
+        lazy='joined',
+        primaryjoin='and_(Connection.id==ConnectionComments.connection_id, ConnectionComments.parent_id == None)'
+    )
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     session_id = db.Column(db.String(260), db.ForeignKey('interview_session.id'))
@@ -534,8 +539,6 @@ class ConnectionComments(db.Model):
         A comment can refer to the connection its associated with via 'connection'
     """
     __tablename__ = 'connection_comments'
-    
-    query_class = QueryWithSoftDelete
 
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(1024), default=None)

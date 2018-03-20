@@ -16,15 +16,19 @@ class UserAnnotationTagSchema(ma.ModelSchema):
 
 class UserAnnotationCommentSchema(ma.ModelSchema):
     creator = ma.Method("_creator")
-    parent_id = ma.Function(lambda data: data.parent_id)
-    annotation_id = ma.Function(lambda data: data.connection.id)
-    session_id = ma.Function(lambda data: data.connection.session_id)
+    content = ma.Method("_content")
+    annotation_id = ma.Int(attribute='data.connection.id')
+    session_id = ma.Int(attribute='data.connection.session_id')
     replies = ma.Method("_replies")
+
+    @staticmethod
+    def _content(data):
+        return data.content if data.is_active else '[deleted]'
 
     @staticmethod
     def _replies(data):
         # TODO: this should be performed on the Model side, but due to self-ref nature is different.
-        return [i.id for i in data.replies.all() if i.is_active and i.id != data.id]
+        return [i.id for i in data.replies.all()]
 
     @staticmethod
     def _creator(data):
