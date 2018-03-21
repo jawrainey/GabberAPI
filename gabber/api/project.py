@@ -88,6 +88,6 @@ class Project(Resource):
         helpers.abort_on_unknown_project_id(pid)
         user = User.query.filter_by(email=get_jwt_identity()).first()
         helpers.abort_if_unknown_user(user)
-        helpers.abort_if_not_admin_or_staff(user, pid, action="DELETE")
+        helpers.abort_if_not_admin_or_staff(user, pid, action="PROJECT.DELETE")
         ProjectModel.query.filter_by(id=pid).update({'is_active': False})
         return custom_response(200)

@@ -132,7 +132,7 @@ The user object:
 - `AUTH_EMAIL_DOES_NOT_EXIST`: A user with that account does not exist.
 - `AUTH_EMAIL_REQUIRED`: An email address is required to register. This is your username.
 - `AUTH_INVALID_EMAIL`: The email address provided is invalid.
-- `ALREADY_REGISTERED`: the account has already been confirmed and registered
+- `AUTH_ALREADY_REGISTERED`: the account has already been confirmed and registered
 
 </details>
 
@@ -287,7 +287,6 @@ N/A, but a JWT must be provided.
 - `AUTH_EMAIL_KEY_REQUIRED`: The attribute `email` is required in your request body.
 - `AUTH_EMAIL_IS_EMPTY`: The attribute `email` must not be empty.
 - `AUTH_EMAIL_IS_NOT_STRING`: The attribute `email` must be a string.
-- `ISSUE_SENDING_EMAIL`: An error occurred when trying to send the email. If this continues, please get in touch.
 
 </details>
 
@@ -602,7 +601,7 @@ it overrides all existing topics for the project; `text` and `is_active` is requ
 
 - `ID_404`: The project ID provided in the request does not match the resource endpoint.
 - `UNAUTHORIZED`: You do not have the permission to edit this project.
-- `USER_404`: No user for the creator ID provided in the request exists.
+- `USER_NOT_FOUND`: No user for the creator ID provided in the request exists.
 - `TITLE_EXISTS`: There already exists a project with that title; titles must be unique.
 - `PROJECTS_PRIVACY_INVALID`: The value for the privacy parameter is invalid, which must be private or public.
 - `TOPICS_IS_NOT_DICT`: The value for the topics parameter must be a string.
@@ -1073,18 +1072,18 @@ removed.
 - `GENERAL_UNKNOWN_JWT_USER`: ??
 - `PROJECT_UNAUTHORIZED`: ??
 - `GENERAL_INVALID_JSON`: ??
-- `CONTENT_REQUIRED`: ??
-- `CONTENT_IS_NOT_STRING`: ??
-- `CONTENT_IS_EMPTY`: ??
-- `START_INTERVAL_REQUIRED`: ??
-- `START_INTERVAL_IS_NOT_INT`: ??
-- `START_INTERVAL_MUST_BE_POSITIVE_INT`: ??
-- `END_INTERVAL_REQUIRED`: ??
-- `END_INTERVAL_IS_NOT_INT`: ??
-- `END_INTERVAL_MUST_BE_POSITIVE_INT`: ??
-- `START_BEFORE_END`: ??
-- `TAGS_IS_NOT_LIST`: ??
-- `TAG_IS_NOT_INT`: ??
+- `ANNOTATIONS_CONTENT_REQUIRED`: ??
+- `ANNOTATIONS_CONTENT_IS_NOT_STRING`: ??
+- `ANNOTATIONS_CONTENT_IS_EMPTY`: ??
+- `ANNOTATIONS_START_INTERVAL_REQUIRED`: ??
+- `ANNOTATIONS_START_INTERVAL_IS_NOT_INT`: ??
+- `ANNOTATIONS_START_INTERVAL_MUST_BE_POSITIVE_INT`: ??
+- `ANNOTATIONS_END_INTERVAL_REQUIRED`: ??
+- `ANNOTATIONS_END_INTERVAL_IS_NOT_INT`: ??
+- `ANNOTATIONS_END_INTERVAL_MUST_BE_POSITIVE_INT`: ??
+- `ANNOTATIONS_START_BEFORE_END`: ??
+- `ANNOTATIONS_TAGS_IS_NOT_LIST`: ??
+- `ANNOTATIONS_TAG_IS_NOT_INT`: ??
 
 </details>
 
@@ -1107,7 +1106,7 @@ removed.
 - `SESSION_NOT_IN_PROJECT`: ??
 - `GENERAL_UNKNOWN_JWT_USER` ??
 - `PROJECT_UNAUTHORIZED`: ??
-- `ANNOTATION_404`: ??
+- `ANNOTATIONS_NOT_FOUND`: ??
 - `NOT_ANNOTATION_CREATOR`: ??
 
 </details>

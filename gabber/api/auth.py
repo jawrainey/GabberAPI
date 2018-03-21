@@ -120,10 +120,10 @@ class ResetPassword(Resource):
                 reset_token.is_active = False
                 db.session.commit()
             # The token expired and tried to be used again, so we must expire it.
-            raise CustomException(400, errors=['TOKEN_EXPIRED'])
+            raise CustomException(400, errors=['RESET_TOKEN_EXPIRED'])
         except BadSignature:
             # All other potential errors, such as SECRET/SALTs not being set.
-            raise CustomException(400, errors=['TOKEN_404'])
+            raise CustomException(400, errors=['RESET_TOKEN_404'])
         return email
 
 
@@ -175,7 +175,7 @@ class RegisterInvitedUser(Resource):
 
         user = User.query.filter_by(email=data['email']).first()
         if user.registered:
-            return custom_response(400, errors=['ALREADY_REGISTERED'])
+            return custom_response(400, errors=['AUTH_ALREADY_REGISTERED'])
         user.fullname = data['fullname']
         user.email = data['email']
         user.set_password(data['password'])

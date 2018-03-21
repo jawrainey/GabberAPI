@@ -38,18 +38,18 @@ from gabber.utils import logging, email, general
 
 
 @jwt.expired_token_loader
-def my_expired_token_callback(callback):
-    return general.custom_response(400, errors=['TOKEN_EXPIRED'])
+def jwt_expired(callback):
+    return general.custom_response(400, errors=['EXPIRED'])
 
 
 @jwt.invalid_token_loader
-def invalid_token_loader(callback):
-    return general.custom_response(400, errors=['TOKEN_INVALID'])
+def jwt_invalid(callback):
+    return general.custom_response(400, errors=['INVALID'])
 
 
 @jwt.unauthorized_loader
-def unauthorized(callback):
-    return general.custom_response(400, errors=['TOKEN_UNAUTHORIZED'])
+def jwt_unauthorized(callback):
+    return general.custom_response(400, errors=['UNAUTHORIZED'])
 
 
 from gabber.api.projects import Projects

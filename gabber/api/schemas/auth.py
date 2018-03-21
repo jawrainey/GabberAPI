@@ -13,7 +13,7 @@ def validate_email(email, errors):
         # but catch, suppress and log the error to our custom error list. Neat.
         validate.Email().__call__(email)
     except ValidationError:
-        errors.append("INVALID_EMAIL")
+        errors.append("EMAIL_INVALID")
 
 
 def known_users():

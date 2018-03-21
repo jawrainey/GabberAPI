@@ -152,7 +152,7 @@ class ProjectModelSchema(ma.ModelSchema):
         pid_valid = validator.validate('id', 'int', data)
 
         if pid_valid and data['id'] not in [p.id for p in Project.query.with_deleted().all()]:
-            validator.errors.append("ID_404")
+            validator.errors.append("PROJECT_ID_NOT_FOUND")
             pid_valid = False
 
         # This must be a known user, and must be a member of this project
@@ -164,7 +164,7 @@ class ProjectModelSchema(ma.ModelSchema):
                 if data['creator'] != Project.query.get(data['id']).creator:
                     validator.errors.append("UNAUTHORIZED")
             else:
-                validator.errors.append("USER_404")
+                validator.errors.append("USER_NOT_FOUND")
 
         title_valid = validator.validate('title', 'str', data)
         title_as_slug = slugify(data['title'])

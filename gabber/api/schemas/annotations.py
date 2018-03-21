@@ -40,7 +40,7 @@ class UserAnnotationCommentSchema(ma.ModelSchema):
 
     @pre_load()
     def __validate(self, data):
-        validator = HelperSchemaValidator('USER_COMMENT')
+        validator = HelperSchemaValidator('COMMENTS')
         validator.validate('content', 'str', data)
         validate_length(data.get('content'), 1024, 'content', validator)
         validator.raise_if_errors()
@@ -80,7 +80,7 @@ class UserAnnotationSchema(ma.ModelSchema):
 
     @pre_load()
     def __validate(self, data):
-        validator = HelperSchemaValidator('USER_ANNOTATIONS')
+        validator = HelperSchemaValidator('ANNOTATIONS')
 
         validator.validate('content', 'str', data)
         validate_length(data.get('content'), 1024, 'CONTENT', validator)

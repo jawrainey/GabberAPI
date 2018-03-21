@@ -8,7 +8,7 @@ from flask_jwt_extended import get_jwt_identity
 def abort_if_not_admin_or_staff(user, project_id, action="UPDATE"):
     role = user.role_for_project(project_id)
     if not role or role == 'user':
-        raise CustomException(403, errors=[('PROJECT_%s_UNAUTHORIZED' % action)])
+        raise CustomException(403, errors=[('%s_UNAUTHORIZED' % action)])
 
 
 def abort_on_unknown_project_id(pid):
@@ -28,12 +28,12 @@ def abort_if_not_a_member_and_private(user, project):
 
 def abort_if_not_project_member(user, project_id):
     if not user.is_project_member(project_id):
-        raise CustomException(401, errors=['USER_NOT_PROJECT_MEMBER'])
+        raise CustomException(401, errors=['MEMBERSHIP_NOT_EXISTS'])
 
 
 def abort_if_project_member(user, project_id):
     if user.is_project_member(project_id):
-        raise CustomException(401, errors=['ALREADY_MEMBER'])
+        raise CustomException(401, errors=['MEMBERSHIP_EXISTS'])
 
 
 def abort_if_unknown_project(project):
@@ -78,17 +78,17 @@ def abort_if_errors_in_validation(errors):
 
 def abort_if_unknown_annotation(annotation):
     if not annotation:
-        raise CustomException(400, errors=['ANNOTATION_404'])
+        raise CustomException(400, errors=['ANNOTATIONS_NOT_FOUND'])
 
 
 def abort_if_not_user_made(user_id, user_of_annotation):
     if user_id != user_of_annotation:
-        raise CustomException(400, errors=['NOT_ANNOTATION_CREATOR'])
+        raise CustomException(400, errors=['ANNOTATIONS_NOT_CREATOR'])
 
 
 def abort_if_not_user_made_comment(user_id, user_of_comment):
     if user_id != user_of_comment:
-        raise CustomException(400, errors=['NOT_COMMENT_CREATOR'])
+        raise CustomException(400, errors=['COMMENT_NOT_CREATOR'])
 
 
 def abort_if_unauthorized(project):
