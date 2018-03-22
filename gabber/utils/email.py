@@ -44,6 +44,16 @@ def send_email_action(receiver, data):
     __send_email(mail)
 
 
+def send_email_verification(user, token):
+    send_email_action(user.email, dict(
+        subject='Verify your Gabber account',
+        name=user.fullname,
+        top_body='Please verify your account',
+        button_url=(app.config['WEB_HOST'] + '/auth/verify/' + token + '/'),
+        button_label='Verify Email',
+        bottom_body=''))
+
+
 def send_welcome_after_registration(user):
     data = dict(subject="Welcome to Gabber, what's next?", name=user.fullname)
     data['body'] = 'Thanks for registering ... TODO: content/images to describe Gabber process.'

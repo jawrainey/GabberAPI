@@ -30,6 +30,7 @@ class User(UserMixin, db.Model):
     # User accounts are created when participating in a session; once registered,
     # this is changed so that we can identify between registers/unregistered users.
     registered = db.Column(db.Boolean, default=False)
+    verified = db.Column(db.Boolean, default=False)
 
     participant_of = db.relationship("InterviewParticipants", lazy='joined')
     member_of = db.relationship("Membership", back_populates="user", lazy='dynamic')

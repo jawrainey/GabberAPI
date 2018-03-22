@@ -216,6 +216,45 @@ class RegisterInvitedUser(Resource):
         return data
 
 
+class AuthToken:
+    def __init__(self, **kwargs):
+        self.token = URLSafeTimedSerializer(app.config["SECRET_KEY"]).dumps(kwargs, app.config['SALT'])
+
+    @staticmethod
+    def validate_token(token):
+        """
+        Validates that the token used to register an unconfirmed user is time valid.
+        """
+        serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+        try:
+            data = serializer.loads(token, salt=app.config['SALT'], max_age=86400 * 7)  # one week
+        except SignatureExpired:
+            raise CustomException(400, errors=['TOKEN_EXPIRED'])
+        except BadSignature:
+            raise CustomException(400, errors=['TOKEN_404'])
+        return data
+
+
+class VerifyRegistration(Resource):
+    """
+    Mapped to: /api/auth/verify/<token>/
+    """
+    @staticmethod
+    def get(token):
+        """
+        ??
+        """
+        token = AuthToken.validate_token(token)
+        user = User.query.get(token['user_id'])
+        # Rather than storing tokens, check if the user has been verified before
+        if user.verified:
+            return custom_response(201, errors=['ALREADY_VERIFIED'])
+        user.verified = True
+        db.session.commit()
+        email_client.send_welcome_after_registration(user)
+        return custom_response(201, data=create_jwt_access(user.email))
+
+
 class UserRegistration(Resource):
     """
     Mapped to: /api/auth/register/
@@ -230,8 +269,8 @@ class UserRegistration(Resource):
         user = User(fullname=data['fullname'], email=data['email'], password=data['password'], registered=True)
         db.session.add(user)
         db.session.commit()
-        email_client.send_welcome_after_registration(user)
-        return custom_response(201, data=create_jwt_access(data['email']))
+        email_client.send_email_verification(user, AuthToken(user_id=user.id).token)
+        return custom_response(201)
 
 
 class LoginInvitedUser(Resource):

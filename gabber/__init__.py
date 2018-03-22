@@ -76,9 +76,10 @@ restful_api.add_resource(Comment, '/api/projects/<int:pid>/sessions/<string:sid>
 restful_api.add_resource(CommentsReplies, '/api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/replies/')
 
 from gabber.api.auth import TokenRefresh, UserRegistration, UserLogin, ForgotPassword, ResetPassword, UserAsMe
-from gabber.api.auth import LoginInvitedUser, RegisterInvitedUser
+from gabber.api.auth import LoginInvitedUser, RegisterInvitedUser, VerifyRegistration
 restful_api.add_resource(TokenRefresh, '/api/auth/token/refresh/')
 restful_api.add_resource(UserAsMe, '/api/auth/me/')
+restful_api.add_resource(VerifyRegistration, '/api/auth/verify/<string:token>/')
 restful_api.add_resource(UserRegistration, '/api/auth/register/')
 restful_api.add_resource(UserLogin, '/api/auth/login/')
 restful_api.add_resource(ForgotPassword, '/api/auth/forgot/')

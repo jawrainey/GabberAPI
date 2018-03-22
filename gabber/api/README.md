@@ -20,7 +20,7 @@ All requests are returned in the following format where errors contains unique _
 
 `POST: /api/auth/register/`
   
-> Create a new user and returns a JWT
+> Create a new user and emails a user a unique token to verify their account
 
 **Arguments**
 
@@ -28,6 +28,38 @@ All requests are returned in the following format where errors contains unique _
 fullname varies across countries, where some consider middle name, etc.
 - `email`: must be a valid email address and is used to uniquely identify a user.
 - `password`: must be at least 12 characters.
+
+**Returns:**
+
+- Within the custom response: `data` is `null` and `success` is `True`
+
+**Actions:**
+
+- Emails the user a unique token to verify their account.
+
+**Errors**
+
+- `AUTH_INCORRECT_PASSWORD`: The password you provided for that email is invalid.
+- `AUTH_FULLNAME_REQUIRED`: A full name is required to register. This is for others to identify you.
+- `AUTH_EMAIL_DOES_NOT_EXIST`: A user with that account does not exist.
+- `AUTH_EMAIL_REQUIRED`: An email address is required to register. This is your username.
+- `AUTH_INVALID_EMAIL`: The email address provided is invalid.
+- `AUTH_PASSWORD_REQUIRED`: A password is required to register
+- `AUTH_PASSWORD_LENGTH`: The password must be at least 12 characters long
+</details>
+
+<details>
+<summary>users.register.verify</summary>
+<br>
+
+`GET: /api/auth/register/verify/<token>/`
+  
+> A magic URL is sent to the user after registering. Once clicked, the user is verified and the associated
+user object and tokens are returned.
+
+**Arguments**
+
+- N/A
 
 **Returns:**
 
@@ -48,15 +80,16 @@ fullname varies across countries, where some consider middle name, etc.
     }
 ```
 
+**Actions:**
+
+- Emails the user a welcome message.
+
 **Errors**
 
-- `AUTH_INCORRECT_PASSWORD`: The password you provided for that email is invalid.
-- `AUTH_FULLNAME_REQUIRED`: A full name is required to register. This is for others to identify you.
-- `AUTH_EMAIL_DOES_NOT_EXIST`: A user with that account does not exist.
-- `AUTH_EMAIL_REQUIRED`: An email address is required to register. This is your username.
-- `AUTH_INVALID_EMAIL`: The email address provided is invalid.
-- `AUTH_PASSWORD_REQUIRED`: A password is required to register
-- `AUTH_PASSWORD_LENGTH`: The password must be at least 12 characters long
+- `TOKEN_EXPIRED`: The token provided has expired; default length is one week.
+- `TOKEN_404`: The token provided is invalid.
+- `ALREADY_VERIFIED`: The magic URL has already been used to verify the account.
+
 </details>
 
 <details>
