@@ -2,7 +2,7 @@ from gabber import db
 from flask_restful import Resource, reqparse, abort
 from flask_jwt_extended import jwt_required, get_jwt_identity, jwt_optional
 from gabber.projects.models import InterviewSession, InterviewParticipants, InterviewPrompts, Project
-from gabber.users.models import User
+from gabber.users.models import User, SessionConsent
 from uuid import uuid4
 import gabber.api.helpers as helpers
 from marshmallow import ValidationError
@@ -90,8 +90,8 @@ class ProjectSessions(Resource):
 
         db.session.add(interview_session)
         db.session.commit()
-        email_client.request_consent(participants, project)
-        return interview_session.serialize(), 201
+        email_client.request_consent(participants, project, interview_session)
+        return {}, 201
 
     @staticmethod
     def validate_and_serialize(data, message, scheme):

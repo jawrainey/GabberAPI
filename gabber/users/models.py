@@ -14,6 +14,33 @@ class ResetTokens(db.Model):
     is_active = db.Column(db.Boolean, default=True)
 
 
+class SessionConsent(db.Model):
+    """
+    Stores the type of consent provided by a participant for their Gabber,
+    which is used to determine if a Gabber has been consented to be public.
+
+    Type options include:
+        public: anyone can view/listen to the recording
+        private: only members of the project can view/listen to the recording
+        none: no consent was provided
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    # Options include: public, private, none.
+    type = db.Column(db.String(50), default='none')
+    session_id = db.Column(db.String(260), db.ForeignKey('interview_session.id'))
+    participant_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    created_on = db.Column(db.DateTime, default=db.func.now())
+    updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+
+    @staticmethod
+    def create_default_consent(session_id, user_id):
+        consent = SessionConsent(session_id=session_id, participant_id=user_id)
+        db.session.add(consent)
+        db.session.commit()
+        return consent
+
+
 class User(UserMixin, db.Model):
     """
     A registered user of the system

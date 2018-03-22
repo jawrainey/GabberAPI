@@ -210,8 +210,6 @@ class UserLogin(Resource):
         """
         Provide a user with JWT access/refresh tokens to use other aspects of API
         """
-        # If token exists, then get the email from token ...
-        # if the email is different
 
         data = helpers.jsonify_request_or_abort()
         helpers.abort_if_errors_in_validation(AuthLoginSchema().validate(data))

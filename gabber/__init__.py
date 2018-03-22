@@ -57,6 +57,7 @@ from gabber.api.project import Project
 from gabber.api.membership import ProjectMembership, ProjectInvites, ProjectInviteVerification
 from gabber.api.sessions import ProjectSessions
 from gabber.api.session import ProjectSession
+from gabber.api.consent import SessionConsent
 from gabber.api.annotations import UserAnnotations, UserAnnotation
 from gabber.api.comments import Comments, Comment, CommentsReplies
 
@@ -70,6 +71,7 @@ restful_api.add_resource(ProjectInvites,
 restful_api.add_resource(ProjectInviteVerification, '/api/projects/invites/<token>/')
 restful_api.add_resource(ProjectSessions, '/api/projects/<int:pid>/sessions/')
 restful_api.add_resource(ProjectSession, '/api/projects/<int:pid>/sessions/<string:sid>/')
+restful_api.add_resource(SessionConsent, '/api/consent/<string:token>/')
 restful_api.add_resource(UserAnnotations, '/api/projects/<int:pid>/sessions/<string:sid>/annotations/')
 restful_api.add_resource(UserAnnotation, '/api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/')
 restful_api.add_resource(Comments, '/api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/')

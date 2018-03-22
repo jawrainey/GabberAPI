@@ -671,7 +671,7 @@ N/A
 </details>
 
 <details>
-<summary>users.invites.accept</summary>
+<summary>projects.invites.accept</summary>
 <br>
 
 `PUT: /api/projects/invites/<token>/`
@@ -904,6 +904,147 @@ which should be of the format: `{Start: 0, End: 10, PromptID: 21}`.
 - `SESSION_UNKNOWN`: The session you tried to view does not exist.
 
 </details>
+
+#### Consent
+
+<details>
+<summary>session.consent.show</summary>
+<br>
+  
+`GET: /api/consent/<token>`
+
+> Using a magic URL, a user involved in a session can provide their consent for what they would like to happen
+to their audio recording
+
+**Returns**
+
+The `project`, `session`, and `user` associated with the Gabber session that is being consented.
+
+
+```json
+{
+    "data": {
+        "project": {
+            "created_on": "2018-03-19T10:51:45+00:00",
+            "creator": {
+                "fullname": "Geoff Testington",
+                "user_id": 1
+            },
+            "description": "All that chat you will ever need to have about your boy Geoff Testington",
+            "has_consent": false,
+            "id": 1,
+            "is_active": true,
+            "is_public": true,
+            "members": [
+                {
+                    "confirmed": true,
+                    "date_accepted": "2018-03-19T10:51:45+00:00",
+                    "date_sent": "2018-03-19T10:51:45+00:00",
+                    "deactivated": false,
+                    "id": 1,
+                    "role": "admin",
+                    "user_id": 9
+                },
+                "..."
+            ],
+            "privacy": "public",
+            "slug": "geoff-s-super-sessions",
+            "title": "Geoff's Super Sessions",
+            "topics": [
+                {
+                    "created_on": "2018-03-19T10:51:45+00:00",
+                    "id": 1,
+                    "is_active": 1,
+                    "project_id": 1,
+                    "text": "Topper Box",
+                    "updated_on": "2018-03-19T10:51:45+00:00"
+                },
+                "..."
+            ],
+            "updated_on": "2018-03-21T19:18:03+00:00"
+        },
+        "session": {
+            "audio_url": "https://gabber-ncl.s3.amazonaws.com/1/61539890a92f46f78dd41d2f65bcd89b?AWSAccessKeyId=AKIAIWPXLUJXTAOEZ7SA&Expires=1521751447&Signature=wPYelHcTrqeaf1I9WAF0HJuVUW0%3D",
+            "created_on": "2018-03-22T18:42:33+00:00",
+            "id": "61539890a92f46f78dd41d2f65bcd89b",
+            "num_user_annotations": 0,
+            "participants": [
+                {
+                    "role": "interviewer",
+                    "user_id": "26"
+                },
+                {
+                    "role": "interviewee",
+                    "user_id": "28"
+                }
+            ],
+            "project_id": 1,
+            "topics": [
+                {
+                    "end_interval": 21,
+                    "id": 59,
+                    "start_interval": 0,
+                    "text": "Topper Box",
+                    "topic": 1,
+                    "topic_id": 1
+                }
+            ]
+        },
+        "user": {
+            "created_on": "2018-03-22T18:42:33+00:00",
+            "id": 28,
+            "participant_of": [
+                43
+            ],
+            "registered": false,
+            "updated_on": "2018-03-22T18:42:33+00:00",
+            "verified": false
+        }
+    },
+    "meta": {
+        "messages": [],
+        "success": true
+    }
+}
+```
+
+**Errors**
+
+- `TOKEN_EXPIRED`: The token provided has expired; default length is one week.
+- `TOKEN_404`: The token provided is invalid.
+- `GENERAL_INVALID_JSON`: The request is not valid JSON.
+
+</details>
+
+
+<details>
+<summary>session.consent.update</summary>
+<br>
+  
+`PUT: /api/consent/<token>`
+
+> Updates the consent for a specific session
+
+**Arguments**
+
+- `type`: must be `none`, `private` or `public`.
+
+**Returns**
+
+- `null` data object, with `success` set as `true`.
+
+**Errors**
+
+- `TOKEN_EXPIRED`: The token provided has expired; default length is one week.
+- `TOKEN_404`: The token provided is invalid.
+- `GENERAL_INVALID_JSON`: The request is not valid JSON.
+- `CONSENT_TYPE_KEY_REQUIRED`: The type attribute is required.
+- `CONSENT_TYPE_IS_EMPTY`: The type attribute is empty.
+- `CONSENT_TYPE_IS_NOT_STRING`: The type attribute must be a string.
+- `CONSENT_INVALID_TYPE_VALUE`: The value provided for type is not none, private or public.
+        
+</details>
+
 
 ## Annotations
 

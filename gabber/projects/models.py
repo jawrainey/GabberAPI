@@ -360,19 +360,7 @@ class InterviewSession(db.Model):
         returns
             dict: a serialization of an InterviewSession
         """
-        import datetime
-        return {
-            'id': self.id,
-            'creator': self.creator().fullname,
-            'topics': [i.topic() for i in self.prompts.all()],
-            'participants': [i.fullname() for i in self.participants.all()],
-            'date': self.created_on.strftime("%d-%b-%Y"),
-            'location': "TODO: update once GPS added",
-            'meta': {
-                "numAnnotations": len(self.connections.all()),
-                'recordingLength': str(datetime.timedelta(seconds=self.prompts.all()[-1].end_interval))
-            }
-        }
+        return {}
 
 
 class InterviewPrompts(db.Model):

@@ -60,25 +60,28 @@ def send_welcome_after_registration(user):
     send_email_message(user.email, data)
 
 
-def request_consent(participants, project):
-    from gabber.users.models import User
+def request_consent(participants, project, session):
+    # Note: having to create a consent model here as this is called after participants are created
+    from gabber.users.models import User, SessionConsent as SessionConsentModel
+    from gabber.api.consent import SessionConsent
 
-    subject = "Provide Consent to your Gabber recording"
-    content = "Thanks for taking part in a Gabber on the project %s. " \
-              "<br><br>" \
-              "You can now review the content and provide consent <TODO:URL>" % project.title
-    bottom_body = "You can create an account using this magic URL <URL>"
+    content = 'Thanks for Gabbering on the <b>%s</b>.' \
+              'Click the button to review and consent to your recording being used, and shared within the project.' \
+              'You can now review the content and provide consent.' % project.title
 
     # Email each client to request individual consent on the recorded session.
     for participant in participants:
         user = User.query.filter_by(email=participant['Email']).first()
+        # Create a default consent as participants will receive an email afterwards
+        # to update their consent. Likewise, this ensures all queries manipulate all data.
+        consent = SessionConsentModel.create_default_consent(session.id, user.id)
         send_email_action(user.email, dict(
-            subject=subject,
+            subject='Provide Consent to your Gabber recording',
             name=user.fullname,
             top_body=content,
-            button_url='/',
+            button_url=SessionConsent.generate_invite_url(user.id, project.id, session.id, consent.id),
             button_label='Provide Consent',
-            bottom_body=bottom_body if not user.registered else ''))
+            bottom_body=''))
 
 
 def send_forgot_password(user, url):
