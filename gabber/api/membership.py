@@ -5,15 +5,71 @@ These actions are notified to users once carried out.
 """
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from gabber.api.schemas.project import ProjectMember
-from gabber.api.schemas.membership import AddMemberSchema
+from gabber.api.auth import create_jwt_access, AuthToken
+from gabber.api.schemas.auth import UserSchema
+from gabber.api.schemas.membership import AddMemberSchema, ProjectInviteWithToken
+from gabber.api.schemas.project import ProjectMember, ProjectModelSchema
 from gabber.projects.models import Project
 from gabber.projects.models import Membership, Roles
 from gabber.users.models import User
 from gabber.utils.general import custom_response, CustomException
-from gabber import db
+from gabber import db, app
+from itsdangerous import URLSafeTimedSerializer
 import gabber.api.helpers as helpers
 import gabber.utils.email as email_client
+
+
+class ProjectInviteVerification(Resource):
+    """
+    Mapped to: /api/projects/invites/<token>/
+    """
+    @staticmethod
+    def get(token):
+        """
+        Provides details of a user (fullname & email) and the project (ID) they were invited to.
+        """
+        token_data = AuthToken.validate_token(token)
+        user = User.query.get(token_data['user_id'])
+        project = Project.query.get(token_data['project_id'])
+        payload = dict(user=UserSchema().dump(user), project=ProjectModelSchema().dump(project))
+        return custom_response(201, data=payload)
+
+    @staticmethod
+    def put(token):
+        """
+        Updates an unconfirmed user record* and accepts the membership invite.
+        *i.e. someone created through a Gabber or when invited
+        """
+        token_data = AuthToken.validate_token(token)
+        data = helpers.jsonify_request_or_abort()
+        helpers.abort_if_errors_in_validation(ProjectInviteWithToken().validate(data))
+
+        user = User.query.get(token_data['user_id'])
+        user.fullname = data['fullname']
+        user.set_password(data['password'])
+        user.registered = True
+        user.verified = True
+
+        membership = Membership.query.filter_by(project_id=token_data['project_id'], user_id=user.id).first()
+        # Makes sure that they can only be confirmed once
+        if membership.confirmed:
+            return custom_response(400, errors=['MEMBERSHIP_CONFIRMED'])
+
+        membership.confirmed = True
+        db.session.commit()
+        email_client.send_welcome_after_registration(user)
+        return custom_response(201, data=create_jwt_access(user.email))
+
+    @staticmethod
+    def generate_invite_url(user_id, project_id):
+        """
+        Generates an invite URL with embedded information
+        """
+        # Only embed necessary information for lookup on the GET
+        payload = {'user_id': user_id, 'project_id': project_id}
+        token = URLSafeTimedSerializer(app.config["SECRET_KEY"]).dumps(payload, app.config['SALT'])
+        # Do not store tokens as: (1) they're one time use and (2) token expires.
+        return '%s/projects/invites/%s/' % (app.config['WEB_HOST'], token)
 
 
 class ProjectInvites(Resource):

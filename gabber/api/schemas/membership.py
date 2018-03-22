@@ -21,3 +21,14 @@ class AddMemberSchema(ma.Schema):
         if email_valid:
             validate_email(data['email'], validator.errors)
         validator.raise_if_errors()
+
+
+class ProjectInviteWithToken(ma.Schema):
+    fullname = ma.String()
+    password = ma.String()
+
+    @pre_load()
+    def __validate(self, data):
+        validator = HelperSchemaValidator('MEMBERSHIP')
+        fullname_valid = validator.validate('fullname', 'str', data)
+        validator.raise_if_errors()

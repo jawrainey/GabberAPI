@@ -117,23 +117,18 @@ def send_project_member_invite_unregistered_user(admin, user, project):
     """
     The user exists (i.e. participated in a session) or was created above before sending the email
     """
-    from gabber.api.auth import RegisterInvitedUser
-
-    token_register_url = RegisterInvitedUser.generate_url(user.fullname, user.email, project.id, 'register')
-    token_login_url = RegisterInvitedUser.generate_url(user.fullname, user.email, project.id, 'login')
+    from gabber.api.membership import ProjectInviteVerification
 
     data = dict()
     data['subject'] = '%s invited you to join the project %s on Gabber' % (admin.fullname, project.title)
     data['name'] = user.fullname
-    data['top_body'] = "%s invites you to join the project <b>%s</b>.</br>" \
-                       "Register by clicking the button below and the account you create will be part of the project " \
-                       "where you can begin listening to and annotating Gabbers." \
-                       "" % (admin.fullname, project.title)
-    data['button_url'] = token_register_url
-    data['button_label'] = "Join the project"
-    data['bottom_body'] = 'If you already have a Gabber account, ' \
-                          'then login using <a href="%s">this url</a>.' % token_login_url
-
+    data['top_body'] = '%s invites you to join the project <b>%s</b>.</br>' \
+                       'Register by clicking the button below and the account you create will be part of the project ' \
+                       'where you can begin listening to and annotating Gabbers.' \
+                       '' % (admin.fullname, project.title)
+    data['button_url'] = ProjectInviteVerification.generate_invite_url(user.id, project.id)
+    data['button_label'] = 'Join the project'
+    data['bottom_body'] = ''
     send_email_action(user.email, data)
 
 

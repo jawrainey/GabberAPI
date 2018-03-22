@@ -54,7 +54,7 @@ def jwt_unauthorized(callback):
 
 from gabber.api.projects import Projects
 from gabber.api.project import Project
-from gabber.api.membership import ProjectMembership, ProjectInvites
+from gabber.api.membership import ProjectMembership, ProjectInvites, ProjectInviteVerification
 from gabber.api.sessions import ProjectSessions
 from gabber.api.session import ProjectSession
 from gabber.api.annotations import UserAnnotations, UserAnnotation
@@ -67,6 +67,7 @@ restful_api.add_resource(ProjectMembership, '/api/projects/<int:pid>/membership/
 restful_api.add_resource(ProjectInvites,
                          '/api/projects/<int:pid>/membership/invites/',
                          '/api/projects/<int:pid>/membership/invites/<int:mid>/')
+restful_api.add_resource(ProjectInviteVerification, '/api/projects/invites/<token>/')
 restful_api.add_resource(ProjectSessions, '/api/projects/<int:pid>/sessions/')
 restful_api.add_resource(ProjectSession, '/api/projects/<int:pid>/sessions/<string:sid>/')
 restful_api.add_resource(UserAnnotations, '/api/projects/<int:pid>/sessions/<string:sid>/annotations/')
@@ -76,15 +77,13 @@ restful_api.add_resource(Comment, '/api/projects/<int:pid>/sessions/<string:sid>
 restful_api.add_resource(CommentsReplies, '/api/projects/<int:pid>/sessions/<string:sid>/annotations/<int:aid>/comments/<int:cid>/replies/')
 
 from gabber.api.auth import TokenRefresh, UserRegistration, UserLogin, ForgotPassword, ResetPassword, UserAsMe
-from gabber.api.auth import LoginInvitedUser, RegisterInvitedUser, VerifyRegistration
+from gabber.api.auth import VerifyRegistration
 restful_api.add_resource(TokenRefresh, '/api/auth/token/refresh/')
 restful_api.add_resource(UserAsMe, '/api/auth/me/')
 restful_api.add_resource(VerifyRegistration, '/api/auth/verify/<string:token>/')
 restful_api.add_resource(UserRegistration, '/api/auth/register/')
 restful_api.add_resource(UserLogin, '/api/auth/login/')
 restful_api.add_resource(ForgotPassword, '/api/auth/forgot/')
-restful_api.add_resource(RegisterInvitedUser, '/api/auth/register/<string:token>/', endpoint="api.register")
-restful_api.add_resource(LoginInvitedUser, '/api/auth/login/<string:token>/', endpoint="api.login")
 restful_api.add_resource(ResetPassword, '/api/auth/reset/', endpoint="api.reset")
 
 # The existing API is confusing because methods are separate ...

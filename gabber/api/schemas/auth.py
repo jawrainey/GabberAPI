@@ -102,25 +102,6 @@ class AuthRegisterSchema(ma.Schema):
         validator.raise_if_errors()
 
 
-class AuthRegisterWithTokenSchema(ma.Schema):
-    fullname = ma.String()
-    email = ma.String()
-    password = ma.String()
-
-    @pre_load()
-    def __validate(self, data):
-        validator = HelperSchemaValidator('AUTH')
-
-        fullname_valid = validator.validate('fullname', 'str', data)
-        email_valid = validator.validate('email', 'str', data)
-
-        if email_valid:
-            validate_email(data['email'], validator.errors)
-
-        validate_password(data, validator)
-        validator.raise_if_errors()
-
-
 class UserSchema(ma.ModelSchema):
     class Meta:
         model = User
