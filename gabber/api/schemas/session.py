@@ -14,8 +14,7 @@ class RecordingTopicSchema(ma.ModelSchema):
 
 class RecordingParticipantsSchema(ma.ModelSchema):
     user_id = ma.String(attribute='user.id')
-    fullname = ma.String(attribute='user.fullname')
-    role = ma.String(attribute='role_type')
+    role = ma.Function(lambda member: 'interviewer' if member.role else 'interviewee')
 
     class Meta:
         model = InterviewParticipants

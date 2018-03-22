@@ -105,5 +105,5 @@ class AuthRegisterSchema(ma.Schema):
 class UserSchema(ma.ModelSchema):
     class Meta:
         model = User
-        exclude = ['connection_comments', 'connections', 'password', 'member_of']
+        exclude = ['connection_comments', 'connections', 'password', 'member_of', 'email', 'fullname']
 
