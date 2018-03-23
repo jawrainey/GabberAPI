@@ -1,6 +1,6 @@
 from gabber import ma
 from marshmallow import ValidationError, validates_schema
-from gabber.projects.models import ProjectPrompt
+from gabber.models.projects import ProjectPrompt
 
 
 def is_known_topic(data):

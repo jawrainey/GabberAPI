@@ -2,16 +2,16 @@
 """
 Content for all projects that a user has access to
 """
+from .. import db
+from ..models.user import User
+from ..models.projects import Membership, Project as ProjectModel, ProjectPrompt, Roles
+from ..api.schemas.project import ProjectPostSchema, ProjectModelSchema
 from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
-from gabber.users.models import User
-from gabber.projects.models import Membership, Project as ProjectModel, ProjectPrompt, Roles
-from gabber.api.schemas.project import ProjectPostSchema, ProjectModelSchema
 from gabber.utils.general import custom_response
-from gabber import db
 from sqlalchemy import or_
-import gabber.api.helpers as helpers
+import gabber.utils.helpers as helpers
 
 
 class Projects(Resource):

@@ -2,15 +2,15 @@
 """
 JWT configuration and authentication (registration, login and logout).
 """
+from .. import db
+from ..api.schemas.auth import AuthRegisterSchema, AuthLoginSchema, ResetPasswordSchema, ForgotPasswordSchema, UserSchema
+from ..models.user import User, ResetTokens
+from ..utils.general import CustomException, custom_response
+from ..utils import helpers
+from flask import current_app as app
 from flask_restful import Resource
 from flask_jwt_extended import create_access_token, \
     create_refresh_token, jwt_refresh_token_required, get_jwt_identity, jwt_optional
-from gabber import db, app
-from gabber.api import helpers
-from gabber.api.schemas.auth import AuthRegisterSchema, AuthLoginSchema, \
-    ResetPasswordSchema, ForgotPasswordSchema, UserSchema
-from gabber.users.models import User, ResetTokens
-from gabber.utils.general import CustomException, custom_response
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 import gabber.utils.email as email_client
 

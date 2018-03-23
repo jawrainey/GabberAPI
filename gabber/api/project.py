@@ -2,15 +2,15 @@
 """
 Content for all projects that a user has access to
 """
-from gabber import db
-from gabber.users.models import User
-from gabber.projects.models import Project as ProjectModel, ProjectPrompt
-from gabber.utils.general import custom_response
-from gabber.api.schemas.project import ProjectModelSchema
+from .. import db
+from ..models.user import User
+from ..models.projects import Project as ProjectModel, ProjectPrompt
+from ..utils.general import custom_response
+from ..api.schemas.project import ProjectModelSchema
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity, jwt_optional
 from flask import request
-import gabber.api.helpers as helpers
+from gabber.utils import helpers
 
 
 class Project(Resource):

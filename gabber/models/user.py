@@ -1,7 +1,8 @@
-from gabber import db, bcrypt
-from flask_login import UserMixin, AnonymousUserMixin
+from flask_bcrypt import Bcrypt
+from gabber import db
 from uuid import uuid4
-import gabber.utils.email as email_client
+
+bcrypt = Bcrypt()
 
 
 class ResetTokens(db.Model):
@@ -41,7 +42,7 @@ class SessionConsent(db.Model):
         return consent
 
 
-class User(UserMixin, db.Model):
+class User(db.Model):
     """
     A registered user of the system
 
@@ -86,12 +87,6 @@ class User(UserMixin, db.Model):
     def is_correct_password(self, plaintext):
         return bcrypt.check_password_hash(self.password, plaintext)
 
-    def get_id(self):
-        """
-        Overriding method from UserMixin
-        """
-        return self.id
-
     def is_project_member(self, pid):
         """
         Determines whether or not this user is a member of a project.
@@ -109,22 +104,6 @@ class User(UserMixin, db.Model):
         :param pid: the project id to search for
         :return: The type of role (such as admin, staff, or user), otherwise None
         """
-        from gabber.projects.models import Roles
+        from gabber.models.projects import Roles
         match = [i.role_id for i in self.member_of if i.project_id == pid]
         return Roles.query.get(match[0]).name if match else None
-
-
-class Anonymous(AnonymousUserMixin, User):
-    """
-    Required as we access user details via 'current_user', which do not exist for
-    an anonymous user. By inheriting from both, and creating a fake user, we overcome that.
-
-    Note: the order of inheritence is critical as we want to use the properties set by AnonymousUserMixin,
-    e.g. is_authenticated and is_anonymous,and the methods defined above for a User.
-    The way Python implements multiple inheritence is by assigning parent attributes from left-to-right.
-    The potential problem is that User inherits from UserMixin where these properties are set to identify a user.
-    """
-    def __init__(self):
-        self.username = 'Guest'
-        self.password = 'none'
-        self.fullname = 'Yaj Yeniar'

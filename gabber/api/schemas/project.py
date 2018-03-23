@@ -1,8 +1,8 @@
 from gabber import ma
 from slugify import slugify
 from marshmallow import pre_load, ValidationError
-from gabber.projects.models import Project, ProjectPrompt, Roles, Membership
-from gabber.users.models import User
+from gabber.models.projects import Project, ProjectPrompt, Membership
+from gabber.models.user import User
 
 
 class ValidationErrorWithCustomErrorFormat(ValidationError):

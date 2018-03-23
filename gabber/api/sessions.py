@@ -1,17 +1,21 @@
-from gabber import db
+# -*- coding: utf-8 -*-
+"""
+Viewing all Gabber sessions and creating a new one
+"""
+from .. import db
+from ..api.schemas.create_session import ParticipantScheme, RecordingAnnotationSchema
+from ..api.schemas.session import RecordingSessionsSchema
+from ..api.schemas.helpers import is_not_empty
+from ..models.projects import InterviewSession, InterviewParticipants, InterviewPrompts, Project
+from ..models.user import User
+from ..utils.general import custom_response
+from marshmallow import ValidationError
 from flask_restful import Resource, reqparse, abort
 from flask_jwt_extended import jwt_required, get_jwt_identity, jwt_optional
-from gabber.projects.models import InterviewSession, InterviewParticipants, InterviewPrompts, Project
-from gabber.users.models import User, SessionConsent
 from uuid import uuid4
-import gabber.api.helpers as helpers
-from marshmallow import ValidationError
-from gabber.api.schemas.create_session import ParticipantScheme, RecordingAnnotationSchema
-from gabber.api.schemas.session import RecordingSessionsSchema
-from gabber.api.schemas.helpers import is_not_empty
-import json
-from gabber.utils.general import custom_response
 import gabber.utils.email as email_client
+import gabber.utils.helpers as helpers
+import json
 
 
 class ProjectSessions(Resource):
@@ -134,7 +138,7 @@ class ProjectSessions(Resource):
         about each participant (mapping to a User model, i.e. their name and email) should also be provided.
         :return: A list of InterviewParticipants that were used in a specific interview session.
         """
-        from gabber.users.models import User
+        from gabber.models.user import User
         _participants_to_add = []
 
         for p in participants:

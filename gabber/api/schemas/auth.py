@@ -1,5 +1,5 @@
 from gabber import ma
-from gabber.users.models import User
+from gabber.models.user import User
 from gabber.api.schemas.project import HelperSchemaValidator
 from marshmallow import pre_load, validate, ValidationError
 

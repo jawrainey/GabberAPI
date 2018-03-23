@@ -2,13 +2,13 @@
 """
 REST Actions for a Gabber session, e.g. the recording between participants
 """
+from ..api.schemas.session import RecordingSessionSchema
+from ..models.projects import InterviewSession, Project
+from ..models.user import User
+from ..utils.general import custom_response
 from flask_restful import Resource
 from flask_jwt_extended import jwt_optional, get_jwt_identity
-from gabber.projects.models import InterviewSession, Project
-from gabber.users.models import User
-import gabber.api.helpers as helpers
-from gabber.api.schemas.session import RecordingSessionSchema
-from gabber.utils.general import custom_response
+import gabber.utils.helpers as helpers
 
 
 class ProjectSession(Resource):

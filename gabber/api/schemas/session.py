@@ -1,4 +1,4 @@
-from gabber.projects.models import InterviewSession, InterviewParticipants, Connection, InterviewPrompts
+from gabber.models.projects import InterviewSession, InterviewParticipants, Connection, InterviewPrompts
 from gabber import ma
 
 

@@ -2,13 +2,13 @@
 """
 READ a list of the comments for an annotation or CREATE a new comment.
 """
+from .. import db
+from ..api.schemas.annotations import UserAnnotationCommentSchema
+from ..models.projects import ConnectionComments as CommentsModel, Project
+from ..utils.general import custom_response
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, jwt_optional
-from gabber.projects.models import ConnectionComments as CommentsModel, Project
-from gabber.api.schemas.annotations import UserAnnotationCommentSchema
-from gabber.utils.general import custom_response
-from gabber import db
-import gabber.api.helpers as helpers
+import gabber.utils.helpers as helpers
 
 
 def create_comment(project_id, session_id, annotation_id, comment_id=None):

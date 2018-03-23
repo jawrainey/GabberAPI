@@ -2,18 +2,19 @@
 """
 The consent for a Gabber session.
 """
+from .. import db
+from ..api.schemas.auth import UserSchema
+from ..api.schemas.consent import ConsentType
+from ..api.schemas.project import ProjectModelSchema
+from ..api.schemas.session import RecordingSessionSchema
+from ..api.auth import AuthToken
+from ..models.projects import Project, InterviewSession
+from ..models.user import User, SessionConsent as SessionConsentModel
+from ..utils.general import custom_response
+from flask import current_app as app
 from flask_restful import Resource
-from gabber import app, db
-from gabber.api.schemas.auth import UserSchema
-from gabber.api.schemas.consent import ConsentType
-from gabber.api.schemas.project import ProjectModelSchema
-from gabber.api.schemas.session import RecordingSessionSchema
-from gabber.api.auth import AuthToken
-from gabber.projects.models import Project, InterviewSession
-from gabber.utils.general import custom_response
-from gabber.users.models import User, SessionConsent as SessionConsentModel
 from itsdangerous import URLSafeTimedSerializer
-import gabber.api.helpers as helpers
+import gabber.utils.helpers as helpers
 
 
 class SessionConsent(Resource):

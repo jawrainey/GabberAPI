@@ -2,8 +2,8 @@
 """
 Handles uploading and access writes (ACL) for files in the Gabber bucket
 """
-
-import boto3, botocore.client
+import boto3
+import botocore.client
 import os
 
 S3_BUCKET = os.getenv('S3_BUCKET', '')

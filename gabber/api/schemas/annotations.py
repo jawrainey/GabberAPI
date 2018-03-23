@@ -1,6 +1,6 @@
-from gabber import ma, db
+from gabber import ma
 # TODO: this should help simplify refactoring
-from gabber.projects.models import \
+from gabber.models.projects import \
     Connection as UserAnnotations, \
     Code as Tags, \
     ConnectionComments as Comments

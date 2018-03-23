@@ -5,7 +5,7 @@ All emails send through sendgrid on behalf of Gabber through user-actions.
 import os
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Mail, Substitution
-from gabber import app
+from flask import current_app as app
 
 SEND_GRID = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY', ''))
 
@@ -62,7 +62,7 @@ def send_welcome_after_registration(user):
 
 def request_consent(participants, project, session):
     # Note: having to create a consent model here as this is called after participants are created
-    from gabber.users.models import User, SessionConsent as SessionConsentModel
+    from gabber.models.user import User, SessionConsent as SessionConsentModel
     from gabber.api.consent import SessionConsent
 
     content = 'Thanks for Gabbering on the <b>%s</b>.' \

@@ -3,19 +3,20 @@
 An administrator can invite or remove members from their project.
 These actions are notified to users once carried out.
 """
+from ..api.auth import create_jwt_access, AuthToken
+from ..api.schemas.auth import UserSchema
+from ..api.schemas.membership import AddMemberSchema, ProjectInviteWithToken
+from ..api.schemas.project import ProjectMember, ProjectModelSchema
+from ..models.projects import Project
+from ..models.projects import Membership, Roles
+from ..models.user import User
+from ..utils.general import custom_response, CustomException
+from .. import db
+from flask import current_app as app
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from gabber.api.auth import create_jwt_access, AuthToken
-from gabber.api.schemas.auth import UserSchema
-from gabber.api.schemas.membership import AddMemberSchema, ProjectInviteWithToken
-from gabber.api.schemas.project import ProjectMember, ProjectModelSchema
-from gabber.projects.models import Project
-from gabber.projects.models import Membership, Roles
-from gabber.users.models import User
-from gabber.utils.general import custom_response, CustomException
-from gabber import db, app
 from itsdangerous import URLSafeTimedSerializer
-import gabber.api.helpers as helpers
+import gabber.utils.helpers as helpers
 import gabber.utils.email as email_client
 
 

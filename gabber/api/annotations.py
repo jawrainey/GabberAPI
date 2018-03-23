@@ -2,15 +2,15 @@
 """
 All annotations for a session
 """
+from .. import db
+from ..utils.general import custom_response
+from ..api.schemas.annotations import UserAnnotationSchema
+from ..models.projects import Connection as UserAnnotationModel, Code as Tags, Project
+from ..models.user import User
 from flask import request
-from gabber import db
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
-from gabber.utils.general import custom_response
-from gabber.api.schemas.annotations import UserAnnotationSchema
-from gabber.projects.models import Connection as UserAnnotationModel, Code as Tags, Project
-from gabber.users.models import User
-import gabber.api.helpers as helpers
+import gabber.utils.helpers as helpers
 
 
 class UserAnnotations(Resource):

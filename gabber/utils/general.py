@@ -1,5 +1,20 @@
 from flask import jsonify
-from gabber import app
+from .. import jwt
+
+
+@jwt.expired_token_loader
+def jwt_expired(callback):
+    return custom_response(400, errors=['JWT_EXPIRED'])
+
+
+@jwt.invalid_token_loader
+def jwt_invalid(callback):
+    return custom_response(400, errors=['JWT_INVALID'])
+
+
+@jwt.unauthorized_loader
+def jwt_unauthorized(callback):
+    return custom_response(400, errors=['JWT_UNAUTHORIZED'])
 
 
 class CustomException(Exception):
@@ -30,12 +45,3 @@ def custom_response(status_code, data=None, errors=None):
     )
     response.status_code = status_code
     return response
-
-
-@app.errorhandler(CustomException)
-def handle_error(e):
-    """
-    Create a custom response for resource endpoints; this simplifies how data can be directly
-    returned from within endpoint, and from within helper classes who can raise errors immediately.
-    """
-    return custom_response(e.status_code, data=e.data, errors=e.errors)

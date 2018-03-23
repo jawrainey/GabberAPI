@@ -1,7 +1,7 @@
-from gabber.projects.models import Project
+from gabber.models.projects import Project
 from gabber.utils.general import CustomException
-from gabber.users.models import User
-from gabber.projects.models import InterviewSession, ConnectionComments
+from gabber.models.user import User
+from gabber.models.projects import InterviewSession, ConnectionComments
 from flask_jwt_extended import get_jwt_identity
 
 
