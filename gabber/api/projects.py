@@ -6,7 +6,6 @@ from .. import db
 from ..models.user import User
 from ..models.projects import Membership, Project as ProjectModel, ProjectPrompt, Roles
 from ..api.schemas.project import ProjectPostSchema, ProjectModelSchema
-from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 from gabber.utils.general import custom_response
@@ -48,13 +47,10 @@ class Projects(Resource):
         user = User.query.filter_by(email=current_user).first()
         helpers.abort_if_unknown_user(user)
         # Force request to JSON, and fail silently if that fails the data is None.
-        json_data = request.get_json(force=True, silent=True)
-        helpers.abort_if_invalid_json(json_data)
+        json_data = helpers.jsonify_request_or_abort()
 
         schema = ProjectPostSchema()
-        errors = schema.validate(json_data)
-        helpers.abort_if_errors_in_validation(errors)
-
+        helpers.abort_if_errors_in_validation(schema.validate(json_data))
         data = schema.dump(json_data)
 
         project = ProjectModel(
