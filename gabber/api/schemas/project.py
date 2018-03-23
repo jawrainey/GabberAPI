@@ -79,7 +79,7 @@ class ProjectPostSchema(ma.Schema):
         validator = HelperSchemaValidator('PROJECTS')
 
         title_valid = validator.validate('title', 'str', data)
-        if title_valid and Project.query.filter_by(slug=slugify(data['title'])).first():
+        if title_valid and Project.query.with_deleted().filter_by(slug=slugify(data['title'])).first():
             validator.errors.append("TITLE_EXISTS")
 
         validator.validate('description', 'str', data)
