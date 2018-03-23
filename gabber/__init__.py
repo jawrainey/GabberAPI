@@ -11,6 +11,13 @@ ma = Marshmallow()
 migrate = Migrate()
 
 
+def add_headers(app, response):
+    response.headers.add('Access-Control-Allow-Origin', app.config['WEB_HOST'])
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+    return response
+
+
 def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
@@ -26,6 +33,8 @@ def create_app(config_name):
     # TODO: create a blueprint that handles errors
     from gabber.utils import general as er
     app.register_error_handler(er.CustomException, lambda e: er.custom_response(e.status_code, e.data, e.errors))
+
+    app.after_request(lambda response: add_headers(app, response))
 
     # TODO: use Flask-Script for database initialisation, etc.
     return app
