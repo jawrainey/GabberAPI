@@ -176,11 +176,11 @@ class VerifyRegistration(Resource):
         user = User.query.get(token['user_id'])
         # Rather than storing tokens, check if the user has been verified before
         if user.verified:
-            return custom_response(201, errors=['ALREADY_VERIFIED'])
+            return custom_response(400, errors=['ALREADY_VERIFIED'])
         user.verified = True
         db.session.commit()
         email_client.send_welcome_after_registration(user)
-        return custom_response(201, data=create_jwt_access(user.email))
+        return custom_response(200, data=create_jwt_access(user.email))
 
 
 class UserRegistration(Resource):
