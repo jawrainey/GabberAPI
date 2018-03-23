@@ -1,4 +1,5 @@
 from gabber.models.projects import InterviewSession, InterviewParticipants, Connection, InterviewPrompts
+from gabber.models.user import User
 from gabber import ma
 
 
@@ -34,6 +35,12 @@ class RecordingSessionsSchema(ma.ModelSchema):
     topics = ma.Nested(RecordingTopicSchema, many=True, attribute="prompts")
     participants = ma.Nested(RecordingParticipantsSchema, many=True, attribute="participants")
     num_user_annotations = ma.Function(lambda data: len(data.connections))
+    creator = ma.Method("_creator")
+
+    @staticmethod
+    def _creator(data):
+        user = User.query.get(data.creator)
+        return {'user_id': user.id, 'fullname': user.fullname}
 
     class Meta:
         model = InterviewSession
