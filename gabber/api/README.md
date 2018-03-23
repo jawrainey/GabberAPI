@@ -49,10 +49,10 @@ fullname varies across countries, where some consider middle name, etc.
 </details>
 
 <details>
-<summary>users.register.verify</summary>
+<summary>users.verify</summary>
 <br>
 
-`GET: /api/auth/register/verify/<token>/`
+`POST: /api/auth/verify/<token>/`
   
 > A magic URL is sent to the user after registering. Once clicked, the user is verified and the associated
 user object and tokens are returned.

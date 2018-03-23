@@ -168,7 +168,7 @@ class VerifyRegistration(Resource):
     Mapped to: /api/auth/verify/<token>/
     """
     @staticmethod
-    def get(token):
+    def post(token):
         """
         ??
         """
