@@ -3,12 +3,12 @@
 Content for all projects that a user has access to
 """
 from .. import db
+from ..api.schemas.project import ProjectPostSchema, ProjectModelSchema
 from ..models.user import User
 from ..models.projects import Membership, Project as ProjectModel, ProjectPrompt, Roles
-from ..api.schemas.project import ProjectPostSchema, ProjectModelSchema
+from ..utils.general import custom_response
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
-from gabber.utils.general import custom_response
 from sqlalchemy import or_
 import gabber.utils.helpers as helpers
 

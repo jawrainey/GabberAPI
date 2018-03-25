@@ -31,7 +31,7 @@ def create_app(config_name):
     restful_api.init_app(app)
 
     # TODO: create a blueprint that handles errors
-    from gabber.utils import general as er
+    from .utils import general as er
     app.register_error_handler(er.CustomException, lambda e: er.custom_response(e.status_code, e.data, e.errors))
 
     app.after_request(lambda response: add_headers(app, response))

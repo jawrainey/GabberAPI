@@ -2,7 +2,7 @@
 """
 ???
 """
-from gabber import db
+from .. import db
 from flask_sqlalchemy import BaseQuery
 
 codes_for_connections = db.Table(
@@ -227,7 +227,7 @@ class InterviewSession(db.Model):
 
         :return: signed URL for the audio recording of the interview
         """
-        from gabber.utils import amazon
+        from ..utils import amazon
         return amazon.signed_url(self.project_id, self.id)
 
 

@@ -2,8 +2,8 @@
 """
 Consent validation Schemas
 """
-from gabber.api.schemas.project import HelperSchemaValidator
-from gabber import ma
+from ...api.schemas.project import HelperSchemaValidator
+from ... import ma
 from marshmallow import pre_load
 
 

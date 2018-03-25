@@ -119,7 +119,7 @@ class ProjectSessions(Resource):
         :param session_id: the ID of the session associated with the recording
         :param project_id: the project associated with the session
         """
-        from gabber.utils import amazon
+        from ..utils import amazon
         try:
             amazon.upload(recording, project_id, session_id)
         except Exception:
@@ -138,7 +138,7 @@ class ProjectSessions(Resource):
         about each participant (mapping to a User model, i.e. their name and email) should also be provided.
         :return: A list of InterviewParticipants that were used in a specific interview session.
         """
-        from gabber.models.user import User
+        from ..models.user import User
         _participants_to_add = []
 
         for p in participants:

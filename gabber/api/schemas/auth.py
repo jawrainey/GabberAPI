@@ -1,6 +1,6 @@
-from gabber import ma
-from gabber.models.user import User
-from gabber.api.schemas.project import HelperSchemaValidator
+from ... import ma
+from ...models.user import User
+from ...api.schemas.project import HelperSchemaValidator
 from marshmallow import pre_load, validate, ValidationError
 
 

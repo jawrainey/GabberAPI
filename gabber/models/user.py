@@ -1,5 +1,5 @@
 from flask_bcrypt import Bcrypt
-from gabber import db
+from .. import db
 from uuid import uuid4
 
 bcrypt = Bcrypt()
@@ -104,6 +104,6 @@ class User(db.Model):
         :param pid: the project id to search for
         :return: The type of role (such as admin, staff, or user), otherwise None
         """
-        from gabber.models.projects import Roles
+        from ..models.projects import Roles
         match = [i.role_id for i in self.member_of if i.project_id == pid]
         return Roles.query.get(match[0]).name if match else None

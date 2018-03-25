@@ -62,8 +62,8 @@ def send_welcome_after_registration(user):
 
 def request_consent(participants, project, session):
     # Note: having to create a consent model here as this is called after participants are created
-    from gabber.models.user import User, SessionConsent as SessionConsentModel
-    from gabber.api.consent import SessionConsent
+    from ..models.user import User, SessionConsent as SessionConsentModel
+    from ..api.consent import SessionConsent
 
     content = 'Thanks for Gabbering on the <b>%s</b>.' \
               'Click the button to review and consent to your recording being used, and shared within the project.' \
@@ -119,7 +119,7 @@ def send_project_member_invite_unregistered_user(admin, user, project):
     """
     The user exists (i.e. participated in a session) or was created above before sending the email
     """
-    from gabber.api.membership import ProjectInviteVerification
+    from ..api.membership import ProjectInviteVerification
 
     data = dict()
     data['subject'] = '%s invited you to join the project %s on Gabber' % (admin.fullname, project.title)
