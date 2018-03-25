@@ -33,7 +33,7 @@ class ProjectInviteVerification(Resource):
         user = User.query.get(token_data['user_id'])
         project = Project.query.get(token_data['project_id'])
         payload = dict(user=UserSchemaHasAccess().dump(user), project=ProjectModelSchema().dump(project))
-        return custom_response(201, data=payload)
+        return custom_response(200, data=payload)
 
     @staticmethod
     def put(token):
@@ -59,7 +59,7 @@ class ProjectInviteVerification(Resource):
         membership.confirmed = True
         db.session.commit()
         email_client.send_welcome_after_registration(user)
-        return custom_response(201, data=create_jwt_access(user.email))
+        return custom_response(200, data=create_jwt_access(user.email))
 
     @staticmethod
     def generate_invite_url(user_id, project_id):

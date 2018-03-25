@@ -29,7 +29,7 @@ def create_comment(project_id, session_id, annotation_id, comment_id=None):
     comment = CommentsModel(data['content'], comment_id, user.id, annotation_id)
     db.session.add(comment)
     db.session.commit()
-    return custom_response(201, data=schema.dump(comment))
+    return custom_response(200, data=schema.dump(comment))
 
 
 class Comments(Resource):

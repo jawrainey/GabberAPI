@@ -93,7 +93,7 @@ class ResetPassword(Resource):
         db.session.commit()
 
         #email_client.send_password_changed(email)
-        return custom_response(201, data=create_jwt_access(email))
+        return custom_response(200, data=create_jwt_access(email))
 
     @staticmethod
     def abort_if_invalid_token(token, user_id):
@@ -214,7 +214,7 @@ class UserLogin(Resource):
 
         data = helpers.jsonify_request_or_abort()
         helpers.abort_if_errors_in_validation(AuthLoginSchema().validate(data))
-        return custom_response(201, data=create_jwt_access(data['email']))
+        return custom_response(200, data=create_jwt_access(data['email']))
 
 
 def create_jwt_access(username):
