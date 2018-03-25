@@ -50,15 +50,12 @@ class Project(Resource):
         helpers.abort_on_unknown_project_id(pid)
         user = User.query.filter_by(email=get_jwt_identity()).first()
         helpers.abort_if_unknown_user(user)
+        helpers.abort_if_not_admin_or_staff(user, pid)
         json_data = helpers.jsonify_request_or_abort()
         # TODO: have to have prompts to validate; must remove later
         json_data['prompts'] = json_data['topics']
         json_data['id'] = pid
         json_data['creator'] = user.id
-
-        for topic in json_data['topics']:
-            topic.pop('created_on')
-            topic.pop('updated_on')
 
         schema = ProjectModelSchema()
         errors = schema.validate(json_data)

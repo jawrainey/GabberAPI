@@ -124,7 +124,7 @@ class ProjectTopicSchema(ma.ModelSchema):
     class Meta:
         model = ProjectPrompt
         include_fk = True
-        exclude = ['text_prompt', 'image_path', 'project', 'creator']
+        exclude = ['text_prompt', 'image_path', 'project', 'creator', 'created_on', 'updated_on']
 
 
 class ProjectModelSchema(ma.ModelSchema):
@@ -156,15 +156,6 @@ class ProjectModelSchema(ma.ModelSchema):
 
         # This must be a known user, and must be a member of this project
         creator_valid = validator.validate('creator', 'int', data)
-        # The property exists...
-        if creator_valid:
-            user = User.query.get(data['creator'])
-            if user and pid_valid:
-                if data['creator'] != Project.query.get(data['id']).creator:
-                    validator.errors.append("UNAUTHORIZED")
-            else:
-                validator.errors.append("USER_NOT_FOUND")
-
         title_valid = validator.validate('title', 'str', data)
         title_as_slug = slugify(data['title'])
 
