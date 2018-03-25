@@ -87,4 +87,5 @@ class Comment(Resource):
         comment = CommentsModel.query.filter_by(id=cid)
         helpers.abort_if_not_user_made_comment(user.id, comment.first().user_id)
         comment.update({'is_active': False})
+        db.session.commit()
         return custom_response(200)
