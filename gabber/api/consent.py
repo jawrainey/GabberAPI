@@ -41,7 +41,7 @@ class SessionConsent(Resource):
         data = helpers.jsonify_request_or_abort()
         helpers.abort_if_errors_in_validation(ConsentType().validate(data))
         consent = SessionConsentModel.query.get(token_data['consent_id'])
-        consent.type = data['type']
+        consent.type = data['consent']
         db.session.commit()
         return custom_response(200)
 

@@ -49,7 +49,7 @@ def send_email_verification(user, token):
         subject='Verify your Gabber account',
         name=user.fullname,
         top_body='Please verify your account',
-        button_url=(app.config['WEB_HOST'] + '/auth/verify/' + token + '/'),
+        button_url=(app.config['WEB_HOST'] + '/verify/' + token + '/'),
         button_label='Verify Email',
         bottom_body=''))
 

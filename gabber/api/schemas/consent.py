@@ -13,11 +13,11 @@ class ConsentType(ma.Schema):
     @pre_load()
     def __validate(self, data):
         validator = HelperSchemaValidator('CONSENT')
-        # TODO: consent must be in the list ...
-        valid_type = validator.validate('type', 'str', data)
+
+        valid_type = validator.validate('consent', 'str', data)
 
         if valid_type:
-            if data['type'] not in ['none', 'private', 'public']:
-                validator.errors.append("INVALID_TYPE_VALUE")
+            if data['consent'] not in ['none', 'private', 'public']:
+                validator.errors.append("INVALID_VALUE")
 
         validator.raise_if_errors()

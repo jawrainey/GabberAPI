@@ -98,6 +98,9 @@ class AuthRegisterSchema(ma.Schema):
         if email_valid:
             validate_email(data['email'], validator.errors)
 
+        if not validator.errors and data['email'] in known_users():
+            validator.errors.append("USER_EXISTS")
+
         validate_password(data, validator)
         validator.raise_if_errors()
 

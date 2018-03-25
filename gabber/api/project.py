@@ -48,11 +48,9 @@ class Project(Resource):
         The project to UPDATE: expecting a whole Project object to be sent.
         """
         helpers.abort_on_unknown_project_id(pid)
-        current_user = get_jwt_identity()
-        user = User.query.filter_by(email=current_user).first()
+        user = User.query.filter_by(email=get_jwt_identity()).first()
         helpers.abort_if_unknown_user(user)
-        json_data = request.get_json(force=True, silent=True)
-        helpers.abort_if_invalid_json(json_data)
+        json_data = helpers.jsonify_request_or_abort()
         # TODO: have to have prompts to validate; must remove later
         json_data['prompts'] = json_data['topics']
         json_data['id'] = pid

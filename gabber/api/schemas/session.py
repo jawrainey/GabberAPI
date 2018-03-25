@@ -14,7 +14,7 @@ class RecordingTopicSchema(ma.ModelSchema):
 
 
 class RecordingParticipantsSchema(ma.ModelSchema):
-    user_id = ma.String(attribute='user.id')
+    user_id = ma.Int(attribute='user.id')
     role = ma.Function(lambda member: 'interviewer' if member.role else 'interviewee')
 
     class Meta:
@@ -39,7 +39,7 @@ class RecordingSessionsSchema(ma.ModelSchema):
 
     @staticmethod
     def _creator(data):
-        user = User.query.get(data.creator)
+        user = User.query.get(data.creator_id)
         return {'user_id': user.id, 'fullname': user.fullname}
 
     class Meta:
