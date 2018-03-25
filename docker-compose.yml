@@ -12,8 +12,12 @@ services:
     env_file:
       - .env
     environment:
+      SECRET_KEY: super-duper-secret
+      SALT: really-not-secret
+      JWT_SECRET: now-this-one-is-secret
       WEB_HOST: http://localhost:8080
       DATABASE_URL: mysql+pymysql://user:secret@mysql/gabber?charset=utf8mb4
+      APP_MODE: development
 
   mysql:
     image: mysql
