@@ -17,7 +17,7 @@ class UserAnnotationTagSchema(ma.ModelSchema):
 class UserAnnotationCommentSchema(ma.ModelSchema):
     creator = ma.Method("_creator")
     content = ma.Method("_content")
-    parent_id = ma.Int(attribute='parent')
+    parent_id = ma.Int(attribute='parent_id', allow_none=True)
     annotation_id = ma.Int(attribute='connection_id')
     replies = ma.Method("_replies")
 
