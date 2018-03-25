@@ -106,14 +106,13 @@ def send_project_member_invite_registered_user(admin, user, project):
     :param user: The User model object for the user to email.
     :param project: The User model object for the user to email.
     """
-    url = app.config['WEB_HOST'] + '/projects/' + project.id + '/'
-    subject = '%s invited you to join the project "%s" on Gabber' % (admin.fullname, project.title)
-    content = "Hi %s, Let's listen and annotate! " \
-              "%s invites you to join the project: %s. " \
-              "Login to view the project: %s" \
-              % (user.fullname, admin.fullname, project.title, url)
+    data = dict(name=user.fullname, button_label='View Project', bottom_body='')
+    data['subject'] = '%s invited you to join the project "%s" on Gabber' % (admin.fullname, project.title)
+    data['top_body'] = "Hi %s,<br> %s invites you to join the project: %s. " \
+                       "Login to view the project:" % (user.fullname, admin.fullname, project.title)
+    data['button_url'] = '{}/projects/'.format(app.config['WEB_HOST'])
 
-    send_email_action(user.email, dict(subject=subject, body=content))
+    send_email_action(user.email, data)
 
 
 def send_project_member_invite_unregistered_user(admin, user, project):

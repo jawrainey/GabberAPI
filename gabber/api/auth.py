@@ -3,7 +3,8 @@
 JWT configuration and authentication (registration, login and logout).
 """
 from .. import db
-from ..api.schemas.auth import AuthRegisterSchema, AuthLoginSchema, ResetPasswordSchema, ForgotPasswordSchema, UserSchema
+from ..api.schemas.auth import AuthRegisterSchema, AuthLoginSchema, \
+    ResetPasswordSchema, ForgotPasswordSchema, UserSchema, UserSchemaHasAccess
 from ..models.user import User, ResetTokens
 from ..utils.general import CustomException, custom_response
 from ..utils import helpers
@@ -38,7 +39,7 @@ class UserAsMe(Resource):
         If no user is logged in then data is empty.
         """
         user = User.query.filter_by(email=get_jwt_identity()).first()
-        return custom_response(200, data=UserSchema().dump(user) if user else None)
+        return custom_response(200, data=UserSchemaHasAccess().dump(user) if user else None)
 
 
 class ForgotPassword(Resource):

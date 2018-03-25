@@ -105,6 +105,12 @@ class AuthRegisterSchema(ma.Schema):
         validator.raise_if_errors()
 
 
+class UserSchemaHasAccess(ma.ModelSchema):
+    class Meta:
+        model = User
+        exclude = ['connection_comments', 'connections', 'password', 'member_of']
+
+
 class UserSchema(ma.ModelSchema):
     class Meta:
         model = User

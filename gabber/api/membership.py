@@ -4,7 +4,7 @@ An administrator can invite or remove members from their project.
 These actions are notified to users once carried out.
 """
 from ..api.auth import create_jwt_access, AuthToken
-from ..api.schemas.auth import UserSchema
+from ..api.schemas.auth import UserSchema, UserSchemaHasAccess
 from ..api.schemas.membership import AddMemberSchema, ProjectInviteWithToken
 from ..api.schemas.project import ProjectMember, ProjectModelSchema
 from ..models.projects import Project
@@ -32,7 +32,7 @@ class ProjectInviteVerification(Resource):
         token_data = AuthToken.validate_token(token)
         user = User.query.get(token_data['user_id'])
         project = Project.query.get(token_data['project_id'])
-        payload = dict(user=UserSchema().dump(user), project=ProjectModelSchema().dump(project))
+        payload = dict(user=UserSchemaHasAccess().dump(user), project=ProjectModelSchema().dump(project))
         return custom_response(201, data=payload)
 
     @staticmethod
@@ -70,7 +70,7 @@ class ProjectInviteVerification(Resource):
         payload = {'user_id': user_id, 'project_id': project_id}
         token = URLSafeTimedSerializer(app.config["SECRET_KEY"]).dumps(payload, app.config['SALT'])
         # Do not store tokens as: (1) they're one time use and (2) token expires.
-        return '%s/projects/invites/%s/' % (app.config['WEB_HOST'], token)
+        return '{}/accept/{}/'.format(app.config['WEB_HOST'], token)
 
 
 class ProjectInvites(Resource):
@@ -96,7 +96,7 @@ class ProjectInvites(Resource):
 
             project = Project.query.get(pid)
 
-            if user.registered:
+            if user.registered or user.verified:
                 email_client.send_project_member_invite_registered_user(admin, user, project)
             else:
                 email_client.send_project_member_invite_unregistered_user(admin, user, project)

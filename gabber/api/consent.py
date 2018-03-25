@@ -3,7 +3,7 @@
 The consent for a Gabber session.
 """
 from .. import db
-from ..api.schemas.auth import UserSchema
+from ..api.schemas.auth import UserSchema, UserSchemaHasAccess
 from ..api.schemas.consent import ConsentType
 from ..api.schemas.project import ProjectModelSchema
 from ..api.schemas.session import RecordingSessionSchema
@@ -27,10 +27,12 @@ class SessionConsent(Resource):
         Returns the project, session and user associated with the session that is being consented by the user.
         """
         data = AuthToken.validate_token(token)
-        user = UserSchema().dump(User.query.get(data['user_id']))
+        user = UserSchemaHasAccess().dump(User.query.get(data['user_id']))
         project = ProjectModelSchema().dump(Project.query.get(data['project_id']))
         session = RecordingSessionSchema().dump(InterviewSession.query.get(data['session_id']))
-        return custom_response(200, data=dict(user=user, project=project, session=session))
+        # It is unnecessary to serialize the consent as only the type is used.
+        consent = SessionConsentModel.query.get(data['consent_id']).type
+        return custom_response(200, data=dict(user=user, project=project, session=session, consent=consent))
 
     @staticmethod
     def put(token):
