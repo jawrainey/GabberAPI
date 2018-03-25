@@ -19,29 +19,38 @@ s3 = boto3.client(
 )
 
 
-def signed_url(path):
+def __get_path(project_id, session_id):
+    """
+    The path to specific Gabber session in the mode that the app is being run in.
+    """
+    return '{}/{}/{}'.format(os.environ.get('APP_MODE', 'dev'), project_id, session_id)
+
+
+def signed_url(project_id, session_id):
     """
     Generates a signed URL for a given file (which includes its path) on S3.
 
-    :param path the complete path on S3, i.e. folderName/fileID as a string
+    :param project_id: The ID of the project associated with the file to upload
+    :param session_id: The ID of the session associated with the file to upload.
     :return: A temporary (2 hour) URL for a given file on S3.
     """
     return s3.generate_presigned_url(
         ClientMethod='get_object',
-        Params={'Bucket': S3_BUCKET, 'Key': path},
+        Params={'Bucket': S3_BUCKET, 'Key': __get_path(project_id, session_id)},
         ExpiresIn=3600*2)
 
 
-def upload(the_file, path):
+def upload(the_file, project_id, session_id):
     """
     Uploads a given file to S3
 
     :param the_file: The file (as binary) to upload
-    :param path: The name to store the file on S3, which can include the path.
-    :return: True if the file uploaded successfully, otherwise  False
+    :param project_id: The ID of the project associated with the file to upload
+    :param session_id: The ID of the session associated with the file to upload.
+    :return: True if the file uploaded successfully, otherwise False
     """
     s3.upload_fileobj(
         the_file,
         S3_BUCKET,
-        path
+        __get_path(project_id, session_id)
     )

@@ -8,7 +8,4 @@ dati.db
 *.env
 .ropeproject/
 .idea/
-/experiences
-/gabber/protected
-/frontend/static/img/*
 .env

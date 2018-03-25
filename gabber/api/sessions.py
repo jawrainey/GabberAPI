@@ -121,7 +121,7 @@ class ProjectSessions(Resource):
         """
         from gabber.utils import amazon
         try:
-            amazon.upload(recording, str(project_id) + "/" + str(session_id))
+            amazon.upload(recording, project_id, session_id)
         except Exception:
             abort(500, message={'errors': 'There was an issue uploading your session.'})
 

@@ -228,7 +228,7 @@ class InterviewSession(db.Model):
         :return: signed URL for the audio recording of the interview
         """
         from gabber.utils import amazon
-        return amazon.signed_url(str(self.project_id) + "/" + str(self.id))
+        return amazon.signed_url(self.project_id, self.id)
 
 
 class InterviewPrompts(db.Model):
