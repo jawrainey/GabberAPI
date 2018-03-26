@@ -105,5 +105,5 @@ class User(db.Model):
         :return: The type of role (such as admin, staff, or user), otherwise None
         """
         from ..models.projects import Roles
-        match = [i.role_id for i in self.member_of if i.project_id == pid]
-        return Roles.query.get(match[0]).name if match else None
+        match = [i.role_id for i in self.member_of if i.project_id == pid if i.confirmed and not i.deactivated]
+        return Roles.query.get(match[0]).name if match else 'user'

@@ -115,9 +115,14 @@ class ProjectMember(ma.ModelSchema):
         exclude = ['project', 'user']
 
 
+class ProjectMemberWithAccess(ProjectMember):
+    fullname = ma.String(attribute='user.fullname')
+    email = ma.String(attribute='user.email')
+
+
 class ProjectTopicSchema(ma.ModelSchema):
     """
-    No validation is done here as it's all done in ProjectModelSchema before serialization
+    Note: No validation is done here as it's all done in ProjectModelSchema before serialization
     """
     text = ma.String(attribute="text_prompt")
 
@@ -129,9 +134,29 @@ class ProjectTopicSchema(ma.ModelSchema):
 
 class ProjectModelSchema(ma.ModelSchema):
     topics = ma.Nested(ProjectTopicSchema, many=True, attribute="prompts")
-    members = ma.Nested(ProjectMember, many=True, attribute="members")
+    members = ma.Method("_members")
     creator = ma.Method("_creator")
     privacy = ma.Function(lambda obj: "public" if obj.is_public else "private")
+
+    def __init__(self, **kwargs):
+        """
+        When Schema is created, it can optionally take a user_id, which is used
+        to provide fullname/email for members of projects where the user is an admin/creator.
+        """
+        # Remove this as parent ModelSchema does not expect this argument
+        self.user_id = kwargs.pop('user_id', None)
+        # Need to initialise parent manually
+        ma.ModelSchema.__init__(self,  **kwargs)
+
+    def _members(self, data):
+        """
+        Show the name/email of member of a project if the user making the request (well, to serialize the object)
+        is an admin on the project or they are the creator of a project.
+        """
+        if self.user_id:
+            if User.query.get(self.user_id).role_for_project(data.id) in ['admin', 'staff'] or data.creator == self.user_id:
+                return ProjectMemberWithAccess(many=True).dump(data.members)
+        return ProjectMember(many=True).dump(data.members)
 
     @staticmethod
     def _creator(data):
@@ -140,11 +165,11 @@ class ProjectModelSchema(ma.ModelSchema):
 
     class Meta:
         model = Project
-        # We include FKs so that to gain access to Topics, Creator and Members
+        # We include FKs to gain access to Topics, Creator and Members
         include_fk = True
         exclude = ['codebook', 'prompts']
 
-    @pre_load()
+    @pre_load
     def __validate(self, data):
         validator = HelperSchemaValidator('PROJECTS')
 

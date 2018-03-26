@@ -28,17 +28,16 @@ class Project(Resource):
         helpers.abort_on_unknown_project_id(pid)
         project = ProjectModel.query.filter_by(id=pid).first()
         helpers.abort_if_unknown_project(project)
-        schema = ProjectModelSchema()
 
         if project.is_public:
-            return custom_response(200, schema.dump(project))
+            return custom_response(200, ProjectModelSchema().dump(project))
 
         current_user = get_jwt_identity()
         if current_user:
             user = User.query.filter_by(email=current_user).first()
             helpers.abort_if_unknown_user(user)
             helpers.abort_if_not_a_member_and_private(user, project)
-            return custom_response(200, schema.dump(project))
+            return custom_response(200, ProjectModelSchema(user_id=user.id).dump(project))
         # If the user is not authenticated and the project is private
         return custom_response(200, errors=['PROJECT_DOES_NOT_EXIST'])
 

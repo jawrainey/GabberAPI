@@ -15,28 +15,26 @@ import gabber.utils.helpers as helpers
 
 class Projects(Resource):
     """
-    All public AND private projects for an authenticated user
-
     Mapped to: /api/projects/
     """
     @staticmethod
     @jwt_optional
     def get():
         """
-        The projects for an authenticated user; if unauthenticated, then only public projects are shown
-
-        :return: A dictionary of public (i.e. available to all users) and private (user specific) projects.
+        The projects the JWT user is a member of, otherwise all public projects.
         """
         current_user = get_jwt_identity()
-        projects = ProjectModel.query.filter_by(is_public=True).order_by(ProjectModel.id.desc()).all()
-
         if current_user:
             user = User.query.filter_by(email=current_user).first()
             helpers.abort_if_unknown_user(user)
             projects = ProjectModel.query.filter(or_(
                 ProjectModel.members.any(Membership.user_id == user.id),
-                ProjectModel.is_public)).all()
-        return custom_response(200, data=ProjectModelSchema(many=True).dump(projects))
+                ProjectModel.is_public)).order_by(ProjectModel.id.desc()).all()
+            # Pass optional argument to show more details of members if the user is an admin.creator of the project.
+            return custom_response(200, data=ProjectModelSchema(many=True, user_id=user.id).dump(projects))
+        else:
+            projects = ProjectModel.query.filter_by(is_public=True).order_by(ProjectModel.id.desc()).all()
+            return custom_response(200, data=ProjectModelSchema(many=True).dump(projects))
 
     @jwt_required
     def post(self):
