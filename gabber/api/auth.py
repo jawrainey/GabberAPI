@@ -196,9 +196,15 @@ class UserRegistration(Resource):
         data = helpers.jsonify_request_or_abort()
         helpers.abort_if_errors_in_validation(AuthRegisterSchema().validate(data))
         user = User(fullname=data['fullname'], email=data['email'], password=data['password'], registered=True)
-        db.session.add(user)
-        db.session.commit()
-        email_client.send_email_verification(user, AuthToken(user_id=user.id).token)
+
+        known_user = User.query.filter_by(email=data['email']).first()
+        if known_user:
+            email_client.send_register_notification(known_user)
+        else:
+            db.session.add(user)
+            db.session.commit()
+            email_client.send_email_verification(user, AuthToken(user_id=user.id).token)
+
         return custom_response(201)
 
 

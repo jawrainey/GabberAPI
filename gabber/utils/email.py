@@ -60,6 +60,17 @@ def send_welcome_after_registration(user):
     send_email_message(user.email, data)
 
 
+def send_register_notification(user):
+    send_email_action(user.email, dict(
+        subject='Attempt to register with your email',
+        name=user.fullname,
+        top_body='Someone has tried to access your email account. If this was you and you have forgot your password,'
+                 'then reset it using the button below.',
+        button_url=(app.config['WEB_HOST'] + '/forgot/'),
+        button_label='Reset Password',
+        bottom_body='If you did not make this request, then disregard this email.'))
+
+
 def request_consent(participants, project, session):
     # Note: having to create a consent model here as this is called after participants are created
     from ..models.user import User, SessionConsent as SessionConsentModel
