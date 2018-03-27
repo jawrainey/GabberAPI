@@ -4,9 +4,9 @@ An administrator can invite or remove members from their project.
 These actions are notified to users once carried out.
 """
 from ..api.auth import create_jwt_access, AuthToken
-from ..api.schemas.auth import UserSchema, UserSchemaHasAccess
+from ..api.schemas.auth import UserSchemaHasAccess
 from ..api.schemas.membership import AddMemberSchema, ProjectInviteWithToken
-from ..api.schemas.project import ProjectMember, ProjectModelSchema
+from ..api.schemas.project import ProjectMember, ProjectMemberWithAccess, ProjectModelSchema
 from ..models.projects import Project
 from ..models.projects import Membership, Roles
 from ..models.user import User
@@ -102,7 +102,7 @@ class ProjectInvites(Resource):
                 email_client.send_project_member_invite_unregistered_user(admin, user, project)
         else:
             return custom_response(400, errors=['MEMBERSHIP_MEMBER_EXISTS'])
-        return custom_response(200, data=ProjectMember().dump(membership))
+        return custom_response(200, data=ProjectMemberWithAccess().dump(membership))
 
     @jwt_required
     def delete(self, pid, mid=None):
@@ -127,7 +127,7 @@ class ProjectInvites(Resource):
         membership.deactivated = True
         db.session.commit()
         email_client.send_project_member_removal(admin, User.query.get(membership.user_id), Project.query.get(pid))
-        return custom_response(200, data=ProjectMember().dump(membership))
+        return custom_response(200, data=ProjectMemberWithAccess().dump(membership))
 
     @staticmethod
     def validate_and_get_data(project_id):
