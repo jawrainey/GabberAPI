@@ -39,7 +39,6 @@ fullname varies across countries, where some consider middle name, etc.
 
 **Errors**
 
-- `AUTH_INCORRECT_PASSWORD`: The password you provided for that email is invalid.
 - `AUTH_FULLNAME_REQUIRED`: A full name is required to register. This is for others to identify you.
 - `AUTH_EMAIL_DOES_NOT_EXIST`: A user with that account does not exist.
 - `AUTH_EMAIL_REQUIRED`: An email address is required to register. This is your username.
@@ -87,7 +86,6 @@ user object and tokens are returned.
 **Errors**
 
 - `TOKEN_EXPIRED`: The token provided has expired; default length is one week.
-- `TOKEN_404`: The token provided is invalid.
 - `ALREADY_VERIFIED`: The magic URL has already been used to verify the account.
 
 </details>
@@ -112,12 +110,10 @@ user object and tokens are returned.
 
 **Errors**
 
-- `AUTH_INCORRECT_PASSWORD`: The password you provided for that email is invalid.
 - `AUTH_EMAIL_EXISTS`: A user with that account does not exist.
 - `AUTH_EMAIL_REQUIRED`: An email address is required to register. This is your username.
 - `AUTH_INVALID_EMAIL`: The email address provided is invalid.
 - `AUTH_PASSWORD_REQUIRED`: A password is required to register
-- `AUTH_INCORRECT_PASSWORD`: An incorrect password was provided for this email address.
 - `AUTH_PASSWORD_LENGTH`: The password must be at least 12 characters long
 </details>
 
@@ -196,7 +192,6 @@ N/A, but a JWT must be provided.
 - `AUTH_PASSWORD_IS_EMPTY`: The provided password attribute is empty.
 - `AUTH_PASSWORD_IS_NOT_STRING`: The password attribute must be a string.
 - `TOKEN_EXPIRED`: The token is invalid as it has expired.
-- `TOKEN_404:` The token does not exist.
 - `TOKEN_USED`: This token was previously used to reset the password.
   
 </details>
@@ -372,7 +367,6 @@ The same format as `/projects/`, but for the individual project the user just cr
 - `PROJECTS_TOPIC_MUST_BE_LIST`: The topics parameter must be of type list.
 - `PROJECTS_TOPIC_IS_NOT_STRING`: The value for the privacy parameter must be a string.
 - `PROJECTS_TOPIC_IS_EMPTY`: A topic provided is empty.
-- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database.
 - `GENERAL_INVALID_JSON`: The request made contains invalid JSON
 
 </details>
@@ -428,7 +422,6 @@ The same format as `/projects/`, but for the individual project the user just cr
 
 **Errors**
 
-- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database.
 - `PROJECT_DOES_NOT_EXIST`: The project you tried to view does not exist.
 - `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
 
@@ -509,7 +502,6 @@ it overrides all existing topics for the project; `text` and `is_active` is requ
 **Errors**
 
 - `PROJECT_DOES_NOT_EXIST`: ??
-- `GENERAL_UNKNOWN_JWT_USER`: ??
 - `PROJECT_DELETE_UNAUTHORIZED`: ??
 
 </details>
@@ -546,7 +538,6 @@ login with an existing account, which is then associated with the membership inv
 
 **Errors**
 
-- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database.
 - `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
 - `GENERAL_UNKNOWN_USER`: The user in the JWT request does not exist.
 - `PROJECT_INVITE_MEMBER_UNAUTHORIZED`: You are unauthorized to remove a member from a project
@@ -584,7 +575,6 @@ N/A
 
 **Errors**
 
-- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database.
 - `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
 - `GENERAL_UNKNOWN_USER`: The user in the JWT request does not exist.
 - `PROJECT_INVITE_MEMBER_UNAUTHORIZED`: You are unauthorized to remove a member from a project
@@ -666,7 +656,6 @@ N/A
 **Errors**
 
 - `TOKEN_EXPIRED`: The token provided has expired; default length is one week.
-- `TOKEN_404`: The token provided is invalid.
 
 </details>
 
@@ -708,11 +697,9 @@ The user object:
 **Errors**
 
 - `TOKEN_EXPIRED`: The token provided has expired; default length is one week.
-- `TOKEN_404`: The token provided is invalid.
 - `GENERAL_INVALID_JSON`: The request is not valid JSON.
 - `MEMBERSHIP_CONFIRMED`: You have already previously confirmed your membership to this project.
 - `AUTH_FULLNAME_REQUIRED`: A full name is required to register. This is for others to identify you.
-- `AUTH_ALREADY_REGISTERED`: the account has already been confirmed and registered
 
 </details>
 
@@ -732,7 +719,6 @@ The user object:
 
 **Errors**
 
-- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database.
 - `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
 - `ALREADY_MEMBER`: You have tried to join a project that you are already a member of.
 
@@ -752,7 +738,6 @@ The user object:
 
 **Errors**
 
-- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database.
 - `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
 - `USER_NOT_PROJECT_MEMBER`: You are not a member of that project.
 
@@ -808,7 +793,6 @@ The user object:
 
 **Errors**
 
-- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database.
 - `PROJECT_DOES_NOT_EXIST`: The project you tried to view does not exist.
 - `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
 - `SESSION_UNKNOWN`: The session you tried to view does not exist.
@@ -898,7 +882,6 @@ which should be of the format: `{Start: 0, End: 10, PromptID: 21}`.
 
 **Errors**
 
-- `GENERAL_UNKNOWN_JWT_USER`: The JWT user is unknown to the database.
 - `PROJECT_DOES_NOT_EXIST`: The project you tried to view does not exist.
 - `PROJECT_UNAUTHORIZED`: You are unauthorized to view this project.
 - `SESSION_UNKNOWN`: The session you tried to view does not exist.
@@ -1011,7 +994,6 @@ The `project`, `session`, and `user` associated with the Gabber session that is 
 **Errors**
 
 - `TOKEN_EXPIRED`: The token provided has expired; default length is one week.
-- `TOKEN_404`: The token provided is invalid.
 - `GENERAL_INVALID_JSON`: The request is not valid JSON.
 
 </details>
@@ -1036,7 +1018,6 @@ The `project`, `session`, and `user` associated with the Gabber session that is 
 **Errors**
 
 - `TOKEN_EXPIRED`: The token provided has expired; default length is one week.
-- `TOKEN_404`: The token provided is invalid.
 - `GENERAL_INVALID_JSON`: The request is not valid JSON.
 - `CONSENT_TYPE_KEY_REQUIRED`: The type attribute is required.
 - `CONSENT_TYPE_IS_EMPTY`: The type attribute is empty.
@@ -1145,7 +1126,6 @@ simplifies updating the model.
 - `PROJECT_DOES_NOT_EXIST`: ??
 - `SESSION_UNKNOWN`: ??
 - `SESSION_NOT_IN_PROJECT`: ??
-- `GENERAL_UNKNOWN_JWT_USER`: ??
 - `PROJECT_UNAUTHORIZED`: ??
 
 </details>
@@ -1210,7 +1190,6 @@ removed.
 - `PROJECT_DOES_NOT_EXIST`: ??
 - `SESSION_UNKNOWN`: ??
 - `SESSION_NOT_IN_PROJECT`: ??
-- `GENERAL_UNKNOWN_JWT_USER`: ??
 - `PROJECT_UNAUTHORIZED`: ??
 - `GENERAL_INVALID_JSON`: ??
 - `ANNOTATIONS_CONTENT_REQUIRED`: ??
@@ -1245,7 +1224,6 @@ removed.
 - `PROJECT_DOES_NOT_EXIST`: ??
 - `SESSION_UNKNOWN`: ??
 - `SESSION_NOT_IN_PROJECT`: ??
-- `GENERAL_UNKNOWN_JWT_USER` ??
 - `PROJECT_UNAUTHORIZED`: ??
 - `ANNOTATIONS_NOT_FOUND`: ??
 - `NOT_ANNOTATION_CREATOR`: ??
@@ -1298,7 +1276,6 @@ The content of the comment
 - `PROJECT_DOES_NOT_EXIST`: ??
 - `SESSION_UNKNOWN`: ??
 - `SESSION_NOT_IN_PROJECT`: ??
-- `GENERAL_UNKNOWN_JWT_USER`: ??
 - `PROJECT_UNAUTHORIZED`: ??
 - `COMMENT_404`: ??
 - `COMMENT_NOT_IN_SESSION`: ??
@@ -1323,7 +1300,6 @@ The content of the comment
 - `PROJECT_DOES_NOT_EXIST`: ??
 - `SESSION_UNKNOWN`: ??
 - `SESSION_NOT_IN_PROJECT`: ??
-- `GENERAL_UNKNOWN_JWT_USER`: ??
 - `PROJECT_UNAUTHORIZED`: ??
 - `COMMENT_404`: ??
 - `COMMENT_NOT_IN_SESSION`: ??
@@ -1347,7 +1323,6 @@ The content of the comment
 - `PROJECT_DOES_NOT_EXIST`: ??
 - `SESSION_UNKNOWN`: ??
 - `SESSION_NOT_IN_PROJECT`: ??
-- `GENERAL_UNKNOWN_JWT_USER`: ??
 - `PROJECT_UNAUTHORIZED`: ??
 - `COMMENT_404`: ??
 - `COMMENT_NOT_IN_SESSION`: ??

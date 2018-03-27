@@ -38,12 +38,12 @@ def abort_if_project_member(user, project_id):
 
 def abort_if_unknown_project(project):
     if not project:
-        raise CustomException(400, errors=['PROJECT_UNKNOWN'])
+        raise CustomException(400, errors=['PROJECT_404'])
 
 
 def abort_if_unknown_session(session):
     if not session:
-        raise CustomException(401, errors=['SESSION_UNKNOWN'])
+        raise CustomException(401, errors=['SESSION_404'])
 
 
 def abort_if_unknown_user(user):
@@ -53,10 +53,10 @@ def abort_if_unknown_user(user):
 
 def abort_if_unknown_comment(cid, aid):
     if cid not in [i.id for i in ConnectionComments.query.all()]:
-        raise CustomException(400, errors=['COMMENT_404'])
+        raise CustomException(400, errors=['COMMENTS_404'])
 
     if aid != ConnectionComments.query.get(cid).connection_id:
-        raise CustomException(400, errors=['COMMENT_NOT_IN_SESSION'])
+        raise CustomException(400, errors=['COMMENTS_NOT_IN_SESSION'])
 
 
 def jsonify_request_or_abort():
@@ -78,7 +78,7 @@ def abort_if_errors_in_validation(errors):
 
 def abort_if_unknown_annotation(annotation):
     if not annotation:
-        raise CustomException(400, errors=['ANNOTATIONS_NOT_FOUND'])
+        raise CustomException(400, errors=['ANNOTATIONS_404'])
 
 
 def abort_if_not_user_made(user_id, user_of_annotation):
@@ -88,14 +88,14 @@ def abort_if_not_user_made(user_id, user_of_annotation):
 
 def abort_if_not_user_made_comment(user_id, user_of_comment):
     if user_id != user_of_comment:
-        raise CustomException(400, errors=['COMMENT_NOT_CREATOR'])
+        raise CustomException(400, errors=['COMMENTS_NOT_CREATOR'])
 
 
 def abort_if_unauthorized(project):
     """
     Can return the following:
 
-        - GENERAL_UNKNOWN_JWT_USER
+        - GENERAL_UNKNOWN_USER
         - PROJECT_UNAUTHORIZED
     """
     current_user = get_jwt_identity()

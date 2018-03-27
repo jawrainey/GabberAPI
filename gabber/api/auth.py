@@ -100,10 +100,10 @@ class ResetPassword(Resource):
         reset_token = ResetTokens.query.filter_by(token=token, user_id=user_id).first()
         if not reset_token or not reset_token.token:
             # The user has not requested a password reset
-            raise CustomException(400, errors=['TOKEN_404'])
+            raise CustomException(400, errors=['RESET_TOKEN_404'])
         elif not reset_token.is_active:
             # The user previously reset their password using this token
-            raise CustomException(400, errors=['TOKEN_USED'])
+            raise CustomException(400, errors=['RESET_TOKEN_USED'])
         return reset_token
 
     def serialize_token_or_abort(self, token):
@@ -158,9 +158,9 @@ class AuthToken:
         try:
             data = serializer.loads(token, salt=app.config['SALT'], max_age=86400 * 7)  # one week
         except SignatureExpired:
-            raise CustomException(400, errors=['TOKEN_EXPIRED'])
+            raise CustomException(400, errors=['AUTH_TOKEN_EXPIRED'])
         except BadSignature:
-            raise CustomException(400, errors=['TOKEN_404'])
+            raise CustomException(400, errors=['AUTH_TOKEN_404'])
         return data
 
 

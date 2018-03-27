@@ -176,7 +176,7 @@ class ProjectModelSchema(ma.ModelSchema):
         pid_valid = validator.validate('id', 'int', data)
 
         if pid_valid and data['id'] not in [p.id for p in Project.query.with_deleted().all()]:
-            validator.errors.append("PROJECT_ID_NOT_FOUND")
+            validator.errors.append("ID_404")
             pid_valid = False
 
         # This must be a known user, and must be a member of this project
