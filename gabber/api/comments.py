@@ -5,9 +5,10 @@ READ a list of the comments for an annotation or CREATE a new comment.
 from .. import db
 from ..api.schemas.annotations import UserAnnotationCommentSchema
 from ..models.projects import ConnectionComments as CommentsModel, Project
+from ..models.user import User
 from ..utils.general import custom_response
 from flask_restful import Resource
-from flask_jwt_extended import jwt_required, jwt_optional
+from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 import gabber.utils.helpers as helpers
 
 
@@ -59,6 +60,12 @@ class CommentsReplies(Resource):
         READ a comment an session annotation
         """
         helpers.abort_if_invalid_parameters(pid, sid)
+        helpers.abort_if_unknown_comment(cid, aid)
+        project = Project.query.get(pid)
+
+        if not project.is_public:
+            user = User.query.filter_by(email=get_jwt_identity()).first()
+            helpers.abort_if_not_a_member_and_private(user, project)
         children = CommentsModel.query.filter_by(parent_id=cid).all()
         return custom_response(200, data=UserAnnotationCommentSchema(many=True).dump(children))
 

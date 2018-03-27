@@ -22,7 +22,7 @@ def abort_if_session_not_in_project(session, pid):
 
 
 def abort_if_not_a_member_and_private(user, project):
-    if not user.is_project_member(project.id) and not project.is_public:
+    if not user or not user.is_project_member(project.id) and not project.is_public:
         raise CustomException(401, errors=['PROJECT_UNAUTHORIZED'])
 
 
