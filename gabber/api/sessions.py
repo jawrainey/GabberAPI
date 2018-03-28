@@ -90,7 +90,7 @@ class ProjectSessions(Resource):
         interview_session = InterviewSession(id=interview_session_id, creator_id=creator_id, project_id=pid)
         self.__upload_interview_recording(args['recording'], interview_session_id, pid)
         interview_session.prompts.extend(self.__add_structural_prompts(prompts, interview_session_id))
-        interview_session.participants.extend(self.__add_participants(participants, interview_session_id))
+        interview_session.participants.extend(self.__add_participants(participants, interview_session_id, project.id))
 
         db.session.add(interview_session)
         db.session.commit()
@@ -126,7 +126,7 @@ class ProjectSessions(Resource):
             abort(500, message={'errors': 'There was an issue uploading your session.'})
 
     @staticmethod
-    def __add_participants(participants, session_id):
+    def __add_participants(participants, session_id, project_id):
         """
         Each interview has a set of participants (>1), who each have a role (interviewer or interviewee).
         The problem is that these participants may be known to the system, having been interviewed by
@@ -139,6 +139,7 @@ class ProjectSessions(Resource):
         :return: A list of InterviewParticipants that were used in a specific interview session.
         """
         from ..models.user import User
+        from ..models.projects import Membership
         _participants_to_add = []
 
         for p in participants:
@@ -146,6 +147,9 @@ class ProjectSessions(Resource):
             # e.g. someone interviewed a person who is not a Gabber user
             if not known_user:
                 known_user = User.create_unregistered_user(p['Name'], p['Email'])
+            # By default, participants involved in a Gabber become members
+            if not known_user.is_project_member(project_id):
+                Membership.join_project(known_user.id, project_id)
             participant = InterviewParticipants(known_user.id, session_id, p['Role'])
             _participants_to_add.append(participant)
         return _participants_to_add
