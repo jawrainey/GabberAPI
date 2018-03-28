@@ -84,4 +84,5 @@ class Project(Resource):
         helpers.abort_if_unknown_user(user)
         helpers.abort_if_not_admin_or_staff(user, pid, action="PROJECT.DELETE")
         ProjectModel.query.filter_by(id=pid).update({'is_active': False})
+        db.session.commit()
         return custom_response(200)
