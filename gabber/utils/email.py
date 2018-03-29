@@ -90,7 +90,7 @@ def request_consent(participants, project, session):
             subject='Provide Consent to your Gabber recording',
             name=user.fullname,
             top_body=content,
-            button_url=SessionConsent.generate_invite_url(user.id, project.id, session.id, consent.id),
+            button_url=SessionConsent.generate_invite_url(consent.id),
             button_label='Provide Consent',
             bottom_body=''))
 
