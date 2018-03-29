@@ -213,6 +213,7 @@ class InterviewSession(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
 
     prompts = db.relationship('InterviewPrompts', backref='interview', lazy='joined')
+    consents = db.relationship('SessionConsent', backref='interview', lazy='joined')
     participants = db.relationship('InterviewParticipants', backref='interview', lazy='joined')
     connections = db.relationship(
         'Connection',
@@ -220,6 +221,37 @@ class InterviewSession(db.Model):
         lazy='joined',
         primaryjoin="and_(InterviewSession.id==Connection.session_id, Connection.is_active)"
     )
+
+    def consented(self, project_type):
+        return self.all_members_public_consented() if project_type else self.all_members_private_consented()
+
+    @staticmethod
+    def all_consented_sessions_by_project(project, is_creator_or_admin=False):
+        sessions = InterviewSession.query.filter_by(project_id=project.id).all()
+
+        # Project creators and admins can view all sessions.
+        if is_creator_or_admin:
+            return sessions
+
+        if project.is_public:
+            return [s for s in sessions if s.all_members_public_consented()]
+        else:
+            return [s for s in sessions if s.all_members_private_consented()]
+
+    def all_members_public_consented(self):
+        """
+        If all participants provide consent, i.e. the set of consents only contains public.
+        """
+        unique_consents = set([str(i.type) for i in self.consents])
+        # If only public is within the set, then all participants are in agreement to making the recording public.
+        return True if 'public' in unique_consents and len(unique_consents) == 1 else False
+
+    def all_members_private_consented(self):
+        """
+        If at least one participant does not want to share the Gabber (none), then its not for private.
+        """
+        unique_consents = set([str(i.type) for i in self.consents])
+        return True if 'none' not in unique_consents and len(unique_consents) == 1 else False
 
     def generate_signed_url_for_recording(self):
         """

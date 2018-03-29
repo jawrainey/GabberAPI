@@ -34,7 +34,7 @@ class ProjectSessions(Resource):
         helpers.abort_if_unknown_project(project)
 
         if project.is_public:
-            sessions = InterviewSession.query.filter_by(project_id=pid).all()
+            sessions = InterviewSession.all_consented_sessions_by_project(project)
             return custom_response(200, data=RecordingSessionsSchema(many=True).dump(sessions))
 
         current_user = get_jwt_identity()
@@ -43,7 +43,8 @@ class ProjectSessions(Resource):
         helpers.abort_if_not_a_member_and_private(user, project)
 
         if current_user:
-            sessions = InterviewSession.query.filter_by(project_id=pid).all()
+            is_creator_or_admin = user.role_for_project(pid) == 'admin' or project.creator == user.id
+            sessions = InterviewSession.all_consented_sessions_by_project(project, is_creator_or_admin)
             return custom_response(200, data=RecordingSessionsSchema(many=True).dump(sessions))
 
     @jwt_required

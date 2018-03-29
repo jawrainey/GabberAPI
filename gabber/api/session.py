@@ -18,14 +18,8 @@ class ProjectSession(Resource):
     @jwt_optional
     def get(self, pid, sid):
         """
-        An interview session for a given project
-        if the user is a member of the project or if it is public
-
-        :param pid: The project to associate with the session
-        :param sid: The ID (as UUID) of the interview session to view
-        :return: A serialized interview session
+        An interview session for a given project; viewing depends in consent and project visibility.
         """
-        user = User.query.filter_by(email=get_jwt_identity()).first()
         helpers.abort_on_unknown_project_id(pid)
         project = Project.query.get(pid)
 
@@ -33,7 +27,15 @@ class ProjectSession(Resource):
         helpers.abort_if_unknown_session(session)
         helpers.abort_if_session_not_in_project(session, pid)
 
-        if project.is_public:
+        jwt_user = get_jwt_identity()
+        user = User.query.filter_by(email=jwt_user).first()
+
+        if jwt_user or not project.is_public:
+            helpers.abort_if_not_a_member_and_private(user, project)
+
+        # If the user is known and is an administrator or creator, then they can view the session regardless.
+        if user and (user.role_for_project(pid) == 'admin' or project.creator == user.id):
             return custom_response(200, data=RecordingSessionSchema().dump(session))
-        helpers.abort_if_not_a_member_and_private(user, project)
-        return custom_response(200, data=RecordingSessionSchema().dump(session))
+        else:
+            _session = RecordingSessionSchema().dump(session) if session.consented(project, user) else None
+            return custom_response(200 if _session else 404, _session)

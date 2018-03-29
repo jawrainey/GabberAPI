@@ -45,7 +45,7 @@ class RecordingSessionsSchema(ma.ModelSchema):
     class Meta:
         model = InterviewSession
         include_fk = True
-        exclude = ['prompts', 'creator_id', 'connections']
+        exclude = ['prompts', 'creator_id', 'connections', 'consents']
 
 
 class RecordingSessionSchema(RecordingSessionsSchema):
