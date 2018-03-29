@@ -7,7 +7,7 @@ import sendgrid
 from sendgrid.helpers.mail import Email, Content, Mail, Substitution
 from flask import current_app as app
 
-SEND_GRID = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY', ''))
+SEND_GRID = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY', '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'))
 
 
 def __construct_email(receiver, subject):
@@ -90,7 +90,7 @@ def request_consent(participants, project, session):
             subject='Provide Consent to your Gabber recording',
             name=user.fullname,
             top_body=content,
-            button_url=SessionConsent.generate_invite_url(user.id, project.id, session.id, consent.id),
+            button_url=SessionConsent.generate_invite_url(consent.id),
             button_label='Provide Consent',
             bottom_body=''))
 
