@@ -7,7 +7,7 @@ import sendgrid
 from sendgrid.helpers.mail import Email, Content, Mail, Substitution
 from flask import current_app as app
 
-SEND_GRID = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY', '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'))
+SEND_GRID = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY', ''))
 
 
 def __construct_email(receiver, subject):
