@@ -813,7 +813,6 @@ and is a `application/x-www-form-urlencoded` as it expects a `file` and `metadat
 **Arguments**
 
 - `recording`: An audio recording from the Gabber session
-- `creatorEmail`: The email address of the creator of the project; if not provided it is inferred from JWT.
 - `participants`: A dictionary of participants that were involved in the session [serialized here](https://github.com/jawrainey/GabberServer/blob/master/gabber/api/schemas/create_session.py#L39-L54),
 which should be of the format: `{Name: Jay, Email: blah@jay.me, Role: 0 or 1}`. These should be uppercase and `Role` is a boolean
 that represents if the participant was the creator of the interview.
