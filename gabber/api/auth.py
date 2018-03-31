@@ -200,6 +200,7 @@ class UserRegistration(Resource):
         known_user = User.query.filter_by(email=data['email']).first()
         if known_user:
             email_client.send_register_notification(known_user)
+            return custom_response(400)
         else:
             db.session.add(user)
             db.session.commit()
@@ -230,7 +231,7 @@ def create_jwt_access(username):
     :return: a dictionary containing JWT access/refresh tokens
     """
     return {
-        'user': UserSchema().dump(User.query.filter_by(email=username).first()),
+        'user': UserSchemaHasAccess().dump(User.query.filter_by(email=username).first()),
         'tokens': {
             'access': create_access_token(identity=username),
             'refresh': create_refresh_token(identity=username)
