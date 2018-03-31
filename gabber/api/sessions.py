@@ -69,9 +69,6 @@ class ProjectSessions(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('recording', location='files', type=FileStorage, required=True,
                             help="An audio recording is required, ideally encoded as MP4.")
-        parser.add_argument('creatorEmail', required=False,
-                            help="The creator (i.e. email) of the interviewer is required, i.e. who created it? "
-                                 "If this is not provided, then the user authenticated with the upload is used.")
         parser.add_argument('participants', required=True,
                             help="A dictionary of participants in the interview is required, i.e. who took part?")
         parser.add_argument('prompts', required=True,
@@ -83,12 +80,7 @@ class ProjectSessions(Resource):
         participants = self.validate_and_serialize(args['participants'], 'participants', ParticipantScheme(many=True))
 
         interview_session_id = uuid4().hex
-
-        # Note: if an invalid email is provided (or one not known to the db) then creator is None
-        creator = User.query.filter_by(email=args['creatorEmail']).first()
-        creator_id = creator.id if creator else user.id
-
-        interview_session = InterviewSession(id=interview_session_id, creator_id=creator_id, project_id=pid)
+        interview_session = InterviewSession(id=interview_session_id, creator_id=user.id, project_id=pid)
         self.__upload_interview_recording(args['recording'], interview_session_id, pid)
         interview_session.prompts.extend(self.__add_structural_prompts(prompts, interview_session_id))
         interview_session.participants.extend(self.__add_participants(participants, interview_session_id, project.id))
