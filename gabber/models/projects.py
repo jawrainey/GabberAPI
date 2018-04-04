@@ -222,8 +222,8 @@ class InterviewSession(db.Model):
         primaryjoin="and_(InterviewSession.id==Connection.session_id, Connection.is_active)"
     )
 
-    def consented(self, project_type):
-        return self.all_members_public_consented() if project_type else self.all_members_private_consented()
+    def consented(self, project_is_public):
+        return self.all_members_public_consented() if project_is_public else self.all_members_private_consented()
 
     @staticmethod
     def all_consented_sessions_by_project(project, is_creator_or_admin=False):

@@ -37,5 +37,5 @@ class ProjectSession(Resource):
         if user and (user.role_for_project(pid) == 'admin' or project.creator == user.id):
             return custom_response(200, data=RecordingSessionSchema().dump(session))
         else:
-            _session = RecordingSessionSchema().dump(session) if session.consented(project, user) else None
+            _session = RecordingSessionSchema().dump(session) if session.consented(project.is_public) else None
             return custom_response(200 if _session else 404, _session)
