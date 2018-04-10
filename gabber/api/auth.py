@@ -200,7 +200,7 @@ class UserRegistration(Resource):
         known_user = User.query.filter_by(email=data['email']).first()
         if known_user:
             email_client.send_register_notification(known_user)
-            return custom_response(400)
+            return custom_response(200)
         else:
             db.session.add(user)
             db.session.commit()
