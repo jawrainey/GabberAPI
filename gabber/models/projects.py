@@ -226,7 +226,7 @@ class InterviewSession(db.Model):
         return self.all_members_public_consented() if project_is_public else self.all_members_private_consented()
 
     @staticmethod
-    def all_consented_sessions_by_project(project, is_creator_or_admin=False):
+    def all_consented_sessions_by_project(project, is_creator_or_admin=False, user_sessions=False):
         sessions = InterviewSession.query.filter_by(project_id=project.id).all()
 
         # Project creators and admins can view all sessions.
@@ -234,9 +234,14 @@ class InterviewSession(db.Model):
             return sessions
 
         if project.is_public:
-            return [s for s in sessions if s.all_members_public_consented()]
+            data = [session for session in sessions if session.all_members_public_consented()]
         else:
-            return [s for s in sessions if s.all_members_private_consented()]
+            data = [session for session in sessions if session.all_members_private_consented()]
+
+        if user_sessions:
+            users_sessions = [session for session in sessions if session.user_is_participant(user_sessions)]
+            return set(users_sessions + data)
+        return data
 
     def all_members_public_consented(self):
         """
@@ -251,7 +256,10 @@ class InterviewSession(db.Model):
         If at least one participant does not want to share the Gabber (none), then its not for private.
         """
         unique_consents = set([str(i.type) for i in self.consents])
-        return True if 'none' not in unique_consents and len(unique_consents) == 1 else False
+        return True if 'none' not in unique_consents else False
+
+    def user_is_participant(self, user):
+        return True if user.id in [p.user_id for p in self.participants] else False
 
     def generate_signed_url_for_recording(self):
         """

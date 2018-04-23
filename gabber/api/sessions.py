@@ -44,7 +44,7 @@ class ProjectSessions(Resource):
 
         if current_user:
             is_creator_or_admin = user.role_for_project(pid) == 'admin' or project.creator == user.id
-            sessions = InterviewSession.all_consented_sessions_by_project(project, is_creator_or_admin)
+            sessions = InterviewSession.all_consented_sessions_by_project(project, is_creator_or_admin, user)
             return custom_response(200, data=RecordingSessionsSchema(many=True).dump(sessions))
 
     @jwt_required
