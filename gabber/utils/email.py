@@ -48,7 +48,7 @@ def send_email_verification(user, token):
     send_email_action(user.email, dict(
         subject='Verify your Gabber account',
         name=user.fullname,
-        top_body='Please verify your account',
+        top_body='Welcome to Gabber! Please verify your email address by tapping on the button below.',
         button_url=(app.config['WEB_HOST'] + '/verify/' + token + '/'),
         button_label='Verify Email',
         bottom_body=''))
@@ -65,14 +65,23 @@ def send_register_notification(user):
         bottom_body='If you did not make this request, then disregard this email.'))
 
 
-def request_consent(participants, project, session):
+def format_names(participants):
+    if len(participants) == 1:
+        return participants[0]
+    if len(participants) == 2:
+        return ' and '.join(participants)
+    if len(participants) > 2:
+        return "{} and {}".format(", ".join(participants[0:-1]), participants[-1])
+
+
+def request_consent(participants, session):
     # Note: having to create a consent model here as this is called after participants are created
     from ..models.user import User, SessionConsent as SessionConsentModel
     from ..api.consent import SessionConsent
 
-    content = 'Thanks for Gabbering on the <b>%s</b>.' \
-              'Click the button to review and consent to your recording being used, and shared within the project.' \
-              'You can now review the content and provide consent.' % project.title
+    names = format_names([p['Name'] for p in participants])
+    content = 'You were in a Gabber conversation with {}.<br><br>' \
+              'Review your consent so they and others can listen to the recording.'.format(names)
 
     # Email each client to request individual consent on the recorded session.
     for participant in participants:
@@ -81,19 +90,19 @@ def request_consent(participants, project, session):
         # to update their consent. Likewise, this ensures all queries manipulate all data.
         consent = SessionConsentModel.create_default_consent(session.id, user.id)
         send_email_action(user.email, dict(
-            subject='Provide Consent to your Gabber recording',
+            subject='Review consent for your Gabber conversation',
             name=user.fullname,
             top_body=content,
             button_url=SessionConsent.generate_invite_url(consent.id),
-            button_label='Provide Consent',
-            bottom_body=''))
+            button_label='Review Consent',
+            bottom_body='You can use the link above at any time to review your consent for this recording.'))
 
 
 def send_forgot_password(user, url):
     data = dict()
     data['subject'] = "Gabber password reset"
     data['name'] = user.fullname
-    data['top_body'] = "You recently requested to reset your password for your Gabber account. " \
+    data['top_body'] = "You requested to reset your password for your Gabber account. " \
                        "Click the button below to reset your it:"
     data['button_url'] = url
     data['button_label'] = "Reset your password"
@@ -130,8 +139,8 @@ def send_project_member_invite_unregistered_user(admin, user, project):
     data['subject'] = '%s invited you to join the project %s on Gabber' % (admin.fullname, project.title)
     data['name'] = user.fullname
     data['top_body'] = '%s invites you to join the project <b>%s</b>.</br>' \
-                       'Register by clicking the button below and the account you create will be part of the project ' \
-                       'where you can begin listening to and annotating Gabbers.' \
+                       'Register by clicking the button below and you will become a project member ' \
+                       'where you can begin listening to Gabber conversations.' \
                        '' % (admin.fullname, project.title)
     data['button_url'] = ProjectInviteVerification.generate_invite_url(user.id, project.id)
     data['button_label'] = 'Join the project'
