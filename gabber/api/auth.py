@@ -180,7 +180,6 @@ class VerifyRegistration(Resource):
             return custom_response(400, errors=['ALREADY_VERIFIED'])
         user.verified = True
         db.session.commit()
-        email_client.send_welcome_after_registration(user)
         return custom_response(200, data=create_jwt_access(user.email))
 
 

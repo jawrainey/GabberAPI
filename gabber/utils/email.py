@@ -54,12 +54,6 @@ def send_email_verification(user, token):
         bottom_body=''))
 
 
-def send_welcome_after_registration(user):
-    data = dict(subject="Welcome to Gabber, what's next?", name=user.fullname)
-    data['body'] = 'Thanks for registering ... TODO: content/images to describe Gabber process.'
-    send_email_message(user.email, data)
-
-
 def send_register_notification(user):
     send_email_action(user.email, dict(
         subject='Attempt to register with your email',
