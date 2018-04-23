@@ -23,7 +23,12 @@ def __get_path(project_id, session_id):
     """
     The path to specific Gabber session in the mode that the app is being run in.
     """
-    return '{}/{}/{}'.format(os.environ.get('APP_MODE', 'dev'), project_id, session_id)
+    return '{}/{}/{}/{}'.format(
+        os.getenv('APP_NAME', 'main'),
+        os.environ.get('APP_MODE', 'dev'),
+        project_id,
+        session_id
+    )
 
 
 def signed_url(project_id, session_id):
