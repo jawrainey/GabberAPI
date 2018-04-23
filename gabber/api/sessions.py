@@ -87,7 +87,7 @@ class ProjectSessions(Resource):
 
         db.session.add(interview_session)
         db.session.commit()
-        email_client.request_consent(participants, project, interview_session)
+        email_client.request_consent(participants, interview_session)
         return {}, 201
 
     @staticmethod
