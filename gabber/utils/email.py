@@ -103,7 +103,7 @@ def send_forgot_password(user, url):
     data['subject'] = "Gabber password reset"
     data['name'] = user.fullname
     data['top_body'] = "You requested to reset your password for your Gabber account. " \
-                       "Click the button below to reset your it:"
+                       "Click the link below and you'll be redirected to a secure site where you can set a new password."
     data['button_url'] = url
     data['button_label'] = "Reset your password"
     data['bottom_body'] = "If you did not request a password reset, " \
