@@ -14,7 +14,7 @@ class AddMemberSchema(ma.Schema):
 
     @pre_load()
     def __validate(self, data):
-        validator = HelperSchemaValidator('MEMBERSHIP')
+        validator = HelperSchemaValidator('membership')
         fullname_valid = validator.validate('fullname', 'str', data)
         email_valid = validator.validate('email', 'str', data)
 
@@ -29,6 +29,6 @@ class ProjectInviteWithToken(ma.Schema):
 
     @pre_load()
     def __validate(self, data):
-        validator = HelperSchemaValidator('MEMBERSHIP')
+        validator = HelperSchemaValidator('membership')
         fullname_valid = validator.validate('fullname', 'str', data)
         validator.raise_if_errors()

@@ -64,7 +64,7 @@ class HelperSchemaValidator:
 
     def raise_if_errors(self):
         if self.errors:
-            errors = [('%s_%s' % (self.caller, error)).upper() for error in self.errors]
+            errors = [('{}.{}'.format(self.caller, error)) for error in self.errors]
             raise ValidationErrorWithCustomErrorFormat(errors)
 
 
@@ -76,7 +76,7 @@ class ProjectPostSchema(ma.Schema):
 
     @pre_load()
     def __validate(self, data):
-        validator = HelperSchemaValidator('PROJECTS')
+        validator = HelperSchemaValidator('projects')
 
         title_valid = validator.validate('title', 'str', data)
         if title_valid and Project.query.with_deleted().filter_by(slug=slugify(data['title'])).first():
@@ -171,7 +171,7 @@ class ProjectModelSchema(ma.ModelSchema):
 
     @pre_load
     def __validate(self, data):
-        validator = HelperSchemaValidator('PROJECTS')
+        validator = HelperSchemaValidator('projects')
 
         pid_valid = validator.validate('id', 'int', data)
 

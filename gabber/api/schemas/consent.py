@@ -12,7 +12,7 @@ class ConsentType(ma.Schema):
 
     @pre_load()
     def __validate(self, data):
-        validator = HelperSchemaValidator('CONSENT')
+        validator = HelperSchemaValidator('consent')
 
         valid_type = validator.validate('consent', 'str', data)
 

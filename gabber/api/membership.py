@@ -111,18 +111,18 @@ class ProjectInvites(Resource):
         Mapped to: /api/project/<int:id>/membership/invites/<int:mid>
         """
         if not mid:
-            raise CustomException(400, errors=['MEMBERSHIP_ID_NOT_PROVIDED'])
+            raise CustomException(400, errors=['membership.NOT_EXISTS'])
 
         helpers.abort_if_unauthorized(Project.query.get(pid))
         admin = User.query.filter_by(email=get_jwt_identity()).first()
         helpers.abort_if_unknown_user(admin)
-        helpers.abort_if_not_admin_or_staff(admin, pid, "MEMBERSHIP.INVITE")
+        helpers.abort_if_not_admin_or_staff(admin, pid, "membership.INVITE")
         membership = Membership.query.filter_by(id=mid).first()
 
         if not membership:
-            raise CustomException(400, errors=['MEMBERSHIP_UNKNOWN'])
+            raise CustomException(400, errors=['membership.UNKNOWN'])
         elif membership.deactivated:
-            raise CustomException(400, errors=['MEMBERSHIP_USER_DEACTIVATED'])
+            raise CustomException(400, errors=['membership.USER_DEACTIVATED'])
         membership.deactivated = True
         db.session.commit()
         email_client.send_project_member_removal(admin, User.query.get(membership.user_id), Project.query.get(pid))
@@ -136,7 +136,7 @@ class ProjectInvites(Resource):
         helpers.abort_if_unauthorized(Project.query.get(project_id))
         user = User.query.filter_by(email=get_jwt_identity()).first()
         helpers.abort_if_unknown_user(user)
-        helpers.abort_if_not_admin_or_staff(user, project_id, "MEMBERSHIP.INVITE")
+        helpers.abort_if_not_admin_or_staff(user, project_id, "membership.INVITE")
         data = helpers.jsonify_request_or_abort()
         return user, data
 
