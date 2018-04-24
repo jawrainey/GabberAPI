@@ -4,7 +4,7 @@ JWT configuration and authentication (registration, login and logout).
 """
 from .. import db
 from ..api.schemas.auth import AuthRegisterSchema, AuthLoginSchema, \
-    ResetPasswordSchema, ForgotPasswordSchema, UserSchema, UserSchemaHasAccess
+    ResetPasswordSchema, ForgotPasswordSchema, UserSchemaHasAccess
 from ..models.user import User, ResetTokens
 from ..utils.general import CustomException, custom_response
 from ..utils import helpers
@@ -92,7 +92,6 @@ class ResetPassword(Resource):
         db.session.add(user)
         db.session.commit()
 
-        #email_client.send_password_changed(email)
         return custom_response(200, data=create_jwt_access(email))
 
     @staticmethod
@@ -100,10 +99,10 @@ class ResetPassword(Resource):
         reset_token = ResetTokens.query.filter_by(token=token, user_id=user_id).first()
         if not reset_token or not reset_token.token:
             # The user has not requested a password reset
-            raise CustomException(400, errors=['RESET_TOKEN_404'])
+            raise CustomException(400, errors=['auth.RESET_TOKEN_404'])
         elif not reset_token.is_active:
             # The user previously reset their password using this token
-            raise CustomException(400, errors=['RESET_TOKEN_USED'])
+            raise CustomException(400, errors=['auth.RESET_TOKEN_USED'])
         return reset_token
 
     def serialize_token_or_abort(self, token):
@@ -119,10 +118,10 @@ class ResetPassword(Resource):
                 reset_token.is_active = False
                 db.session.commit()
             # The token expired and tried to be used again, so we must expire it.
-            raise CustomException(400, errors=['RESET_TOKEN_EXPIRED'])
+            raise CustomException(400, errors=['auth.RESET_TOKEN_EXPIRED'])
         except BadSignature:
             # All other potential errors, such as SECRET/SALTs not being set.
-            raise CustomException(400, errors=['RESET_TOKEN_404'])
+            raise CustomException(400, errors=['auth.RESET_TOKEN_404'])
         return email
 
 
@@ -158,9 +157,9 @@ class AuthToken:
         try:
             data = serializer.loads(token, salt=app.config['SALT'], max_age=86400 * 7)  # one week
         except SignatureExpired:
-            raise CustomException(400, errors=['AUTH_TOKEN_EXPIRED'])
+            raise CustomException(400, errors=['auth.AUTH_TOKEN_EXPIRED'])
         except BadSignature:
-            raise CustomException(400, errors=['AUTH_TOKEN_404'])
+            raise CustomException(400, errors=['auth.AUTH_TOKEN_404'])
         return data
 
 
@@ -171,13 +170,13 @@ class VerifyRegistration(Resource):
     @staticmethod
     def post(token):
         """
-        ??
+        Verifies a user if they have not already been verified.
         """
         token = AuthToken.validate_token(token)
         user = User.query.get(token['user_id'])
         # Rather than storing tokens, check if the user has been verified before
         if user.verified:
-            return custom_response(400, errors=['ALREADY_VERIFIED'])
+            return custom_response(400, errors=['auth.ALREADY_VERIFIED'])
         user.verified = True
         db.session.commit()
         return custom_response(200, data=create_jwt_access(user.email))
@@ -217,7 +216,6 @@ class UserLogin(Resource):
         """
         Provide a user with JWT access/refresh tokens to use other aspects of API
         """
-
         data = helpers.jsonify_request_or_abort()
         helpers.abort_if_errors_in_validation(AuthLoginSchema().validate(data))
         return custom_response(200, data=create_jwt_access(data['email']))

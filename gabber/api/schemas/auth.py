@@ -27,9 +27,6 @@ def validate_password_length(is_valid, attribute, errors):
 
 def validate_password(data, validator):
     password_valid = validator.validate('password', 'str', data)
-    #
-    # if password_valid:
-    #     validate_password_length(password_valid, data['password'], validator.errors)
 
 
 class ForgotPasswordSchema(ma.Schema):
@@ -37,7 +34,7 @@ class ForgotPasswordSchema(ma.Schema):
 
     @pre_load()
     def __validate(self, data):
-        validator = HelperSchemaValidator('AUTH')
+        validator = HelperSchemaValidator('auth')
         email_valid = validator.validate('email', 'str', data)
 
         if email_valid:
@@ -51,7 +48,7 @@ class ResetPasswordSchema(ma.Schema):
 
     @pre_load()
     def __validate(self, data):
-        validator = HelperSchemaValidator('AUTH')
+        validator = HelperSchemaValidator('auth')
         token_valid = validator.validate('token', 'str', data)
         # TODO: VALIDATE PASSWORD LENGTH: currently there is no upper/lower limit
         validate_password(data, validator)
@@ -64,7 +61,7 @@ class AuthLoginSchema(ma.Schema):
 
     @pre_load()
     def __validate(self, data):
-        validator = HelperSchemaValidator('AUTH')
+        validator = HelperSchemaValidator('auth')
 
         email_valid = validator.validate('email', 'str', data)
 
@@ -90,7 +87,7 @@ class AuthRegisterSchema(ma.Schema):
 
     @pre_load()
     def __validate(self, data):
-        validator = HelperSchemaValidator('AUTH')
+        validator = HelperSchemaValidator('auth')
 
         fullname_valid = validator.validate('fullname', 'str', data)
         email_valid = validator.validate('email', 'str', data)
