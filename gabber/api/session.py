@@ -24,6 +24,8 @@ class ProjectSession(Resource):
         project = Project.query.get(pid)
 
         session = InterviewSession.query.get(sid)
+        session.prompts.sort(key=lambda x: x.start_interval, reverse=False)
+
         helpers.abort_if_unknown_session(session)
         helpers.abort_if_session_not_in_project(session, pid)
 
