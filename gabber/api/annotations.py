@@ -80,5 +80,6 @@ class UserAnnotation(Resource):
         helpers.abort_if_not_user_made(user.id, annotation.user_id)
 
         UserAnnotationModel.query.filter_by(id=aid).update({'is_active': 0})
+        db.session.commit()
 
         return custom_response(200)
