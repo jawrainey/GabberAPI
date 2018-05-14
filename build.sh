@@ -4,7 +4,7 @@ then
     exit 1
 fi
 
-REGISTRY="openlab.ncl.ac.uk:4567/gabber/api"
+REGISTRY="gabber/api"
 VERSION="$1"
 
 docker build -t "$REGISTRY:$VERSION" -t "$REGISTRY:latest" .
