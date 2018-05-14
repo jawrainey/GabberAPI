@@ -33,19 +33,19 @@ class ProjectSessions(Resource):
         project = Project.query.get(pid)
         helpers.abort_if_unknown_project(project)
 
-        if project.is_public:
-            sessions = InterviewSession.all_consented_sessions_by_project(project)
-            return custom_response(200, data=RecordingSessionsSchema(many=True).dump(sessions))
-
         current_user = get_jwt_identity()
         user = User.query.filter_by(email=current_user).first()
-        helpers.abort_if_unknown_user(user)
-        helpers.abort_if_not_a_member_and_private(user, project)
+        # Only show private projects to authenticated users
+        if current_user or not project.is_public:
+            helpers.abort_if_not_a_member_and_private(user, project)
 
         if current_user:
             is_creator_or_admin = user.role_for_project(pid) == 'admin' or project.creator == user.id
             sessions = InterviewSession.all_consented_sessions_by_project(project, is_creator_or_admin, user)
-            return custom_response(200, data=RecordingSessionsSchema(many=True).dump(sessions))
+        else:
+            # They are an anonymous user but can still view public projects
+            sessions = InterviewSession.all_consented_sessions_by_project(project)
+        return custom_response(200, data=RecordingSessionsSchema(many=True).dump(sessions))
 
     @jwt_required
     def post(self, pid):
