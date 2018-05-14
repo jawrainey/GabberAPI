@@ -4,7 +4,7 @@
 
 ## Running locally
 
-The API requires that [JWT](https://github.com/jawrainey/GabberServer/blob/master/gabber/__init__.py#L19), [MYSQL](https://github.com/jawrainey/GabberServer/blob/master/gabber/__init__.py#L18) are set, and optionally [Amazon S3](https://github.com/jawrainey/GabberServer/blob/master/gabber/utils/amazon.py#L9-L11) if you want to POST a session. These environmental variables should go into your [`.env` file](https://github.com/jawrainey/GabberServer/blob/master/docker-compose.yml#L11).
+The API requires that [JWT](https://github.com/jawrainey/GabberAPI/blob/master/gabber/__init__.py#L27), [MYSQL](https://github.com/jawrainey/GabberAPI/blob/master/gabber/__init__.py#L8) are set, and optionally [Amazon S3](https://github.com/jawrainey/GabberAPI/blob/master/gabber/utils/amazon.py#L9-L11) if you want to POST a session. These environmental variables should go into your [`.env` file](https://github.com/jawrainey/GabberAPI/blob/master/docker-compose.yml#L11).
 
 ``` bash
 
