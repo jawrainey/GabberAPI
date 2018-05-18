@@ -66,21 +66,26 @@ def send_register_notification(user):
 
 
 def format_names(participants):
+    # TODO: this is related to a bug in the mobile apps
+    participants = [p.replace(' (You)', '') for p in participants]
+
     if len(participants) == 1:
-        return participants[0]
+        participant = participants[0]
+        return participant.decode('UTF-8') if isinstance(participant, str) else participant
     if len(participants) == 2:
-        return ' and '.join(participants)
+        return u' and '.join(participants)
     if len(participants) > 2:
-        return "{} and {}".format(", ".join(participants[0:-1]), participants[-1])
+        return u'{} and {}'.format(u', '.join(participants[0:-1]), participants[-1])
 
 
 def request_consent(participants, session):
     # Note: having to create a consent model here as this is called after participants are created
     from ..models.user import User, SessionConsent as SessionConsentModel
     from ..api.consent import SessionConsent
-
-    names = format_names([p['Name'] for p in participants])
-    content = 'You were in a Gabber conversation with {}.<br><br>' \
+    # Convert all names to unicode as some names may be unicode, e.g. Russian/Korean, etc.
+    names = map(unicode, [p['Name'].decode('UTF-8') if isinstance(p, str) else p["Name"] for p in participants])
+    names = format_names(names)
+    content = u'You were in a Gabber conversation with {0}.<br><br>' \
               'Review your consent so they and others can listen to the recording.'.format(names)
 
     # Email each client to request individual consent on the recorded session.
