@@ -82,11 +82,14 @@ def request_consent(participants, session):
     # Note: having to create a consent model here as this is called after participants are created
     from ..models.user import User, SessionConsent as SessionConsentModel
     from ..api.consent import SessionConsent
-    # Convert all names to unicode as some names may be unicode, e.g. Russian/Korean, etc.
+
     names = map(unicode, [p['Name'].decode('UTF-8') if isinstance(p, str) else p["Name"] for p in participants])
     names = format_names(names)
-    content = u'You were in a Gabber conversation with {0}.<br><br>' \
-              'Review your consent so they and others can listen to the recording.'.format(names)
+
+    content = u'You were recently in a Gabber conversation with {0}.<br><br>' \
+              u'By default, only participants in your conversation can see and listen to the recording on the website '\
+              u'because we want to give you control over your data. This means it is critical that you review your ' \
+              u'consent if you would like other volunteers and IFRC to view, listen and tag your recording.'.format(names)
 
     # Email each client to request individual consent on the recorded session.
     for participant in participants:
@@ -95,7 +98,7 @@ def request_consent(participants, session):
         # to update their consent. Likewise, this ensures all queries manipulate all data.
         consent = SessionConsentModel.create_default_consent(session.id, user.id)
         send_email_action(user.email, dict(
-            subject='Review consent for your Gabber conversation',
+            subject='[URGENT]: Review consent for your IFRC Gabber',
             name=user.fullname,
             top_body=content,
             button_url=SessionConsent.generate_invite_url(consent.id),
