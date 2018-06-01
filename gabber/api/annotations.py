@@ -54,8 +54,7 @@ class UserAnnotations(Resource):
             session_id=sid
         )
 
-        # TODO: tags are currently optional as they may not exist on the UI, yet.
-        if json_data.get('tags'):
+        if json_data.get('tags', None):
             user_annotation.tags.extend([Tags.query.filter_by(id=cid).first() for cid in json_data['tags']])
         db.session.add(user_annotation)
         db.session.commit()

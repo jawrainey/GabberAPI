@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from gabber import create_app
 import os
 

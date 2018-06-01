@@ -1,5 +1,5 @@
 from ... import ma
-from ...models.projects import Project, ProjectPrompt, Membership
+from ...models.projects import Project, ProjectPrompt, Membership, Codebook, Code as Tags
 from ...models.user import User
 from marshmallow import pre_load, ValidationError
 from slugify import slugify
@@ -68,6 +68,20 @@ class HelperSchemaValidator:
             raise ValidationErrorWithCustomErrorFormat(errors)
 
 
+class TagsSchema(ma.ModelSchema):
+    class Meta:
+        model = Tags
+        exclude = ['codebook', 'connections']
+
+
+class CodebookSchema(ma.ModelSchema):
+    tags = ma.Nested(TagsSchema, many=True, attribute="tags")
+
+    class Meta:
+        model = Codebook
+        exclude = ['project']
+
+
 class ProjectPostSchema(ma.Schema):
     title = ma.String()
     description = ma.String()
@@ -134,6 +148,7 @@ class ProjectTopicSchema(ma.ModelSchema):
 
 class ProjectModelSchema(ma.ModelSchema):
     topics = ma.Nested(ProjectTopicSchema, many=True, attribute="prompts")
+    codebook = ma.Nested(CodebookSchema, many=True, attribute="codebook")
     members = ma.Method("_members")
     creator = ma.Method("_creator")
     privacy = ma.Function(lambda obj: "public" if obj.is_public else "private")
@@ -167,7 +182,7 @@ class ProjectModelSchema(ma.ModelSchema):
         model = Project
         # We include FKs to gain access to Topics, Creator and Members
         include_fk = True
-        exclude = ['codebook', 'prompts']
+        exclude = ['prompts']
 
     @pre_load
     def __validate(self, data):
