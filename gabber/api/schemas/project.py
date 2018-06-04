@@ -148,7 +148,7 @@ class ProjectTopicSchema(ma.ModelSchema):
 
 class ProjectModelSchema(ma.ModelSchema):
     topics = ma.Nested(ProjectTopicSchema, many=True, attribute="prompts")
-    codebook = ma.Nested(CodebookSchema, many=True, attribute="codebook")
+    codebook = ma.Function(lambda o: CodebookSchema().dump(o.codebook.first()) if o.codebook.first() else None)
     members = ma.Method("_members")
     creator = ma.Method("_creator")
     privacy = ma.Function(lambda obj: "public" if obj.is_public else "private")
