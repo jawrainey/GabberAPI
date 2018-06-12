@@ -188,7 +188,7 @@ class ProjectModelSchema(ma.ModelSchema):
         if not data.organisation:
             return None
         org = Organisation.query.get(data.organisation)
-        return {'id': org.id, 'name': org.name}
+        return {'id': org.id, 'name': org.name, 'description': org.description}
 
     class Meta:
         model = Project
