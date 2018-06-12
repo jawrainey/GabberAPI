@@ -128,6 +128,17 @@ class Roles(db.Model):
         return Roles.query.filter_by(name='user').first().id
 
 
+class Organisation(db.Model):
+    """
+    An organisation associated with a specific project, which is used to add
+    further context to who has created the project.
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(256))
+    description = db.Column(db.String(1028))
+    projects = db.relationship('Project', lazy='dynamic')
+
+
 class Project(db.Model):
     """
     A project is the overarching theme for an interview session
@@ -151,10 +162,11 @@ class Project(db.Model):
     description = db.Column(db.String(256))
     # Used as a 'soft-delete' to preserve prompt-content for viewing
     is_active = db.Column(db.Boolean, default=True)
+    # This can be null as the organisation may be an individual
+    organisation = db.Column(db.Integer, db.ForeignKey('organisation.id'), nullable=True)
 
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
     # Is the project public or private? True (1) is public.
-    has_consent = db.Column(db.Boolean, default=False)
     is_public = db.Column(db.Boolean, default=True)
 
     codebook = db.relationship('Codebook', backref='project', lazy='dynamic')
@@ -253,10 +265,10 @@ class InterviewSession(db.Model):
 
     def all_members_private_consented(self):
         """
-        If at least one participant does not want to share the Gabber (none), then its not for private.
+        If at least one participant does not want to share the Gabber (private), then its not for private.
         """
         unique_consents = set([str(i.type) for i in self.consents])
-        return True if 'none' not in unique_consents else False
+        return True if 'private' not in unique_consents else False
 
     def user_is_participant(self, user):
         return True if user.id in [p.user_id for p in self.participants] else False

@@ -7,7 +7,7 @@ from ..api.schemas.create_session import ParticipantScheme, RecordingAnnotationS
 from ..api.schemas.session import RecordingSessionsSchema
 from ..api.schemas.helpers import is_not_empty
 from ..models.projects import InterviewSession, InterviewParticipants, InterviewPrompts, Project
-from ..models.user import User
+from ..models.user import User, SessionConsent
 from ..utils.general import custom_response
 from marshmallow import ValidationError
 from flask_restful import Resource, reqparse, abort
@@ -73,6 +73,9 @@ class ProjectSessions(Resource):
                             help="A dictionary of participants in the interview is required, i.e. who took part?")
         parser.add_argument('prompts', required=True,
                             help="A dictionary of prompts that were selected during the interview is required")
+        parser.add_argument('consent', required=True,
+                            help="The type of consent participants selected within the mobile application. This can"
+                                 "be either everyone, members or private")
 
         args = parser.parse_args()
 
@@ -84,9 +87,21 @@ class ProjectSessions(Resource):
         self.__upload_interview_recording(args['recording'], interview_session_id, pid)
         interview_session.prompts.extend(self.__add_structural_prompts(prompts, interview_session_id))
         interview_session.participants.extend(self.__add_participants(participants, interview_session_id, project.id))
-
+        interview_session.consents.extend(
+            self.__create_consent(interview_session.participants, interview_session.id, args['consent'])
+        )
         db.session.add(interview_session)
         db.session.commit()
+
+        # Once the session is saved, generate tokens as they require knowing the consent ID.
+        # Storing tokens will allow users to edit their consent through the website and prevents
+        # us regenerating a new consent token each time.
+        from ..api.consent import SessionConsent
+        for consent in InterviewSession.query.get(interview_session_id).consents.all():
+            consent.token = SessionConsent.generate_invite_token(consent.id)
+            db.session.commit()
+
+        # Here we would update consent for the recording based on the selection in the app
         email_client.request_consent(participants, interview_session)
         return {}, 201
 
@@ -163,3 +178,15 @@ class ProjectSessions(Resource):
             )
             for p in prompts
         ]
+
+    @staticmethod
+    def __create_consent(participants, sid, consent_type):
+        """
+        Creates the initial session consents for each participant
+
+        :param participants: who was involved in the Gabber session?
+        :param sid: which session was it exactly?
+        :param consent_type: what consent was agreed to by all particpants?
+        :return: A list of session consents; one for each participant of the conversation
+        """
+        return [SessionConsent(session_id=sid, participant_id=p.user_id, type=consent_type) for p in participants]

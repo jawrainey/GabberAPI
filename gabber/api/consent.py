@@ -3,7 +3,7 @@
 The consent for a Gabber session.
 """
 from .. import db
-from ..api.schemas.auth import UserSchema, UserSchemaHasAccess
+from ..api.schemas.auth import UserSchemaHasAccess
 from ..api.schemas.consent import ConsentType
 from ..api.schemas.project import ProjectModelSchema
 from ..api.schemas.session import RecordingSessionSchema
@@ -48,9 +48,16 @@ class SessionConsent(Resource):
         return custom_response(200)
 
     @staticmethod
-    def generate_invite_url(consent_id):
+    def generate_invite_token(consent_id):
         """
         Generates an invite URL with embedded information
         """
-        token = URLSafeTimedSerializer(app.config["SECRET_KEY"]).dumps(consent_id, app.config['SALT'])
-        return '{}/consent/{}/'.format(app.config['WEB_HOST'], token)
+        return URLSafeTimedSerializer(app.config["SECRET_KEY"]).dumps(consent_id, app.config['SALT'])
+
+    @staticmethod
+    def consent_url(session_id, user_id):
+        """
+        Generates an invite URL with embedded information
+        """
+        consent = SessionConsentModel.query.filter_by(session_id=session_id, participant_id=user_id).first()
+        return '{}/consent/{}/'.format(app.config['WEB_HOST'], consent.token)

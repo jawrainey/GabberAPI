@@ -80,7 +80,7 @@ def format_names(participants):
 
 def request_consent(participants, session):
     # Note: having to create a consent model here as this is called after participants are created
-    from ..models.user import User, SessionConsent as SessionConsentModel
+    from ..models.user import User
     from ..api.consent import SessionConsent
 
     names = map(unicode, [p['Name'].decode('UTF-8') if isinstance(p, str) else p["Name"] for p in participants])
@@ -89,19 +89,18 @@ def request_consent(participants, session):
     content = u'You were recently in a Gabber conversation with {0}.<br><br>' \
               u'By default, only participants in your conversation can see and listen to the recording on the website '\
               u'because we want to give you control over your data. This means it is critical that you review your ' \
-              u'consent if you would like other volunteers and IFRC to view, listen and tag your recording.'.format(names)
+              u'consent if you would like other participants to view, listen and tag your recording.'.format(names)
 
     # Email each client to request individual consent on the recorded session.
     for participant in participants:
         user = User.query.filter_by(email=participant['Email']).first()
         # Create a default consent as participants will receive an email afterwards
         # to update their consent. Likewise, this ensures all queries manipulate all data.
-        consent = SessionConsentModel.create_default_consent(session.id, user.id)
         send_email_action(user.email, dict(
-            subject='[URGENT]: Review consent for your IFRC Gabber',
+            subject='[URGENT]: Review consent for your Gabber',
             name=user.fullname,
             top_body=content,
-            button_url=SessionConsent.generate_invite_url(consent.id),
+            button_url=SessionConsent.consent_url(session.id, user.id),
             button_label='Review Consent',
             bottom_body='You can use the link above at any time to review your consent for this recording.'))
 

@@ -219,7 +219,6 @@ N/A, but a JWT must be provided.
             "user_id": 13
         },
         "description": "now now",
-        "has_consent": false,
         "id": 7,
         "is_active": true,
         "members": [
@@ -255,7 +254,6 @@ N/A, but a JWT must be provided.
             "user_id": 13
         },
         "description": "new desc",
-        "has_consent": false,
         "id": 2,
         "is_active": true,
         "members": [
@@ -325,7 +323,6 @@ The same format as `/projects/`, but for the individual project the user just cr
         "fullname": "jay rainey"
     },
     "description": "new desc",
-    "has_consent": false,
     "id": 11,
     "is_public": true,
     "is_active": true,
@@ -391,7 +388,6 @@ The same format as `/projects/`, but for the individual project the user just cr
             "fullname": "Jay Rainey"
         },
         "description": "Describe your project in at most 230 words",
-        "has_consent": false,
         "id": 11,
         "is_public": true,
         "is_active": true,
@@ -608,7 +604,6 @@ N/A
             "user_id": 1
         },
         "description": "All that chat you will ever need to have about your boy Geoff Testington",
-        "has_consent": false,
         "id": 1,
         "is_active": true,
         "is_public": true,
@@ -913,7 +908,6 @@ The `project`, `session`, and `user` associated with the Gabber session that is 
                 "user_id": 1
             },
             "description": "All that chat you will ever need to have about your boy Geoff Testington",
-            "has_consent": false,
             "id": 1,
             "is_active": true,
             "is_public": true,

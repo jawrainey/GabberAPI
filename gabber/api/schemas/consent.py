@@ -17,7 +17,7 @@ class ConsentType(ma.Schema):
         valid_type = validator.validate('consent', 'str', data)
 
         if valid_type:
-            if data['consent'] not in ['none', 'private', 'public']:
+            if data['consent'] not in ['private', 'members', 'public']:
                 validator.errors.append("INVALID_VALUE")
 
         validator.raise_if_errors()

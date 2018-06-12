@@ -1,5 +1,5 @@
 from ... import ma
-from ...models.projects import Project, ProjectPrompt, Membership, Codebook, Code as Tags
+from ...models.projects import Project, ProjectPrompt, Membership, Codebook, Code as Tags, Organisation
 from ...models.user import User
 from marshmallow import pre_load, ValidationError
 from slugify import slugify
@@ -121,8 +121,10 @@ class ProjectPostSchema(ma.Schema):
 
 class ProjectMember(ma.ModelSchema):
     id = ma.Int(attribute='id')
+    project_id = ma.String(attribute='project.id')
     role = ma.String(attribute='role.name')
     user_id = ma.Int(attribute='user_id')
+    fullname = ma.Function(lambda d: d.user.fullname if d.role.name == 'staff' else None)
 
     class Meta:
         model = Membership
@@ -151,6 +153,9 @@ class ProjectModelSchema(ma.ModelSchema):
     codebook = ma.Function(lambda o: CodebookSchema().dump(o.codebook.first()) if o.codebook.first() else None)
     members = ma.Method("_members")
     creator = ma.Method("_creator")
+    organisation = ma.Method("_organisation")
+    organisation_id = ma.Function(lambda d: d.organisation)
+    creator_id = ma.Function(lambda d: d.creator)
     privacy = ma.Function(lambda obj: "public" if obj.is_public else "private")
 
     def __init__(self, **kwargs):
@@ -177,6 +182,13 @@ class ProjectModelSchema(ma.ModelSchema):
     def _creator(data):
         user = User.query.get(data.creator)
         return {'user_id': user.id, 'fullname': user.fullname}
+
+    @staticmethod
+    def _organisation(data):
+        if not data.organisation:
+            return None
+        org = Organisation.query.get(data.organisation)
+        return {'id': org.id, 'name': org.name}
 
     class Meta:
         model = Project
