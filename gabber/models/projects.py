@@ -225,7 +225,7 @@ class InterviewSession(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
 
     prompts = db.relationship('InterviewPrompts', backref='interview', lazy='joined')
-    consents = db.relationship('SessionConsent', backref='interview', lazy='joined')
+    consents = db.relationship('SessionConsent', backref='interview', lazy='dynamic')
     participants = db.relationship('InterviewParticipants', backref='interview', lazy='joined')
     connections = db.relationship(
         'Connection',
