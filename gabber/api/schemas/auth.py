@@ -66,14 +66,14 @@ class AuthLoginSchema(ma.Schema):
         email_valid = validator.validate('email', 'str', data)
 
         if email_valid:
-            validate_email(data['email'], validator.errors)
-        if data['email'] not in known_users():
+            validate_email(data['email'].lower(), validator.errors)
+        if data['email'].lower() not in known_users():
             validator.errors.append("USER_404")
 
         validate_password(data, validator)
 
         if not validator.errors:
-            user = User.query.filter_by(email=data['email']).first()
+            user = User.query.filter_by(email=data['email'].lower()).first()
             if user and not user.is_correct_password(data['password']):
                 validator.errors.append("INVALID_PASSWORD")
 
@@ -93,7 +93,7 @@ class AuthRegisterSchema(ma.Schema):
         email_valid = validator.validate('email', 'str', data)
 
         if email_valid:
-            validate_email(data['email'], validator.errors)
+            validate_email(data['email'].lower(), validator.errors)
 
         validate_password(data, validator)
         validator.raise_if_errors()

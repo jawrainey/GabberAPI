@@ -193,7 +193,7 @@ class UserRegistration(Resource):
         """
         data = helpers.jsonify_request_or_abort()
         helpers.abort_if_errors_in_validation(AuthRegisterSchema().validate(data))
-        user = User(fullname=data['fullname'], email=data['email'], password=data['password'], registered=True)
+        user = User(fullname=data['fullname'], email=data['email'].lower(), password=data['password'], registered=True)
 
         known_user = User.query.filter_by(email=data['email']).first()
         if known_user:
@@ -218,7 +218,7 @@ class UserLogin(Resource):
         """
         data = helpers.jsonify_request_or_abort()
         helpers.abort_if_errors_in_validation(AuthLoginSchema().validate(data))
-        return custom_response(200, data=create_jwt_access(data['email']))
+        return custom_response(200, data=create_jwt_access(data['email'].lower()))
 
 
 def create_jwt_access(username):
