@@ -74,6 +74,8 @@ class Project(Resource):
         for topic in topics:
             if not topic.project_id:
                 ProjectPrompt.query.filter_by(id=topic.id).update({'is_active': 0, 'project_id': pid})
+        # TODO: this is temporary as it's hard-coded in the frontend and not validated in the schema above.
+        project.organisation = int(json_data.get('organisation', {id: 0})['id'])
         db.session.commit()
         return custom_response(200, schema.dump(data))
 
