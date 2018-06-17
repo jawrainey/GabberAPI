@@ -263,7 +263,7 @@ N/A, but a JWT must be provided.
                 "date_sent": "12-Mar-2018",
                 "deactivated": false,
                 "fullname": "jay",
-                "role": "admin",
+                "role": "administrator",
                 "user_id": 30
             }
         ],
@@ -330,7 +330,7 @@ The same format as `/projects/`, but for the individual project the user just cr
         {
             "id": 22,
             "name": "jay rainey",
-            "role": "admin",
+            "role": "administrator",
             "user_id": 22
         }
     ],
@@ -614,7 +614,7 @@ N/A
                 "date_sent": "2018-03-19T10:51:45+00:00",
                 "deactivated": false,
                 "id": 1,
-                "role": "admin",
+                "role": "administrator",
                 "user_id": 9
             },
             "..."
@@ -918,7 +918,7 @@ The `project`, `session`, and `user` associated with the Gabber session that is 
                     "date_sent": "2018-03-19T10:51:45+00:00",
                     "deactivated": false,
                     "id": 1,
-                    "role": "admin",
+                    "role": "administrator",
                     "user_id": 9
                 },
                 "..."

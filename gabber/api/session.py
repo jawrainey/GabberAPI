@@ -36,7 +36,7 @@ class ProjectSession(Resource):
             helpers.abort_if_not_a_member_and_private(user, project)
 
         # If the user is known and is an administrator or creator, then they can view the session regardless.
-        if user and (user.role_for_project(pid) == 'admin' or project.creator == user.id or session.user_is_participant(user)):
+        if user and (user.role_for_project(pid) in ['administrator', 'researcher'] or project.creator == user.id or session.user_is_participant(user)):
             return custom_response(200, data=RecordingSessionSchema().dump(session))
         else:
             _session = RecordingSessionSchema().dump(session) if session.consented(project.is_public) else None

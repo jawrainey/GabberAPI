@@ -125,7 +125,7 @@ class Roles(db.Model):
 
     @staticmethod
     def user_role():
-        return Roles.query.filter_by(name='user').first().id
+        return Roles.query.filter_by(name='participant').first().id
 
 
 class Organisation(db.Model):
@@ -238,11 +238,11 @@ class InterviewSession(db.Model):
         return self.all_members_public_consented() if project_is_public else self.all_members_private_consented()
 
     @staticmethod
-    def all_consented_sessions_by_project(project, is_creator_or_admin=False, user_sessions=False):
+    def all_consented_sessions_by_project(project, is_creator_researcher_or_admin=False, user_sessions=False):
         sessions = InterviewSession.query.filter_by(project_id=project.id).all()
 
         # Project creators and admins can view all sessions.
-        if is_creator_or_admin:
+        if is_creator_researcher_or_admin:
             return sessions
 
         if project.is_public:

@@ -40,8 +40,8 @@ class ProjectSessions(Resource):
             helpers.abort_if_not_a_member_and_private(user, project)
 
         if current_user:
-            is_creator_or_admin = user.role_for_project(pid) == 'admin' or project.creator == user.id
-            sessions = InterviewSession.all_consented_sessions_by_project(project, is_creator_or_admin, user)
+            is_creator_researcher_or_admin = user.role_for_project(pid) in ['administrator', 'researcher'] or project.creator == user.id
+            sessions = InterviewSession.all_consented_sessions_by_project(project, is_creator_researcher_or_admin, user)
         else:
             # They are an anonymous user but can still view public projects
             sessions = InterviewSession.all_consented_sessions_by_project(project)

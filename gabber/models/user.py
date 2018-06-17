@@ -100,4 +100,4 @@ class User(db.Model):
         """
         from ..models.projects import Roles
         match = [i.role_id for i in self.member_of if i.project_id == pid if i.confirmed and not i.deactivated]
-        return Roles.query.get(match[0]).name if match else 'user'
+        return Roles.query.get(match[0]).name if match else 'participant'

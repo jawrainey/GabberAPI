@@ -25,14 +25,6 @@ def __send_email(mail):
         print("TODO: log details of error %s" % e)
 
 
-def send_email_message(receiver, data):
-    mail = __construct_email(receiver, data['subject'])
-    mail.personalizations[0].add_substitution(Substitution("{{name}}", data['name']))
-    mail.personalizations[0].add_substitution(Substitution("{{main}}", data['body']))
-    mail.template_id = "2e018c30-0b95-4abe-a8d0-ba9148ac5dd3"
-    __send_email(mail)
-
-
 def send_email_action(receiver, data):
     mail = __construct_email(receiver, data['subject'])
     mail.personalizations[0].add_substitution(Substitution("{{name}}", data['name']))
@@ -161,8 +153,13 @@ def send_project_member_removal(admin, user, project):
     (1) when (time), (2) where (project) and (3) who (admin) performed the action.
     """
     data = dict()
-    data['subject'] = "%s removed you from %s on Gabber" % (admin.fullname, project.title),
+    data['subject'] = "%s removed you from %s on Gabber" % (admin.fullname, project.title)
     data['name'] = user.fullname
-    data['body'] = "There are %s other projects that you can annotate and get involved with."
-    send_email_message(user.email, data)
+    data['top_body'] = "You have been removed from %s by %s, however, " \
+                       "there are other projects that you can contribute " \
+                       "to and get involved with." % (admin.fullname, project.title)
+    data['button_url'] = '{}/projects/'.format(app.config['WEB_HOST'])
+    data['button_label'] = 'View other projects'
+    data['bottom_body'] = ''
+    send_email_action(user.email, data)
 

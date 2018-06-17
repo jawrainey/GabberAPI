@@ -173,10 +173,17 @@ class ProjectModelSchema(ma.ModelSchema):
         Show the name/email of member of a project if the user making the request (well, to serialize the object)
         is an admin on the project or they are the creator of a project.
         """
+
         if self.user_id:
-            if User.query.get(self.user_id).role_for_project(data.id) in ['admin', 'staff'] or data.creator == self.user_id:
+            is_creator = data.creator == self.user_id
+            users_role = User.query.get(self.user_id).role_for_project(data.id)
+            if users_role in ['administrator', 'researcher'] or is_creator:
                 return ProjectMemberWithAccess(many=True).dump(data.members)
-        return ProjectMember(many=True).dump(data.members)
+        # We must show the names if they are a researcher
+        return [ProjectMemberWithAccess().dump(member)
+                if member.role.name == 'researcher'
+                else ProjectMember().dump(member)
+                for member in data.members]
 
     @staticmethod
     def _creator(data):

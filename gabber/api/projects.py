@@ -58,7 +58,7 @@ class Projects(Resource):
             # TODO: this should be privacy, which is passed Public/Private
             is_public=1 if data['privacy'] == 'public' else 0)
 
-        admin_role = Roles.query.filter_by(name='admin').first().id
+        admin_role = Roles.query.filter_by(name='administrator').first().id
         membership = Membership(uid=user.id, pid=project.id, rid=admin_role, confirmed=True)
         project.members.append(membership)
 

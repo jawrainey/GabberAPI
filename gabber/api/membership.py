@@ -20,6 +20,15 @@ import gabber.utils.helpers as helpers
 import gabber.utils.email as email_client
 
 
+# Given there's only 3, do a lookup here to avoid database lookup
+# In fact, we should store these roles as a global ...
+ROLES = {'participant': 2, 'researcher': 1, 'administrator': 0}
+
+
+def role_id(role):
+    return ROLES.get(role, 2)
+
+
 class ProjectInviteVerification(Resource):
     """
     Mapped to: /api/projects/invites/<token>/
@@ -74,6 +83,15 @@ class ProjectInviteVerification(Resource):
 
 class ProjectInvites(Resource):
     @jwt_required
+    def put(self, pid, mid=None):
+        admin, data = self.validate_and_get_data(pid)
+        helpers.abort_if_errors_in_validation(AddMemberSchema().validate(data))
+        membership = Membership.query.get(data['id'])
+        membership.role_id = role_id(data['role'])
+        db.session.commit()
+        return custom_response(200, data=ProjectMemberWithAccess().dump(membership))
+
+    @jwt_required
     def post(self, pid, mid=None):
         """
         An administrator or staff member of a project invited a user
@@ -89,7 +107,7 @@ class ProjectInvites(Resource):
             user = User.create_unregistered_user(data['fullname'], data['email'])
         # The user cannot be added to the same project multiple times
         if not user.is_project_member(pid):
-            membership = Membership(uid=user.id,  pid=pid, rid=Roles.user_role(), confirmed=user.registered)
+            membership = Membership(uid=user.id,  pid=pid, rid=role_id(data['role']), confirmed=user.registered)
             db.session.add(membership)
             db.session.commit()
 
@@ -100,7 +118,7 @@ class ProjectInvites(Resource):
             else:
                 email_client.send_project_member_invite_unregistered_user(admin, user, project)
         else:
-            return custom_response(400, errors=['MEMBERSHIP_MEMBER_EXISTS'])
+            return custom_response(400, errors=['membership.MEMBER_EXISTS'])
         return custom_response(200, data=ProjectMemberWithAccess().dump(membership))
 
     @jwt_required

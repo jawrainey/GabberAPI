@@ -7,7 +7,7 @@ from flask_jwt_extended import get_jwt_identity
 
 def abort_if_not_admin_or_staff(user, project_id, action="UPDATE"):
     role = user.role_for_project(project_id)
-    if not role or role == 'user':
+    if not role or role == 'participant':
         raise CustomException(403, errors=[('%s_UNAUTHORIZED' % action)])
 
 
