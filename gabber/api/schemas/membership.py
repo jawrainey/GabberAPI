@@ -18,7 +18,7 @@ class AddMemberSchema(ma.Schema):
         fullname_valid = validator.validate('fullname', 'str', data)
         email_valid = validator.validate('email', 'str', data)
         role_valid = validator.validate('role', 'str', data)
-        if role_valid not in ['participant', 'researcher', 'administrator']:
+        if role_valid and data['role'] not in ['participant', 'researcher', 'administrator']:
             validator.errors.append("INVALID_ROLE")
 
         if email_valid:
