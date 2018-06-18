@@ -5,10 +5,10 @@ These actions are notified to users once carried out.
 """
 from ..api.auth import create_jwt_access, AuthToken
 from ..api.schemas.auth import UserSchemaHasAccess
-from ..api.schemas.membership import AddMemberSchema, ProjectInviteWithToken
+from ..api.schemas.membership import AddMemberSchema, EditMemberSchema, ProjectInviteWithToken
 from ..api.schemas.project import ProjectMember, ProjectMemberWithAccess, ProjectModelSchema
 from ..models.projects import Project
-from ..models.projects import Membership, Roles
+from ..models.projects import Membership
 from ..models.user import User
 from ..utils.general import custom_response, CustomException
 from .. import db
@@ -85,7 +85,7 @@ class ProjectInvites(Resource):
     @jwt_required
     def put(self, pid, mid=None):
         admin, data = self.validate_and_get_data(pid)
-        helpers.abort_if_errors_in_validation(AddMemberSchema().validate(data))
+        helpers.abort_if_errors_in_validation(EditMemberSchema().validate(data))
         membership = Membership.query.get(data['id'])
         membership.role_id = role_id(data['role'])
         db.session.commit()

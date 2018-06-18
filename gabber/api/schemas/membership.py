@@ -17,12 +17,19 @@ class AddMemberSchema(ma.Schema):
         validator = HelperSchemaValidator('membership')
         fullname_valid = validator.validate('fullname', 'str', data)
         email_valid = validator.validate('email', 'str', data)
-        role_valid = validator.validate('role', 'str', data)
-        if role_valid and data['role'] not in ['participant', 'researcher', 'administrator']:
-            validator.errors.append("INVALID_ROLE")
 
         if email_valid:
             validate_email(data['email'], validator.errors)
+        validator.raise_if_errors()
+
+
+class EditMemberSchema(ma.Schema):
+    @pre_load()
+    def __validate(self, data):
+        validator = HelperSchemaValidator('membership')
+        role_valid = validator.validate('role', 'str', data)
+        if role_valid and data['role'] not in ['participant', 'researcher', 'administrator']:
+            validator.errors.append("INVALID_ROLE")
         validator.raise_if_errors()
 
 

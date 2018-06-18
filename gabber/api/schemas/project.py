@@ -192,8 +192,6 @@ class ProjectModelSchema(ma.ModelSchema):
 
     @staticmethod
     def _organisation(data):
-        if not data.organisation:
-            return None
         org = Organisation.query.get(data.organisation)
         return {'id': org.id, 'name': org.name, 'description': org.description}
 
