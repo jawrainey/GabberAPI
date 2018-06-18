@@ -23,3 +23,14 @@ exit
 # View the logs of the Flask container
 docker-compose logs -f web
 ```
+
+
+## Deployment Build
+
+Gabber is currently stored on [Docker Hub](https://hub.docker.com/r/gabber/api/), and a new version can be pushed using
+the following command where ``$VERSION`` is the next version of the application.
+
+
+``` bash 
+source build.sh $VERSION
+```
