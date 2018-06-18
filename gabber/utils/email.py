@@ -72,16 +72,25 @@ def format_names(participants):
 
 def request_consent(participants, session):
     # Note: having to create a consent model here as this is called after participants are created
-    from ..models.user import User
+    from ..models.user import User, SessionConsent as SessionConsentModel
+    from ..models.projects import Project
     from ..api.consent import SessionConsent
 
     names = map(unicode, [p['Name'].decode('UTF-8') if isinstance(p, str) else p["Name"] for p in participants])
     names = format_names(names)
 
-    content = u'You were recently in a Gabber conversation with {0}.<br><br>' \
-              u'By default, only participants in your conversation can see and listen to the recording on the website '\
-              u'because we want to give you control over your data. This means it is critical that you review your ' \
-              u'consent if you would like other participants to view, listen and tag your recording.'.format(names)
+    # Consent is the same initially (i.e. what was agreed in the app),so anyone for the session is fine.
+    session_consent = SessionConsentModel.query.filter_by(session_id=session.id).first()
+    project = Project.query.get(session.project_id)
+
+    content = u'You recently participated in a Gabber conversation with <b>{0}</b> for the <b>{1}</b> project ' \
+              u'where you agreed for <b>{2}</b> to have access to your conversation.<br><br>' \
+              u'Your conversation will undergo a 24-hour embargo where only conversation participants can listen. ' \
+              u'This gives you time to review your consent before the agreed-upon consent prior to the conversation ' \
+              u'begins to be used. ' \
+              u'After this time, the consent that you have agreed prior to recording (i.e. {2}) will be used. ' \
+              u'If you would like other people to view, listen and tag your recording, ' \
+              u'then your consent must be either public or members.'.format(names, project.title, session_consent.type)
 
     # Email each client to request individual consent on the recorded session.
     for participant in participants:
@@ -89,12 +98,12 @@ def request_consent(participants, session):
         # Create a default consent as participants will receive an email afterwards
         # to update their consent. Likewise, this ensures all queries manipulate all data.
         send_email_action(user.email, dict(
-            subject='[URGENT]: Review consent for your Gabber',
+            subject='[URGENT]: Review consent for your Gabber conversation',
             name=user.fullname,
             top_body=content,
             button_url=SessionConsent.consent_url(session.id, user.id),
             button_label='Review Consent',
-            bottom_body='You can use the link above at any time to review your consent for this recording.'))
+            bottom_body='You can use the link above at any time to review and update your consent for this conversation.'))
 
 
 def send_forgot_password(user, url):
