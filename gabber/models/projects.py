@@ -246,14 +246,21 @@ class InterviewSession(db.Model):
             return sessions
 
         if project.is_public:
-            data = [session for session in sessions if session.all_members_public_consented()]
+            data = [session for session in sessions
+                    if session.all_members_public_consented() and not session.embargoed()]
         else:
-            data = [session for session in sessions if session.all_members_private_consented()]
+            data = [session for session in sessions
+                    if session.all_members_private_consented() and not session.embargoed()]
 
+        # Users can always access their own conversations, hence not necessary to check for embargo
         if user_sessions:
             users_sessions = [session for session in sessions if session.user_is_participant(user_sessions)]
             return set(users_sessions + data)
         return data
+
+    def embargoed(self):
+        from datetime import datetime, timedelta
+        return datetime.now() < (self.created_on + timedelta(hours=24))
 
     def all_members_public_consented(self):
         """
