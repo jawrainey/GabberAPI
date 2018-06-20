@@ -2,12 +2,9 @@
 """
 All emails send through sendgrid on behalf of Gabber through user-actions.
 """
-import os
 import sendgrid
 from sendgrid.helpers.mail import Email, Content, Mail, Substitution
 from flask import current_app as app
-
-SEND_GRID = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY', ''))
 
 
 def __construct_email(receiver, subject):
@@ -20,7 +17,8 @@ def __construct_email(receiver, subject):
 
 def __send_email(mail):
     try:
-        SEND_GRID.client.mail.send.post(request_body=mail.get())
+        sg = sendgrid.SendGridAPIClient(apikey=app.config['SEND_GRID_API'])
+        sg.client.mail.send.post(request_body=mail.get())
     except Exception as e:
         print("TODO: log details of error %s" % e)
 

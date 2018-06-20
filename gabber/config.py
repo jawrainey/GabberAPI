@@ -8,6 +8,18 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', '')
     SALT = os.environ.get('SALT', '')
 
+    SEND_GRID_API = os.environ.get('SENDGRID_API_KEY', '')
+
+    S3_REGION = os.getenv('S3_REGION', 'eu-west-1')
+    S3_BUCKET = os.getenv('S3_BUCKET', '')
+    S3_KEY = os.getenv('S3_KEY', '')
+    S3_SECRET = os.getenv('S3_SECRET', '')
+    S3_LOCATION = 'https://{}.s3.amazonaws.com/'.format(S3_BUCKET)
+    S3_PIPELINE_ID = os.getenv('S3_PIPELINE_ID', '')
+    S3_PIPELINE_PRESET_ID = os.getenv('S3_PIPELINE_PRESET_ID', '')
+    S3_ROOT_FOLDER = os.getenv('S3_APP_NAME', 'main')
+    S3_PROJECT_MODE = os.environ.get('S3_APP_MODE', 'dev')
+
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET', '')
     JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=60*24*499)
 

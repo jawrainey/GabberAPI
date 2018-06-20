@@ -85,6 +85,7 @@ class ProjectSessions(Resource):
         interview_session_id = uuid4().hex
         interview_session = InterviewSession(id=interview_session_id, creator_id=user.id, project_id=pid)
         self.__upload_interview_recording(args['recording'], interview_session_id, pid)
+        self.__transcode_recording(interview_session_id, pid)
         interview_session.prompts.extend(self.__add_structural_prompts(prompts, interview_session_id))
         interview_session.participants.extend(self.__add_participants(participants, interview_session_id, project.id))
         interview_session.consents.extend(
@@ -131,7 +132,21 @@ class ProjectSessions(Resource):
         try:
             amazon.upload(recording, project_id, session_id)
         except Exception:
-            abort(500, message={'errors': 'There was an issue uploading your session.'})
+            abort(500, message={'errors': 'There was an issue UPLOADING this session (%s).'.format(session_id)})
+
+    @staticmethod
+    def __transcode_recording(session_id, project_id):
+        """
+        Based on the project/session (i.e. audio location on S3), transcode the file to produce a smaller filesize.
+
+        :param session_id: the ID of the session associated with the recording
+        :param project_id: the project associated with the session
+        """
+        from ..utils import amazon
+        try:
+            amazon.transcode(project_id, session_id)
+        except Exception:
+            abort(500, message={'errors': 'There was an issue TRANSCODING this session (%s).'.format(session_id)})
 
     @staticmethod
     def __add_participants(participants, session_id, project_id):

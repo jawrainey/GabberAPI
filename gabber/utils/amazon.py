@@ -4,30 +4,51 @@ Handles uploading and access writes (ACL) for files in the Gabber bucket
 """
 import boto3
 import botocore.client
-import os
-
-S3_BUCKET = os.getenv('S3_BUCKET', '')
-S3_KEY = os.getenv('S3_KEY', '')
-S3_SECRET = os.getenv('S3_SECRET', '')
-S3_LOCATION = 'https://{}.s3.amazonaws.com/'.format(S3_BUCKET)
+from flask import current_app as app
 
 s3 = boto3.client(
     "s3",
-    aws_access_key_id=S3_KEY,
-    aws_secret_access_key=S3_SECRET,
+    aws_access_key_id=app.config['S3_KEY'],
+    aws_secret_access_key=app.config['S3_SECRET'],
     config=botocore.client.Config(signature_version='s3')
 )
 
 
-def __get_path(project_id, session_id):
+def __get_path(project_id, session_id, is_transcoded=False):
     """
     The path to specific Gabber session in the mode that the app is being run in.
     """
-    return '{}/{}/{}/{}'.format(
-        os.getenv('APP_NAME', 'main'),
-        os.environ.get('APP_MODE', 'dev'),
+    return '{}/{}/{}/{}/{}'.format(
+        app.config['S3_ROOT_FOLDER'],
+        app.config['S3_PROJECT_MODE'],
         project_id,
+        'transcoded' if is_transcoded else 'raw',
         session_id
+    )
+
+
+def transcode(project_id, session_id):
+    """
+    Use the project/session ID to retrieve the raw uploaded content, and transcode the audio
+    recording to produce a smaller file (22k sample rate, 24 bit rate).
+
+    :param project_id: which project does the recording belong to?
+    :param session_id: which recording is it?
+    """
+    transcoder = boto3.client(
+        'elastictranscoder',
+        app.config['S3_REGION'],
+        aws_access_key_id=app.config['S3_KEY'],
+        aws_secret_access_key=app.config['S3_SECRET']
+    )
+
+    transcoder.create_job(
+        PipelineId=app.config['S3_PIPELINE_ID'],
+        Input={'Key': __get_path(project_id, session_id)},
+        Outputs=[{
+            'Key': __get_path(project_id, session_id, True),
+            'PresetId': app.config['S3_PIPELINE_PRESET_ID']
+        }]
     )
 
 
@@ -41,7 +62,7 @@ def signed_url(project_id, session_id):
     """
     return s3.generate_presigned_url(
         ClientMethod='get_object',
-        Params={'Bucket': S3_BUCKET, 'Key': __get_path(project_id, session_id)},
+        Params={'Bucket': app.config['S3_BUCKET'], 'Key': __get_path(project_id, session_id, is_transcoded=True)},
         ExpiresIn=3600*2)
 
 
@@ -56,6 +77,6 @@ def upload(the_file, project_id, session_id):
     """
     s3.upload_fileobj(
         the_file,
-        S3_BUCKET,
+        app.config['S3_BUCKET'],
         __get_path(project_id, session_id)
     )
