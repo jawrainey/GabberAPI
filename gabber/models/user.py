@@ -28,7 +28,7 @@ class SessionConsent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # Options include: public, private, none.
     type = db.Column(db.String(50), default='none')
-    token = db.Column(db.String(1028), unique=True)
+    token = db.Column(db.String(260), unique=True)
     session_id = db.Column(db.String(260), db.ForeignKey('interview_session.id'))
     participant_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
