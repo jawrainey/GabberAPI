@@ -17,7 +17,7 @@ def validate_email(email, errors):
 
 
 def known_users():
-    return [user.email for user in User.query.all()]
+    return [user.email.lower() for user in User.query.all()]
 
 
 def validate_password_length(is_valid, attribute, errors):

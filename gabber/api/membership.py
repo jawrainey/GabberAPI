@@ -100,11 +100,12 @@ class ProjectInvites(Resource):
         """
         admin, data = self.validate_and_get_data(pid)
         helpers.abort_if_errors_in_validation(AddMemberSchema().validate(data))
-        user = User.query.filter_by(email=data['email']).first()
+        email = data['email']
+        user = User.query.filter_by(email=email).first()
         # Note: If the user is not known an unregistered user is created.
         # This is similar to how users are created after a Gabber session.
         if not user:
-            user = User.create_unregistered_user(data['fullname'], data['email'])
+            user = User.create_unregistered_user(data['fullname'], email)
         # The user cannot be added to the same project multiple times
         if not user.is_project_member(pid):
             membership = Membership(uid=user.id,  pid=pid, rid=role_id(data['role']), confirmed=user.registered)

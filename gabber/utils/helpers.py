@@ -47,7 +47,7 @@ def abort_if_unknown_session(session):
 
 
 def abort_if_unknown_user(user):
-    if not user or user.email not in [user.email for user in User.query.all()]:
+    if not user or user.email.lower() not in [user.email.lower() for user in User.query.all()]:
         raise CustomException(400, errors=['general.UNKNOWN_USER'])
 
 

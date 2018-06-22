@@ -193,9 +193,10 @@ class UserRegistration(Resource):
         """
         data = helpers.jsonify_request_or_abort()
         helpers.abort_if_errors_in_validation(AuthRegisterSchema().validate(data))
-        user = User(fullname=data['fullname'], email=data['email'].lower(), password=data['password'], registered=True)
+        email = data['email'].lower()
+        user = User(fullname=data['fullname'], email=email, password=data['password'], registered=True)
 
-        known_user = User.query.filter_by(email=data['email']).first()
+        known_user = User.query.filter_by(email=email).first()
         if known_user:
             email_client.send_register_notification(known_user)
             return custom_response(200)
