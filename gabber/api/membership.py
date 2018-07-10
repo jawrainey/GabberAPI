@@ -15,7 +15,7 @@ from .. import db
 from flask import current_app as app
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from itsdangerous import URLSafeTimedSerializer
+from itsdangerous import URLSafeSerializer
 import gabber.utils.helpers as helpers
 import gabber.utils.email as email_client
 
@@ -76,7 +76,7 @@ class ProjectInviteVerification(Resource):
         """
         # Only embed necessary information for lookup on the GET
         payload = {'user_id': user_id, 'project_id': project_id}
-        token = URLSafeTimedSerializer(app.config["SECRET_KEY"]).dumps(payload, app.config['SALT'])
+        token = URLSafeSerializer(app.config["SECRET_KEY"]).dumps(payload, app.config['SALT'])
         # Do not store tokens as: (1) they're one time use and (2) token expires.
         return '{}/accept/{}/'.format(app.config['WEB_HOST'], token)
 
