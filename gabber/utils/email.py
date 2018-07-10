@@ -56,9 +56,6 @@ def send_register_notification(user):
 
 
 def format_names(participants):
-    # TODO: this is related to a bug in the mobile apps
-    participants = [p.replace(' (You)', '') for p in participants]
-
     if len(participants) == 1:
         participant = participants[0]
         return participant.decode('UTF-8') if isinstance(participant, str) else participant
