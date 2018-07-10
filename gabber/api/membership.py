@@ -100,7 +100,7 @@ class ProjectInvites(Resource):
         """
         admin, data = self.validate_and_get_data(pid)
         helpers.abort_if_errors_in_validation(AddMemberSchema().validate(data))
-        email = data['email']
+        email = data['email'].lower()
         user = User.query.filter_by(email=email).first()
         # Note: If the user is not known an unregistered user is created.
         # This is similar to how users are created after a Gabber session.
