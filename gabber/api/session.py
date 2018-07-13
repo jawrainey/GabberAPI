@@ -25,7 +25,6 @@ class ProjectSession(Resource):
         project = Project.query.get(pid)
 
         session = InterviewSession.query.get(sid)
-        session.prompts.sort(key=lambda x: x.start_interval, reverse=False)
 
         helpers.abort_if_unknown_session(session)
         helpers.abort_if_session_not_in_project(session, pid)
@@ -35,6 +34,9 @@ class ProjectSession(Resource):
 
         if jwt_user or not project.is_public:
             helpers.abort_if_not_a_member_and_private(user, project)
+
+        if session.prompts:
+            session.prompts.sort(key=lambda x: x.start_interval, reverse=False)
 
         # In the first 24 hours of capturing a conversation only participants of the conversation can review it
         if datetime.now() < (session.created_on + timedelta(hours=24)):
