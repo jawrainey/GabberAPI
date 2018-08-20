@@ -76,6 +76,7 @@ class ProjectSessions(Resource):
         parser.add_argument('consent', required=True,
                             help="The type of consent participants selected within the mobile application. This can"
                                  "be either everyone, members or private")
+        parser.add_argument('created_on', required=True, help="The creation time of the conversation in UTC.")
 
         args = parser.parse_args()
 
@@ -83,7 +84,10 @@ class ProjectSessions(Resource):
         participants = self.validate_and_serialize(args['participants'], 'participants', ParticipantScheme(many=True))
 
         interview_session_id = uuid4().hex
-        interview_session = InterviewSession(id=interview_session_id, creator_id=user.id, project_id=pid)
+        from datetime import datetime
+        created_on = datetime.strptime(args['created_on'], "%m/%d/%Y %H:%M:%S")
+        interview_session = InterviewSession(
+            id=interview_session_id, creator_id=user.id, project_id=pid, created_on=created_on)
         self.__upload_interview_recording(args['recording'], interview_session_id, pid)
         self.__transcode_recording(interview_session_id, pid)
         interview_session.prompts.extend(self.__add_structural_prompts(prompts, interview_session_id))

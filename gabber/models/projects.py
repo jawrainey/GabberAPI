@@ -222,7 +222,7 @@ class InterviewSession(db.Model):
     id = db.Column(db.String(260), primary_key=True)
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
-    created_on = db.Column(db.DateTime, default=db.func.now())
+    created_on = db.Column(db.DateTime)
 
     prompts = db.relationship('InterviewPrompts', backref='interview', lazy='joined')
     consents = db.relationship('SessionConsent', backref='interview', lazy='dynamic')
