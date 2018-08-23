@@ -51,7 +51,16 @@ class Projects(Resource):
         helpers.abort_if_errors_in_validation(schema.validate(json_data))
         data = schema.dump(json_data)
 
+        from ..utils import amazon
+
+        try:
+            filename = amazon.upload_base64(data['image'])
+        except Exception:
+            # TODO: log error message
+            filename = 'default'
+
         project = ProjectModel(
+            image=filename,
             title=data['title'],
             description=data['description'],
             creator=user.id,
@@ -63,7 +72,6 @@ class Projects(Resource):
         # TODO: temporary hard-coded value[s] in frontend ...
         project.organisation = int(json_data.get('organisation', {id: 0})['id'])
         project.members.append(membership)
-
         project.prompts.extend([ProjectPrompt(creator=user.id, text_prompt=topic) for topic in data['topics']])
         db.session.add(project)
         db.session.commit()

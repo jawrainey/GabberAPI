@@ -2,9 +2,11 @@
 """
 Handles uploading and access writes (ACL) for files in the Gabber bucket
 """
+import base64
 import boto3
 import botocore.client
 from flask import current_app as app
+from uuid import uuid4
 
 s3 = boto3.client(
     "s3",
@@ -80,3 +82,25 @@ def upload(the_file, project_id, session_id):
         app.config['S3_BUCKET'],
         __get_path(project_id, session_id)
     )
+
+
+def __static_path():
+    return '{}/{}/static/'.format(app.config['S3_ROOT_FOLDER'], app.config['S3_PROJECT_MODE'])
+
+
+def static_file_by_name(name):
+    path = 'https://{}.s3.amazonaws.com/{}'.format(app.config['S3_BUCKET'], __static_path())
+    return path + (name or 'default')
+
+
+def upload_base64(data):
+    filename = uuid4().hex
+    s3.put_object(
+        ACL='public-read',
+        Bucket=app.config['S3_BUCKET'],
+        Key=__static_path() + filename,
+        Body=base64.b64decode(data),
+        ContentType='image/jpeg',
+        ContentEncoding='base64'
+    )
+    return filename

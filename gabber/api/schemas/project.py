@@ -83,6 +83,7 @@ class CodebookSchema(ma.ModelSchema):
 
 
 class ProjectPostSchema(ma.Schema):
+    image = ma.String()
     title = ma.String()
     description = ma.String()
     privacy = ma.String()
@@ -149,6 +150,7 @@ class ProjectTopicSchema(ma.ModelSchema):
 
 
 class ProjectModelSchema(ma.ModelSchema):
+    image = ma.Method("_from_amazon")
     topics = ma.Nested(ProjectTopicSchema, many=True, attribute="prompts")
     codebook = ma.Function(lambda o: CodebookSchema().dump(o.codebook.first()) if o.codebook.first() else None)
     members = ma.Method("_members")
@@ -168,12 +170,16 @@ class ProjectModelSchema(ma.ModelSchema):
         # Need to initialise parent manually
         ma.ModelSchema.__init__(self,  **kwargs)
 
+    @staticmethod
+    def _from_amazon(data):
+        from ...utils import amazon
+        return amazon.static_file_by_name(data.image)
+
     def _members(self, data):
         """
         Show the name/email of member of a project if the user making the request (well, to serialize the object)
         is an admin on the project or they are the creator of a project.
         """
-
         if self.user_id:
             is_creator = data.creator == self.user_id
             users_role = User.query.get(self.user_id).role_for_project(data.id)
