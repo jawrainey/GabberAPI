@@ -53,14 +53,8 @@ class Projects(Resource):
 
         from ..utils import amazon
 
-        try:
-            filename = amazon.upload_base64(data['image'])
-        except Exception:
-            # TODO: log error message
-            filename = 'default'
-
         project = ProjectModel(
-            image=filename,
+            image=amazon.upload_base64(data['image']),
             title=data['title'],
             description=data['description'],
             creator=user.id,

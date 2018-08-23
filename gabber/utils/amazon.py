@@ -95,12 +95,15 @@ def static_file_by_name(name):
 
 def upload_base64(data):
     filename = uuid4().hex
-    s3.put_object(
-        ACL='public-read',
-        Bucket=app.config['S3_BUCKET'],
-        Key=__static_path() + filename,
-        Body=base64.b64decode(data),
-        ContentType='image/jpeg',
-        ContentEncoding='base64'
-    )
+    try:
+        s3.put_object(
+            ACL='public-read',
+            Bucket=app.config['S3_BUCKET'],
+            Key=__static_path() + filename,
+            Body=base64.b64decode(data),
+            ContentType='image/jpeg',
+            ContentEncoding='base64'
+        )
+    except Exception:
+        filename = 'default'
     return filename
