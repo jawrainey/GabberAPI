@@ -98,6 +98,7 @@ class ProjectPostSchema(ma.Schema):
             validator.errors.append("TITLE_EXISTS")
 
         validator.validate('description', 'str', data)
+        validator.validate('image', 'str', data)
 
         validate_length(data.get('title'), 64, 'TITLE', validator)
         validate_length(data.get('description'), 256, 'DESCRIPTION', validator)
@@ -221,6 +222,11 @@ class ProjectModelSchema(ma.ModelSchema):
         creator_valid = validator.validate('creator', 'int', data)
         title_valid = validator.validate('title', 'str', data)
         title_as_slug = slugify(data['title'])
+
+        if 'image' not in data and data.get('image', None):
+            validator.errors.append('image_KEY_REQUIRED')
+        if 'image' in data and len(data['image']) > 0 and not isinstance(data['image'], basestring):
+            validator.errors.append('image_IS_NOT_STRING')
 
         validate_length(data.get('title'), 64, 'TITLE', validator)
         validate_length(data.get('description'), 256, 'DESCRIPTION', validator)
