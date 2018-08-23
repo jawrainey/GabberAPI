@@ -67,7 +67,8 @@ class AuthLoginSchema(ma.Schema):
 
         if email_valid:
             validate_email(data['email'].lower(), validator.errors)
-        if data['email'].lower() not in known_users():
+
+        if not validator.errors and data['email'].lower() not in known_users():
             validator.errors.append("USER_404")
 
         validate_password(data, validator)
