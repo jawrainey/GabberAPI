@@ -115,10 +115,3 @@ class UserSchemaHasAccess(ma.ModelSchema):
         model = User
         include_fk = True
         exclude = ['connection_comments', 'connections', 'password', 'member_of', 'pref_lang']
-
-
-class UserSchema(ma.ModelSchema):
-    class Meta:
-        model = User
-        exclude = ['connection_comments', 'connections', 'password', 'member_of', 'email', 'fullname']
-
