@@ -109,9 +109,12 @@ class AuthRegisterSchema(ma.Schema):
 
 
 class UserSchemaHasAccess(ma.ModelSchema):
+    lang = ma.Function(lambda d: SupportedLanguage.query.get(d.pref_lang).code)
+
     class Meta:
         model = User
-        exclude = ['connection_comments', 'connections', 'password', 'member_of']
+        include_fk = True
+        exclude = ['connection_comments', 'connections', 'password', 'member_of', 'pref_lang']
 
 
 class UserSchema(ma.ModelSchema):
