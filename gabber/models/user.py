@@ -49,6 +49,8 @@ class User(db.Model):
     email = db.Column(db.String(64), unique=True)
     password = db.Column(db.String(192))
     fullname = db.Column(db.String(64))
+    pref_lang = db.Column(db.Integer, db.ForeignKey('supported_language.id'))
+
     # User accounts are created when participating in a session; once registered,
     # this is changed so that we can identify between registers/unregistered users.
     registered = db.Column(db.Boolean, default=False)
@@ -62,15 +64,16 @@ class User(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
-    def __init__(self, fullname, email, password, registered=False):
+    def __init__(self, fullname, email, password, preferred_lang, registered=False):
         self.fullname = fullname
         self.email = email
         self.set_password(password)
+        self.pref_lang = preferred_lang
         self.registered = registered
 
     @staticmethod
-    def create_unregistered_user(fullname, email):
-        user = User(fullname, email, uuid4().hex)
+    def create_unregistered_user(fullname, email, lang):
+        user = User(fullname, email, uuid4().hex, lang)
         db.session.add(user)
         db.session.commit()
         return user

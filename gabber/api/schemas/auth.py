@@ -1,5 +1,6 @@
 from ... import ma
 from ...models.user import User
+from ...models.language import SupportedLanguage
 from ...api.schemas.project import HelperSchemaValidator
 from marshmallow import pre_load, validate, ValidationError
 
@@ -85,6 +86,7 @@ class AuthRegisterSchema(ma.Schema):
     fullname = ma.String()
     email = ma.String()
     password = ma.String()
+    lang = ma.Int()
 
     @pre_load()
     def __validate(self, data):
@@ -92,6 +94,12 @@ class AuthRegisterSchema(ma.Schema):
 
         fullname_valid = validator.validate('fullname', 'str', data)
         email_valid = validator.validate('email', 'str', data)
+        lang_valid = validator.validate('lang', 'int', data)
+
+        if lang_valid:
+            is_lang = SupportedLanguage.query.get(data['lang'])
+            if not is_lang:
+                validator.errors.append("INVALID_PREFERRED_LANGUAGE")
 
         if email_valid:
             validate_email(data['email'].lower(), validator.errors)

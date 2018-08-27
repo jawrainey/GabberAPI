@@ -105,7 +105,8 @@ class ProjectInvites(Resource):
         # Note: If the user is not known an unregistered user is created.
         # This is similar to how users are created after a Gabber session.
         if not user:
-            user = User.create_unregistered_user(data['fullname'], email)
+            # TODO: use the project default language?!
+            user = User.create_unregistered_user(data['fullname'], email, 1)
         # The user cannot be added to the same project multiple times
         if not user.is_project_member(pid):
             membership = Membership(uid=user.id,  pid=pid, rid=role_id(data['role']), confirmed=user.registered)
