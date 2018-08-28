@@ -14,7 +14,7 @@ from .comments import Comments, Comment, CommentsReplies
 from .auth import TokenRefresh, UserRegistration, UserLogin, ForgotPassword, ResetPassword, UserAsMe
 from .auth import VerifyRegistration
 
-restful_api.add_resource(SupportedLanguages, '/api/help/languages')
+restful_api.add_resource(SupportedLanguages, '/api/help/languages/')
 restful_api.add_resource(Projects, '/api/projects/')
 restful_api.add_resource(Project, '/api/projects/<int:pid>/')
 restful_api.add_resource(ProjectMembership, '/api/projects/<int:pid>/membership/')
