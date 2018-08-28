@@ -9,7 +9,6 @@ from ..utils.general import custom_response
 from ..api.schemas.project import ProjectModelSchema
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity, jwt_optional
-from flask import request
 from gabber.utils import helpers
 
 
@@ -59,6 +58,12 @@ class Project(Resource):
         schema = ProjectModelSchema()
         errors = schema.validate(json_data)
         helpers.abort_if_errors_in_validation(errors)
+
+        # When the project is updated, only the image data (base-64) is sent if it has changed.
+        if json_data.get('image', None):
+            from ..utils import amazon
+            json_data['image'] = amazon.upload_base64(json_data['image'])
+
         # TODO: When schema.load updates the model it does not invalidate the previous rows, and
         # (1) sets the FK to NULL and (2) does not update the is_active property.
         # I cannot figure out how to do that from within the schema and instead retrieve the
@@ -68,6 +73,8 @@ class Project(Resource):
         topics = project.prompts.all()
         # Deserialize data to internal ORM representation thereby overriding the data and then save it
         data = schema.load(json_data, instance=project)
+        # TODO: it's unclear why schema.load does not load image correctly, hence needing to manually set it.
+        data.image = json_data['image'] if json_data.get('image', None) else data.image
         # Store the updates and therefore invalidating the previous topics and remove their project_id
         db.session.commit()
         # Only Delete is affected by this bug, so we re-populate the project_ids

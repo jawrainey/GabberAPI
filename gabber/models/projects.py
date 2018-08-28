@@ -156,10 +156,11 @@ class Project(db.Model):
     query_class = QueryWithSoftDelete
 
     id = db.Column(db.Integer, primary_key=True)
+    image = db.Column(db.String(64))
     title = db.Column(db.String(64))
     # URL-friendly representation of the title
     slug = db.Column(db.String(256), unique=True, index=True)
-    description = db.Column(db.String(256))
+    description = db.Column(db.String(768))
     # Used as a 'soft-delete' to preserve prompt-content for viewing
     is_active = db.Column(db.Boolean, default=True)
     # This can be null as the organisation may be an individual
@@ -178,8 +179,9 @@ class Project(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
-    def __init__(self, title, description, creator, is_public):
+    def __init__(self, image, title, description, creator, is_public):
         from slugify import slugify
+        self.image = image
         self.title = title
         self.slug = slugify(title)
         self.description = description
