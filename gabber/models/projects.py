@@ -220,8 +220,8 @@ class InterviewSession(db.Model):
         one-to-many: many participants can be involved in one interview
         one-to-many: an interview can have many connections
     """
-    # The ID is also used as the RecordingFilename when storing the file;
     id = db.Column(db.String(260), primary_key=True)
+    lang_id = db.Column(db.Integer, db.ForeignKey('supported_language.id'))
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     created_on = db.Column(db.DateTime)

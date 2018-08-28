@@ -109,7 +109,7 @@ class AuthRegisterSchema(ma.Schema):
 
 
 class UserSchemaHasAccess(ma.ModelSchema):
-    lang = ma.Function(lambda d: SupportedLanguage.query.get(d.pref_lang).code)
+    lang = ma.Function(lambda d: SupportedLanguage.query.get(d.pref_lang).id)
 
     class Meta:
         model = User
