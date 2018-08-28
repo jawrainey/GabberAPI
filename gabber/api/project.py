@@ -60,11 +60,9 @@ class Project(Resource):
         helpers.abort_if_errors_in_validation(errors)
 
         # When the project is updated, only the image data (base-64) is sent if it has changed.
-        if json_data['image']:
+        if json_data.get('image', None):
             from ..utils import amazon
             json_data['image'] = amazon.upload_base64(json_data['image'])
-        else:
-            json_data.pop('image')
 
         # TODO: When schema.load updates the model it does not invalidate the previous rows, and
         # (1) sets the FK to NULL and (2) does not update the is_active property.
