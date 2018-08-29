@@ -50,7 +50,8 @@ class MailClient:
         content = self.content['consent']
         content['subject'] = content['subject'].format(self.brand)
         content['name'] = user.fullname
-        content['body'] = content['body'].format(self.brand, names, project_title, consent_type)
+        consent = self.content['misc']['consent'][consent_type]
+        content['body'] = content['body'].format(self.brand, names, project_title, consent)
         content['button_url'] = SessionConsent.consent_url(session_id, user.id)
 
         self.send_email(user.email, content)
@@ -86,7 +87,7 @@ class MailClient:
     def build_plaintext(self, content):
         content = self.__add_shared(content)
         content['bottom'] = content['bottom'].replace('Android', 'Android ({0}/android/)'.format(self.homepage))
-        content['bottom'] = content['bottom'].replace('iOS', 'iOS ({0}/ios)'.format(self.homepage))
+        content['bottom'] = content['bottom'].replace('iOS', 'iOS ({0}/ios/)'.format(self.homepage))
         return u'Hi {name},\n\n{body}\n\n{button_label} ({button_url})' \
                u'\n\n{footer}\n{brand}\n\n{bottom}'.format(**self.__add_shared(content))
 
