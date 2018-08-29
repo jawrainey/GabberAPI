@@ -16,7 +16,7 @@ from .. import db
 from flask import current_app as app
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from itsdangerous import URLSafeSerializer
+from itsdangerous import URLSafeSerializer, BadSignature
 import gabber.utils.helpers as helpers
 
 # Given there's only 3, do a lookup here to avoid database lookup
@@ -32,24 +32,22 @@ class ProjectInviteVerification(Resource):
     """
     Mapped to: /api/projects/invites/<token>/
     """
-    @staticmethod
-    def get(token):
+    def get(self, token):
         """
         Provides details of a user (fullname & email) and the project (ID) they were invited to.
         """
-        token_data = AuthToken.validate_token(token)
+        token_data = self.validate_token(token)
         user = User.query.get(token_data['user_id'])
         project = Project.query.get(token_data['project_id'])
         payload = dict(user=UserSchemaHasAccess().dump(user), project=ProjectModelSchema().dump(project))
         return custom_response(200, data=payload)
 
-    @staticmethod
-    def put(token):
+    def put(self, token):
         """
         Updates an unconfirmed user record* and accepts the membership invite.
         *i.e. someone created through a Gabber or when invited
         """
-        token_data = AuthToken.validate_token(token)
+        token_data = self.validate_token(token)
         data = helpers.jsonify_request_or_abort()
         helpers.abort_if_errors_in_validation(ProjectInviteWithToken().validate(data))
 
@@ -78,6 +76,16 @@ class ProjectInviteVerification(Resource):
         token = URLSafeSerializer(app.config["SECRET_KEY"]).dumps(payload, app.config['SALT'])
         # Do not store tokens as: (1) they're one time use and (2) token expires.
         return '{}/accept/{}/'.format(app.config['WEB_HOST'], token)
+
+    @staticmethod
+    def validate_token(token):
+        # As the invite does not expire we must validate it against the associated serializer
+        serializer = URLSafeSerializer(app.config['SECRET_KEY'])
+        try:
+            data = serializer.loads(token, salt=app.config['SALT'])
+        except BadSignature:
+            raise CustomException(400, errors=['auth.AUTH_TOKEN_404'])
+        return data
 
 
 class ProjectInvites(Resource):
@@ -113,8 +121,11 @@ class ProjectInvites(Resource):
             db.session.commit()
 
             project = Project.query.get(pid)
+            client = MailClient(user.pref_lang)
             if user.registered or user.verified:
+                client.invite_registered(user, admin.fullname, project)
             else:
+                client.invite_unregistered(user, admin.fullname, project)
         else:
             return custom_response(400, errors=['membership.MEMBER_EXISTS'])
         return custom_response(200, data=ProjectMemberWithAccess().dump(membership))
@@ -141,7 +152,6 @@ class ProjectInvites(Resource):
             raise CustomException(400, errors=['membership.USER_DEACTIVATED'])
         membership.deactivated = True
         db.session.commit()
-        email_client.send_project_member_removal(admin, User.query.get(membership.user_id), Project.query.get(pid))
         return custom_response(200, data=ProjectMemberWithAccess().dump(membership))
 
     @staticmethod
