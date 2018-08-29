@@ -8,7 +8,7 @@ from ..api.schemas.auth import AuthRegisterSchema, AuthLoginSchema, \
 from ..models.user import User, ResetTokens
 from ..utils.general import CustomException, custom_response
 from ..utils import helpers
-from ..utils.email import MailClient
+from ..utils.mail import MailClient
 from flask import current_app as app
 from flask_restful import Resource
 from flask_jwt_extended import create_access_token, \

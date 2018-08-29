@@ -10,7 +10,7 @@ from ..api.schemas.project import ProjectMember, ProjectMemberWithAccess, Projec
 from ..models.projects import Project
 from ..models.projects import Membership
 from ..models.user import User
-from ..utils.email import MailClient
+from ..utils.mail import MailClient
 from ..utils.general import custom_response, CustomException
 from .. import db
 from flask import current_app as app

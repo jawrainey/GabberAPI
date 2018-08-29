@@ -13,7 +13,7 @@ from marshmallow import ValidationError
 from flask_restful import Resource, reqparse, abort
 from flask_jwt_extended import jwt_required, get_jwt_identity, jwt_optional
 from uuid import uuid4
-from ..utils.email import MailClient
+from ..utils.mail import MailClient
 import gabber.utils.helpers as helpers
 import json
 

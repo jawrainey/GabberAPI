@@ -9,9 +9,6 @@ from ..models.projects import InterviewSession
 
 class MailClient:
     def __init__(self, lang_id):
-        # TODO: footer content needs translated
-        # TODO: Greeting needs translated
-        # TODO: "The Gabber team" needs translated
         lang = SupportedLanguage.query.get(lang_id)
         current = os.path.realpath(os.path.dirname(__file__))
         data = os.path.join(current, 'email/locales', '{0}.json'.format(lang.code if lang else 'en'))
@@ -81,9 +78,15 @@ class MailClient:
         self.send_email(user.email, content)
 
     def build_html(self, content):
-        return render_template('action.html', **self.__add_shared(content))
+        content = self.__add_shared(content)
+        content['bottom'] = content['bottom'].replace('Android', '<a href="{0}/android/">Android</a>'.format(self.homepage))
+        content['bottom'] = content['bottom'].replace('iOS', '<a href="{0}/ios/">iOS</a>'.format(self.homepage))
+        return render_template('action.html', **content)
 
     def build_plaintext(self, content):
+        content = self.__add_shared(content)
+        content['bottom'] = content['bottom'].replace('Android', 'Android ({0}/android/)'.format(self.homepage))
+        content['bottom'] = content['bottom'].replace('iOS', 'iOS ({0}/ios)'.format(self.homepage))
         return u'Hi {name},\n\n{body}\n\n{button_label} ({button_url})' \
                u'\n\n{footer}\n{brand}\n\n{bottom}'.format(**self.__add_shared(content))
 
@@ -107,5 +110,5 @@ class MailClient:
         content['footer'] = content['footer'].format(self.contact)
         content['brand'] = self.brand
         content['brand_url'] = self.homepage
-        content['bottom'] = self.content['misc']['footer']
+        content['bottom'] = self.content['misc']['footer'].format(self.brand)
         return content
