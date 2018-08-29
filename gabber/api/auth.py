@@ -8,12 +8,12 @@ from ..api.schemas.auth import AuthRegisterSchema, AuthLoginSchema, \
 from ..models.user import User, ResetTokens
 from ..utils.general import CustomException, custom_response
 from ..utils import helpers
+from ..utils.mail import MailClient
 from flask import current_app as app
 from flask_restful import Resource
 from flask_jwt_extended import create_access_token, \
     create_refresh_token, jwt_refresh_token_required, get_jwt_identity, jwt_optional
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
-import gabber.utils.email as email_client
 
 
 def invalidate_other_user_tokens(email):
@@ -63,8 +63,8 @@ class ForgotPassword(Resource):
         db.session.add(ResetTokens(token=token, user_id=user.id))
         db.session.commit()
 
-        url = app.config['WEB_HOST'] + '/reset/' + token
-        email_client.send_forgot_password(user, url)
+        url = '{0}/reset/{1}'.format(app.config['WEB_HOST'], token)
+        MailClient(user.pref_lang).forgot(user, url)
         return custom_response(200)
 
 
@@ -195,17 +195,17 @@ class UserRegistration(Resource):
         helpers.abort_if_errors_in_validation(AuthRegisterSchema().validate(data))
         email = data['email'].lower()
 
-        user = User(fullname=data['fullname'], email=email, password=data['password'],
-                    preferred_lang=data['lang'], registered=True)
-
-        known_user = User.query.filter_by(email=email).first()
-        if known_user:
-            email_client.send_register_notification(known_user)
+        if User.query.filter_by(email=email).first():
             return custom_response(200)
         else:
+            user = User(fullname=data['fullname'], email=email, password=data['password'],
+                        preferred_lang=data['lang'], registered=True)
+
             db.session.add(user)
             db.session.commit()
-            email_client.send_email_verification(user, AuthToken(user_id=user.id).token)
+
+            url = '{0}/verify/{1}/'.format(app.config['WEB_HOST'], AuthToken(user_id=user.id).token)
+            MailClient(user.pref_lang).verify(user, url)
 
         return custom_response(201)
 

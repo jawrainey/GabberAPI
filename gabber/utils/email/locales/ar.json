@@ -1,0 +1,40 @@
+{
+  "misc": {
+    "footer": "Record and share your own conversation with {0} on Android and iOS.",
+    "consent": {
+      "public": "anyone",
+      "members": "others who have contributed or have been invited to the project",
+      "private": "only participants of the conversation"
+    }
+  },
+  "forgot": {
+    "subject": "{0} password reset",
+    "body": "You requested to reset your password for your {0} account. Click the link below and you'll be redirected to a secure site where you can set a new password.",
+    "button_label": "Reset your password",
+    "footer": "If you did not request a password reset, then please ignore this email or contact us and let us know. This password reset is only valid for the next 30 minutes."
+  },
+  "verify": {
+    "subject": "Verify your {0} account",
+    "body": "Welcome to {0}! Please verify your email address by tapping on the button below.",
+    "button_label": "Verify Email",
+    "footer": ""
+  },
+  "consent": {
+    "subject": "Review consent for your {0} conversation",
+    "body": "You recently participated in {0} with {1} on the theme of {2} and agreed for {3} to have access to your conversation. Only you and others in the conversation can listen to it in the first 24-hours, which gives you time to review your consent before others can listen.",
+    "button_label": "Review Consent",
+    "footer": "You can use the link above at any time to review and update your consent for your conversation. To request for your conversation to be deleted, please email us at {0}."
+  },
+  "invite_registered": {
+    "subject": "{0} invited you to join a project on {1}",
+    "body": "You have been invited to {0} by {1}. Help understand the content of the {2} conversations by listening and highlighting online.",
+    "button_label": "View Conversations",
+    "footer": "This project will become available on the {0} mobile application when you register where you can contribute conversations to the project."
+  },
+  "invite_unregistered": {
+    "subject": "{0} invited you to join a project on {1}",
+    "body": "You have been invited to {0} by {1}. Help understand the content of the {2} conversations by listening and highlighting online. Register by clicking the button below and you will become a project member where you can begin listening to these conversations.",
+    "button_label": "Join Project",
+    "footer": "This project will become available on the {0} mobile application when you register where you can contribute conversations to the project."
+  }
+}

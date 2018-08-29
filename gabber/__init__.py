@@ -19,7 +19,9 @@ def add_headers(app, response):
 
 
 def create_app(config_name):
-    app = Flask(__name__)
+    # It is required to set the template folder to gain access to the html content
+    # when rendering templates (constructing html from jinja variables) to send email.
+    app = Flask(__name__, template_folder="utils/email/html")
     app.config.from_object(config[config_name])
 
     db.init_app(app)
