@@ -1,0 +1,35 @@
+{
+  "misc": {
+    "footer": "Download the {0} mobile application on Android ({1}) and iOS ({2}) to record and share your own conversations"
+  },
+  "forgot": {
+    "subject": "{0} restablecimiento de contraseña",
+    "body": "Solicitaste restablecer tu contraseña para tu cuenta {0}. Haz clic en el siguiente enlace y serás redireccionado a un sitio seguro donde puedes establecer una nueva contraseña.",
+    "button_label": "Restablecer su contraseña",
+    "footer": "Si no solicitó restablecer la contraseña, ignore este correo electrónico o póngase en contacto con nosotros y háganoslo saber. Este restablecimiento de contraseña solo es válido durante los próximos 30 minutos."
+  },
+  "verify": {
+    "subject": "Verifique su cuenta {0}",
+    "body": "¡Bienvenido a {0}! Por favor, verifique su dirección de correo electrónico tocando el botón de abajo.",
+    "button_label": "Verificar correo electrónico",
+    "footer": ""
+  },
+  "consent": {
+    "subject": "Revisa tu {0} consentimiento de conversación",
+    "body": "Recientemente participó en {0} con {1} sobre el tema de {2}. Usted acordó que {3} tuviera acceso a su conversación. Solo usted y otras personas en la conversación pueden escucharlo durante las primeras 24 horas, lo que le da tiempo para revisar su consentimiento antes de que otros puedan escucharlo.",
+    "button_label": "Revisar consentimiento",
+    "footer": "Puede utilizar el enlace anterior en cualquier momento para revisar y actualizar su consentimiento para su conversación. Para solicitar que se elimine su conversación, envíenos un correo electrónico a {0}"
+  },
+  "invite_registered": {
+    "subject": "{0} lo invitó a unirse a un proyecto en {2}.",
+    "body": "Has sido invitado a {0} por {1}, que tiene {2} conversaciones y {3} miembros.",
+    "button_label": "Ver proyecto",
+    "footer": ""
+  },
+  "invite_unregistered": {
+    "subject": "{0} lo invitó a unirse a un proyecto en {2}.",
+    "body": "Has sido invitado a {0} por {1}, que tiene {2} conversaciones y {3} miembros. Regístrese haciendo clic en el botón de abajo y se convertirá en un miembro del proyecto donde puede comenzar a escuchar estos conversaciones.",
+    "button_label": "Unirse al proyecto",
+    "footer": "Este proyecto estará disponible en la aplicación móvil {0} cuando te registres donde puedes contribuir con las conversaciones del proyecto. La aplicación móvil está disponible para descargar en Android ({1}) e iOS ({2}"
+  }
+}

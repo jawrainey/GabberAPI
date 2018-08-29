@@ -13,7 +13,7 @@ from marshmallow import ValidationError
 from flask_restful import Resource, reqparse, abort
 from flask_jwt_extended import jwt_required, get_jwt_identity, jwt_optional
 from uuid import uuid4
-import gabber.utils.email as email_client
+from ..utils.email import MailClient
 import gabber.utils.helpers as helpers
 import json
 
@@ -108,9 +108,22 @@ class ProjectSessions(Resource):
             consent.token = SessionConsent.generate_invite_token(consent.id)
             db.session.commit()
 
-        # Here we would update consent for the recording based on the selection in the app
-        email_client.request_consent(participants, interview_session)
+        send_mail = MailClient(interview_session.lang_id)
+
+        for participant in participants:
+            send_mail.consent(participant, self.names(participants), project.title, interview_session.id, args['consent'])
         return {}, 201
+
+    @staticmethod
+    def names(_participants):
+        participants = map(unicode, [p['Name'].decode('UTF-8') if isinstance(p, str) else p["Name"] for p in _participants])
+        if len(participants) == 1:
+            participant = participants[0]
+            return participant.decode('UTF-8') if isinstance(participant, str) else participant
+        if len(participants) == 2:
+            return u' and '.join(participants)
+        if len(participants) > 2:
+            return u'{} and {}'.format(u', '.join(participants[0:-1]), participants[-1])
 
     @staticmethod
     def validate_and_serialize(data, message, scheme):

@@ -10,6 +10,7 @@ from ..api.schemas.project import ProjectMember, ProjectMemberWithAccess, Projec
 from ..models.projects import Project
 from ..models.projects import Membership
 from ..models.user import User
+from ..utils.email import MailClient
 from ..utils.general import custom_response, CustomException
 from .. import db
 from flask import current_app as app
@@ -17,8 +18,6 @@ from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from itsdangerous import URLSafeSerializer
 import gabber.utils.helpers as helpers
-import gabber.utils.email as email_client
-
 
 # Given there's only 3, do a lookup here to avoid database lookup
 # In fact, we should store these roles as a global ...
@@ -114,11 +113,8 @@ class ProjectInvites(Resource):
             db.session.commit()
 
             project = Project.query.get(pid)
-
             if user.registered or user.verified:
-                email_client.send_project_member_invite_registered_user(admin, user, project)
             else:
-                email_client.send_project_member_invite_unregistered_user(admin, user, project)
         else:
             return custom_response(400, errors=['membership.MEMBER_EXISTS'])
         return custom_response(200, data=ProjectMemberWithAccess().dump(membership))

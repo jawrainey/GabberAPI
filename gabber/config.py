@@ -8,7 +8,13 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', '')
     SALT = os.environ.get('SALT', '')
 
-    SEND_GRID_API = os.environ.get('SENDGRID_API_KEY', '')
+    BRAND = os.environ.get('BRAND', 'Gabber')
+    CONTACT_EMAIL = os.environ.get('CONTACT_EMAIL', 'admin@gabber.audio')
+
+    MAILBOX = os.environ.get('MAILBOX', '')
+    MAIL_API_KEY = os.environ.get('MAIL_API_KEY', '')
+    MAIL_SENDER_NAME = os.environ.get('MAIL_SENDER_NAME', 'Gabber Admin')
+    MAIL_SENDER_EMAIL = os.environ.get('MAIL_SENDER_EMAIL', 'admin@gabber.audio')
 
     S3_REGION = os.getenv('S3_REGION', 'eu-west-1')
     S3_BUCKET = os.getenv('S3_BUCKET', '')
