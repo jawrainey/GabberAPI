@@ -12,6 +12,68 @@ All requests are returned in the following format where errors contains unique _
 }
 ```
 
+## Helpers
+
+<details>
+<summary>help.languages</summary>
+<br>
+
+`GET: /api/help/languages/`
+  
+> Returns a dictionary of supported languages on the platform, including their ISO code and name
+
+**Returns:**
+
+```
+{
+    "data": [
+        {
+            "code": "ar",
+            "endonym": "العربية",
+            "id": 4,
+            "name": "Arabic"
+        },
+        {
+            "code": "en",
+            "endonym": "English",
+            "id": 1,
+            "name": "English"
+        },
+        {
+            "code": "es",
+            "endonym": "Español",
+            "id": 6,
+            "name": "Spanish"
+        },
+        {
+            "code": "fr",
+            "endonym": "Français",
+            "id": 5,
+            "name": "French"
+        },
+        {
+            "code": "it",
+            "endonym": "Italiano",
+            "id": 2,
+            "name": "Italian"
+        },
+        {
+            "code": "ru",
+            "endonym": "Русский",
+            "id": 3,
+            "name": "Russian"
+        }
+    ],
+    "meta": {
+        "messages": [],
+        "success": true
+    }
+}
+```
+
+</details>
+
+
 ## Authentication
 
 <details>
@@ -28,6 +90,7 @@ All requests are returned in the following format where errors contains unique _
 fullname varies across countries, where some consider middle name, etc.
 - `email`: must be a valid email address and is used to uniquely identify a user.
 - `password`: must be at least 12 characters.
+- `lang`: The ID from a supported language (full list at: `/help/languages`)
 
 **Returns:**
 

@@ -77,6 +77,7 @@ class ProjectSessions(Resource):
                             help="The type of consent participants selected within the mobile application. This can"
                                  "be either everyone, members or private")
         parser.add_argument('created_on', required=True, help="The creation time of the conversation in UTC.")
+        parser.add_argument('lang', required=True, help="The language spoken during the recording.")
 
         args = parser.parse_args()
 
@@ -84,14 +85,15 @@ class ProjectSessions(Resource):
         participants = self.validate_and_serialize(args['participants'], 'participants', ParticipantScheme(many=True))
 
         interview_session_id = uuid4().hex
+        lang_id = args['lang']
         from datetime import datetime
         created_on = datetime.strptime(args['created_on'], "%m/%d/%Y %H:%M:%S")
         interview_session = InterviewSession(
-            id=interview_session_id, creator_id=user.id, project_id=pid, created_on=created_on)
+            id=interview_session_id, lang_id=lang_id, creator_id=user.id, project_id=pid, created_on=created_on)
         self.__upload_interview_recording(args['recording'], interview_session_id, pid)
         self.__transcode_recording(interview_session_id, pid)
         interview_session.prompts.extend(self.__add_structural_prompts(prompts, interview_session_id))
-        interview_session.participants.extend(self.__add_participants(participants, interview_session_id, project.id))
+        interview_session.participants.extend(self.__add_participants(participants, interview_session_id, project.id, lang_id))
         interview_session.consents.extend(
             self.__create_consent(interview_session.participants, interview_session.id, args['consent'])
         )
@@ -153,7 +155,7 @@ class ProjectSessions(Resource):
             abort(500, message={'errors': 'There was an issue TRANSCODING this session (%s).'.format(session_id)})
 
     @staticmethod
-    def __add_participants(participants, session_id, project_id):
+    def __add_participants(participants, session_id, project_id, lang_id):
         """
         Each interview has a set of participants (>1), who each have a role (interviewer or interviewee).
         The problem is that these participants may be known to the system, having been interviewed by
@@ -173,7 +175,7 @@ class ProjectSessions(Resource):
             known_user = User.query.filter_by(email=p['Email']).first()
             # e.g. someone interviewed a person who is not a Gabber user
             if not known_user:
-                known_user = User.create_unregistered_user(p['Name'], p['Email'])
+                known_user = User.create_unregistered_user(p['Name'], p['Email'], lang_id)
             # By default, participants involved in a Gabber become members
             if not known_user.is_project_member(project_id):
                 Membership.join_project(known_user.id, project_id)
