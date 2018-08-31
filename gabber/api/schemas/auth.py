@@ -109,9 +109,16 @@ class AuthRegisterSchema(ma.Schema):
 
 
 class UserSchemaHasAccess(ma.ModelSchema):
-    lang = ma.Function(lambda d: SupportedLanguage.query.get(d.pref_lang).id)
-
     class Meta:
         model = User
         include_fk = True
-        exclude = ['connection_comments', 'connections', 'password', 'member_of', 'pref_lang']
+        exclude = ['connection_comments', 'connections', 'password', 'member_of']
+
+    @pre_load()
+    def __validate(self, data):
+        validator = HelperSchemaValidator('auth')
+
+        if data.get('lang', None) and not SupportedLanguage.query.get(data['lang']):
+            validator.errors.append("INVALID_PREFERRED_LANGUAGE")
+
+        validator.raise_if_errors()
