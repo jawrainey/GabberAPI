@@ -36,15 +36,15 @@ class HelperSchemaValidator:
 
     def validate(self, attribute, _type, data):
         if attribute not in data:
-            self.errors.append('%s_KEY_REQUIRED' % attribute)
+            self.errors.append('%s_KEY_REQUIRED' % attribute.upper())
         elif not data[attribute]:
-            self.errors.append('%s_IS_EMPTY' % attribute)
+            self.errors.append('%s_IS_EMPTY' % attribute.upper())
         elif _type == "str" and self.is_not_str(data[attribute]):
-            self.errors.append('%s_IS_NOT_STRING' % attribute)
+            self.errors.append('%s_IS_NOT_STRING' % attribute.upper())
         elif _type == "list" and self.is_not_list(data[attribute]):
-            self.errors.append('%s_IS_NOT_LIST' % attribute)
+            self.errors.append('%s_IS_NOT_LIST' % attribute.upper())
         elif _type == "int" and self.is_not_int(data[attribute]):
-            self.errors.append('%s_IS_NOT_INT' % attribute)
+            self.errors.append('%s_IS_NOT_INT' % attribute.upper())
         else:
             return True
 
