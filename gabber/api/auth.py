@@ -12,7 +12,7 @@ from ..utils.mail import MailClient
 from flask import current_app as app
 from flask_restful import Resource
 from flask_jwt_extended import create_access_token, \
-    create_refresh_token, jwt_refresh_token_required, get_jwt_identity, jwt_optional
+    create_refresh_token, jwt_refresh_token_required, get_jwt_identity, jwt_optional, jwt_required
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 
 
@@ -39,6 +39,26 @@ class UserAsMe(Resource):
         If no user is logged in then data is empty.
         """
         user = User.query.filter_by(email=get_jwt_identity()).first()
+        return self.__user(user)
+
+    @jwt_required
+    def put(self):
+        """
+        Updates the language preference of the user.
+
+        This can be abstracted in the future when users can update their name/email/password, etc.
+
+        :return: the user object
+        """
+        data = helpers.jsonify_request_or_abort()
+        helpers.abort_if_errors_in_validation(UserSchemaHasAccess().validate(data))
+        user = User.query.filter_by(email=get_jwt_identity()).first()
+        user.lang = data['lang']
+        db.session.commit()
+        return self.__user(user)
+
+    @staticmethod
+    def __user(user):
         return custom_response(200, data=UserSchemaHasAccess().dump(user) if user else None)
 
 
@@ -64,7 +84,7 @@ class ForgotPassword(Resource):
         db.session.commit()
 
         url = '{0}/reset/{1}'.format(app.config['WEB_HOST'], token)
-        MailClient(user.pref_lang).forgot(user, url)
+        MailClient(user.lang).forgot(user, url)
         return custom_response(200)
 
 
@@ -205,7 +225,7 @@ class UserRegistration(Resource):
             db.session.commit()
 
             url = '{0}/verify/{1}/'.format(app.config['WEB_HOST'], AuthToken(user_id=user.id).token)
-            MailClient(user.pref_lang).verify(user, url)
+            MailClient(user.lang).verify(user, url)
 
         return custom_response(201)
 

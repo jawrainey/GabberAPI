@@ -121,7 +121,7 @@ class ProjectInvites(Resource):
             db.session.commit()
 
             project = Project.query.get(pid)
-            client = MailClient(user.pref_lang)
+            client = MailClient(user.lang)
             if user.registered or user.verified:
                 client.invite_registered(user, admin.fullname, project)
             else:

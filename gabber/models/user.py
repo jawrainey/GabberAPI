@@ -49,7 +49,7 @@ class User(db.Model):
     email = db.Column(db.String(64), unique=True)
     password = db.Column(db.String(192))
     fullname = db.Column(db.String(64))
-    pref_lang = db.Column(db.Integer, db.ForeignKey('supported_language.id'))
+    lang = db.Column(db.Integer, db.ForeignKey('supported_language.id'))
 
     # User accounts are created when participating in a session; once registered,
     # this is changed so that we can identify between registers/unregistered users.
@@ -68,7 +68,7 @@ class User(db.Model):
         self.fullname = fullname
         self.email = email
         self.set_password(password)
-        self.pref_lang = preferred_lang
+        self.lang = preferred_lang
         self.registered = registered
 
     @staticmethod
