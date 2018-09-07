@@ -139,6 +139,23 @@ class Organisation(db.Model):
     projects = db.relationship('Project', lazy='dynamic')
 
 
+class ProjectLanguage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=True)
+    lang_id = db.Column(db.Integer, db.ForeignKey('supported_language.id'))
+
+    description = db.Column(db.String(768))
+    title = db.Column(db.String(64))
+    slug = db.Column(db.String(256), unique=True, index=True)
+
+
+class TopicLanguage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=True)
+    lang_id = db.Column(db.Integer, db.ForeignKey('supported_language.id'))
+    text = db.Column(db.String(260))
+
+
 class Project(db.Model):
     """
     A project is the overarching theme for an interview session
@@ -169,6 +186,10 @@ class Project(db.Model):
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
     # Is the project public or private? True (1) is public.
     is_public = db.Column(db.Boolean, default=True)
+    default_lang = db.Column(db.Integer, db.ForeignKey('supported_language.id'))
+
+    content = db.relationship('ProjectLanguage', backref='content', lazy='dynamic')
+    topics = db.relationship('TopicLanguage', backref='topics', lazy='dynamic')
 
     codebook = db.relationship('Codebook', backref='project', lazy='dynamic')
     prompts = db.relationship('ProjectPrompt', backref='project', lazy='dynamic')

@@ -1,5 +1,7 @@
 from ... import ma
-from ...models.projects import Project, ProjectPrompt, Membership, Codebook, Code as Tags, Organisation
+from ...models.projects import Project, ProjectPrompt, ProjectLanguage, \
+    TopicLanguage, Membership, Codebook, Code as Tags, Organisation
+from ...models.language import SupportedLanguage
 from ...models.user import User
 from marshmallow import pre_load, ValidationError
 from slugify import slugify
@@ -150,6 +152,20 @@ class ProjectTopicSchema(ma.ModelSchema):
         exclude = ['text_prompt', 'image_path', 'project', 'creator', 'created_on', 'updated_on']
 
 
+class ProjectLanguageSchema(ma.ModelSchema):
+
+    class Meta:
+        model = ProjectLanguage
+        include_fk = True
+        exclude = ['content', 'project_id']
+
+
+class TopicLanguageSchema(ma.ModelSchema):
+
+    class Meta:
+        model = TopicLanguage
+        include_fk = True
+
 class ProjectModelSchema(ma.ModelSchema):
     image = ma.Method("_from_amazon")
     topics = ma.Nested(ProjectTopicSchema, many=True, attribute="prompts")
@@ -161,6 +177,8 @@ class ProjectModelSchema(ma.ModelSchema):
     creator_id = ma.Function(lambda d: d.creator)
     privacy = ma.Function(lambda obj: "public" if obj.is_public else "private")
 
+    content = ma.Method("_content_by_language")
+
     def __init__(self, **kwargs):
         """
         When Schema is created, it can optionally take a user_id, which is used
@@ -170,6 +188,33 @@ class ProjectModelSchema(ma.ModelSchema):
         self.user_id = kwargs.pop('user_id', None)
         # Need to initialise parent manually
         ma.ModelSchema.__init__(self,  **kwargs)
+
+    @staticmethod
+    def _content_by_language(data):
+        """
+        Groups content by language to simplify lookup by clients.
+
+            {
+                "en": {
+                    title: "",
+                    topics: {}
+                },
+                "it": {
+                    ...
+                }
+            }
+        """
+
+        projects = ProjectLanguageSchema(many=True).dump(data.content)
+        topics = TopicLanguageSchema(many=True).dump(data.topics)
+
+        grouped_content = {}
+        for project in projects:
+            lang = SupportedLanguage.query.get(project['lang_id']).code
+            grouped_content[lang] = project
+            grouped_content[lang]['topics'] = [t for t in topics if t['lang_id'] == project['lang_id']]
+
+        return grouped_content
 
     @staticmethod
     def _from_amazon(data):
