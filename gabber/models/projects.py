@@ -148,12 +148,21 @@ class ProjectLanguage(db.Model):
     title = db.Column(db.String(64))
     slug = db.Column(db.String(256), unique=True, index=True)
 
+    def __init__(self, pid, lid, description, title):
+        from slugify import slugify
+        self.project_id = pid
+        self.lang_id = lid
+        self.description = description
+        self.title = title
+        self.slug = slugify(title)
+
 
 class TopicLanguage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=True)
     lang_id = db.Column(db.Integer, db.ForeignKey('supported_language.id'))
     text = db.Column(db.String(260))
+    is_active = db.Column(db.SmallInteger, default=1)
 
 
 class Project(db.Model):
@@ -174,59 +183,22 @@ class Project(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     image = db.Column(db.String(64))
-    title = db.Column(db.String(64))
-    # URL-friendly representation of the title
-    slug = db.Column(db.String(256), unique=True, index=True)
-    description = db.Column(db.String(768))
     # Used as a 'soft-delete' to preserve prompt-content for viewing
     is_active = db.Column(db.Boolean, default=True)
-    # This can be null as the organisation may be an individual
-    organisation = db.Column(db.Integer, db.ForeignKey('organisation.id'), nullable=True)
-
-    creator = db.Column(db.Integer, db.ForeignKey('user.id'))
     # Is the project public or private? True (1) is public.
     is_public = db.Column(db.Boolean, default=True)
+
+    # This can be null as the organisation may be an individual
+    organisation = db.Column(db.Integer, db.ForeignKey('organisation.id'), nullable=True)
+    creator = db.Column(db.Integer, db.ForeignKey('user.id'))
     default_lang = db.Column(db.Integer, db.ForeignKey('supported_language.id'))
 
     content = db.relationship('ProjectLanguage', backref='content', lazy='dynamic')
     topics = db.relationship('TopicLanguage', backref='topics', lazy='dynamic')
-
     codebook = db.relationship('Codebook', backref='project', lazy='dynamic')
-    prompts = db.relationship('ProjectPrompt', backref='project', lazy='dynamic')
 
     members = db.relationship('Membership', back_populates='project',
                               primaryjoin='and_(Project.id==Membership.project_id, Membership.deactivated == False)')
-
-    created_on = db.Column(db.DateTime, default=db.func.now())
-    updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
-
-    def __init__(self, image, title, description, creator, is_public):
-        from slugify import slugify
-        self.image = image
-        self.title = title
-        self.slug = slugify(title)
-        self.description = description
-        self.creator = creator
-        self.is_public = is_public
-
-
-class ProjectPrompt(db.Model):
-    """
-    The discussion prompts used within the application for a project
-
-    Backrefs:
-        Can refer to its parent project with 'project'
-
-    Relationships:
-        one-to-many: a projectPrompt can be used by many interviews
-    """
-    id = db.Column(db.Integer, primary_key=True)
-    creator = db.Column(db.Integer, db.ForeignKey('user.id'))
-    # TODO: these should both be renamed
-    text_prompt = db.Column(db.String(260))
-    image_path = db.Column(db.String(260), default="default.jpg")
-    is_active = db.Column(db.SmallInteger, default=1)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
@@ -322,13 +294,13 @@ class InterviewPrompts(db.Model):
         Can refer to associated interview with 'interview'
     """
     id = db.Column(db.Integer, primary_key=True)
-    prompt_id = db.Column(db.Integer, db.ForeignKey('project_prompt.id'))
+    prompt_id = db.Column(db.Integer, db.ForeignKey('topic_language.id'))
     interview_id = db.Column(db.String(260), db.ForeignKey('interview_session.id'))
     # Where in the structural annotation starts and ends
     start_interval = db.Column(db.Integer)
     end_interval = db.Column(db.Integer, default=0)
-
-    topic = db.relationship("ProjectPrompt", lazy='joined')
+    # Simplifies access to topic.text
+    topic = db.relationship("TopicLanguage", lazy='joined')
 
 
 class InterviewParticipants(db.Model):

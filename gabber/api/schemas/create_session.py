@@ -1,10 +1,10 @@
 from ... import ma
 from marshmallow import ValidationError, validates_schema
-from ...models.projects import ProjectPrompt
+from ...models.projects import TopicLanguage
 
 
 def is_known_topic(data):
-    if data not in [i.id for i in ProjectPrompt.query.all()]:
+    if data not in [i.id for i in TopicLanguage.query.all()]:
         raise ValidationError("The topic with the ID (%i) does not exist" % data)
 
 

@@ -5,7 +5,8 @@ Content for all projects that a user has access to
 from .. import db
 from ..api.schemas.project import ProjectPostSchema, ProjectModelSchema
 from ..models.user import User
-from ..models.projects import Membership, Project as ProjectModel, ProjectPrompt, Roles
+from ..models.projects import Membership, Project as ProjectModel, ProjectLanguage, TopicLanguage, Roles
+from ..models.language import SupportedLanguage
 from ..utils.general import custom_response
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
@@ -53,21 +54,32 @@ class Projects(Resource):
 
         from ..utils import amazon
 
+        # TODO: we currently only support creating English projects
+        english_lang = SupportedLanguage.query.filter_by(code='en').first()
+
         project = ProjectModel(
-            image=amazon.upload_base64(data['image']),
-            title=data['title'],
-            description=data['description'],
+            default_lang=english_lang.id,  # TODO: this should be the one they selected, but for now is EN
             creator=user.id,
-            # TODO: this should be privacy, which is passed Public/Private
-            is_public=1 if data['privacy'] == 'public' else 0)
+            image=amazon.upload_base64(data['image']),
+            is_public=data['privacy'] == 'public'
+        )
 
         admin_role = Roles.query.filter_by(name='administrator').first().id
         membership = Membership(uid=user.id, pid=project.id, rid=admin_role, confirmed=True)
         # TODO: temporary hard-coded value[s] in frontend ...
         project.organisation = int(json_data.get('organisation', {id: 0})['id'])
         project.members.append(membership)
-        project.prompts.extend([ProjectPrompt(creator=user.id, text_prompt=topic) for topic in data['topics']])
         db.session.add(project)
+        db.session.flush()
+
+        content = json_data['content'].get('en', None)
+        if not content:
+            return custom_response(400, errors=['UNSUPPORTED_LANGUAGE'])
+
+        project.content.extend([ProjectLanguage(
+            pid=project.id, lid=english_lang.id, description=content['description'], title=content['title'])])
+        project.topics.extend([TopicLanguage(
+            project_id=project.id, lang_id=english_lang.id, text=t['text']) for t in content['topics']])
         db.session.commit()
 
         return custom_response(201, data=ProjectModelSchema().dump(project))

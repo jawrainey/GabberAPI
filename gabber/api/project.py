@@ -4,12 +4,13 @@ Content for all projects that a user has access to
 """
 from .. import db
 from ..models.user import User
-from ..models.projects import Project as ProjectModel, ProjectPrompt
+from ..models.projects import Project as ProjectModel, TopicLanguage
 from ..utils.general import custom_response
-from ..api.schemas.project import ProjectModelSchema
+from ..api.schemas.project import ProjectModelSchema, ProjectLanguageSchema, TopicLanguageSchema
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity, jwt_optional
 from gabber.utils import helpers
+from slugify import slugify
 
 
 class Project(Resource):
@@ -50,8 +51,7 @@ class Project(Resource):
         helpers.abort_if_unknown_user(user)
         helpers.abort_if_not_admin_or_staff(user, pid)
         json_data = helpers.jsonify_request_or_abort()
-        # TODO: have to have prompts to validate; must remove later
-        json_data['prompts'] = json_data['topics']
+
         json_data['id'] = pid
         json_data['creator'] = user.id
 
@@ -64,25 +64,30 @@ class Project(Resource):
             from ..utils import amazon
             json_data['image'] = amazon.upload_base64(json_data['image'])
 
-        # TODO: When schema.load updates the model it does not invalidate the previous rows, and
-        # (1) sets the FK to NULL and (2) does not update the is_active property.
-        # I cannot figure out how to do that from within the schema and instead retrieve the
-        # topics that exist for the current project, store them before updating the model,
-        # then manually invalidate them. This issue may also relate to how I have setup the models.
         project = ProjectModel.query.get(pid)
-        topics = project.prompts.all()
-        # Deserialize data to internal ORM representation thereby overriding the data and then save it
-        data = schema.load(json_data, instance=project)
         # TODO: it's unclear why schema.load does not load image correctly, hence needing to manually set it.
-        data.image = json_data['image'] if json_data.get('image', None) else data.image
-        # Store the updates and therefore invalidating the previous topics and remove their project_id
-        db.session.commit()
-        # Only Delete is affected by this bug, so we re-populate the project_ids
-        for topic in topics:
-            if not topic.project_id:
-                ProjectPrompt.query.filter_by(id=topic.id).update({'is_active': 0, 'project_id': pid})
-        # TODO: this is temporary as it's hard-coded in the frontend and not validated in the schema above.
+        # TODO: ORG is hard-coded in the frontend and not validated in the schema above.
+        project.image = json_data['image'] if json_data.get('image', None) else project.image
         project.organisation = int(json_data.get('organisation', {id: 0})['id'])
+        project.is_public = json_data['privacy'] == 'public'
+
+        # Loads project data: relations are not loaded in their own schemas
+        data = schema.load(json_data, instance=project)
+
+        # Note: it may be better to move this to schema's pre-load
+        for language, content in json_data['content'].items():
+            # As the title may have changed, we must create a new slug
+            content['slug'] = slugify(content['title'])
+            # Overrides the title/description for the specific language that has changed
+            plang = ProjectLanguageSchema().load(content, instance=data.content.filter_by(id=content['id']).first())
+            for topic in content['topics']:
+                # Updates the topic if it changes, otherwise adds a new topic
+                if 'id' in topic:
+                    TopicLanguageSchema().load(topic, instance=data.content.filter_by(id=topic['id']).first())
+                else:
+                    new_topic = TopicLanguage(project_id=project.id, lang_id=plang.lang_id, text=topic['text'])
+                    db.session.add(new_topic)
+        # Changes are stored in memory; if error occurs, wont be left with half-changed state.
         db.session.commit()
         return custom_response(200, schema.dump(data))
 
