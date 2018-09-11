@@ -1,40 +1,40 @@
 {
   "misc": {
-    "footer": "Record and share your own conversation with {0} on Android and iOS.",
+    "footer": "سجل وشارك محادثتك الخاصة مع {0} على Android و iOS.",
     "consent": {
-      "public": "anyone",
-      "members": "others who have contributed or have been invited to the project",
-      "private": "only participants of the conversation"
+      "public": "أي واحد",
+      "members": "الآخرين الذين ساهموا أو دعوا إلى المشروع",
+      "private": "فقط المشاركين في المحادثة"
     }
   },
   "forgot": {
-    "subject": "{0} password reset",
-    "body": "You requested to reset your password for your {0} account. Click the link below and you'll be redirected to a secure site where you can set a new password.",
-    "button_label": "Reset your password",
-    "footer": "If you did not request a password reset, then please ignore this email or contact us and let us know. This password reset is only valid for the next 30 minutes."
+    "subject": "{0} إعادة تعيين كلمة المرور",
+    "body": "لقد طلبت إعادة تعيين كلمة المرور لحساب {0} الخاص بك. انقر فوق الرابط أدناه وستتم إعادة توجيهك إلى موقع آمن حيث يمكنك تعيين كلمة مرور جديدة.",
+    "button_label": "اعد ضبط كلمه السر",
+    "footer": "إذا لم تطلب إعادة تعيين كلمة المرور ، فيرجى تجاهل هذه الرسالة الإلكترونية أو الاتصال بنا وإخبارنا بذلك. إعادة تعيين كلمة المرور هذه صالحة لمدة 30 دقيقة فقط."
   },
   "verify": {
-    "subject": "Verify your {0} account",
-    "body": "Welcome to {0}! Please verify your email address by tapping on the button below.",
-    "button_label": "Verify Email",
+    "subject": "تحقق من حسابك {0}",
+    "body": "مرحبًا بك {0}! يرجى التحقق من عنوان البريد الإلكتروني الخاص بك عن طريق النقر على الزر أدناه.",
+    "button_label": "التحقق من البريد الإلكتروني",
     "footer": ""
   },
   "consent": {
-    "subject": "Review consent for your {0} conversation",
-    "body": "You recently participated in {0} with {1} on the theme of {2} and agreed for {3} to have access to your conversation. Only you and others in the conversation can listen to it in the first 24-hours, which gives you time to review your consent before others can listen.",
-    "button_label": "Review Consent",
-    "footer": "You can use the link above at any time to review and update your consent for your conversation. To request for your conversation to be deleted, please email us at {0}."
+    "subject": "مراجعة الموافقة لمحادثتك {0}",
+    "body": "لقد شاركت مؤخرًا في {0} مع {1} حول موضوع {2} وتمت الموافقة على {3} للوصول إلى محادثتك. فقط أنت والآخرين في المحادثة يمكنهم الاستماع إليه في الساعات الأربع والعشرين الأولى ، مما يمنحك الوقت لمراجعة موافقتك قبل أن يتمكن الآخرون من الاستماع إليها.",
+    "button_label": "مراجعة الموافقة",
+    "footer": "يمكنك تسجيل المحادثات الخاصة بك ومشاركتها مع العالم. تحميل التطبيق المحمول {0} الآن! يمكنك استخدام الرابط أعلاه في أي وقت لمراجعة وتحديث موافقتك على محادثتك. لطلب حذف محادثتك ، يرجى مراسلتنا عبر البريد الإلكتروني على {1}."
   },
   "invite_registered": {
-    "subject": "{0} invited you to join a project on {1}",
-    "body": "You have been invited to {0} by {1}. Help understand the content of the {2} conversations by listening and highlighting online.",
-    "button_label": "View Conversations",
-    "footer": "This project will become available on the {0} mobile application when you register where you can contribute conversations to the project."
+    "subject": "دعاك {0} للانضمام إلى مشروع في {1}",
+    "body": "لقد تمت دعوتك إلى {0} بحلول {1}. المساعدة في فهم محتوى محادثات {2} عن طريق الاستماع والتمييز عبر الإنترنت.",
+    "button_label": "عرض المحادثات",
+    "footer": "سيصبح هذا المشروع متاحًا على تطبيق الهاتف المحمول {0} عند قيامك بالتسجيل حيث يمكنك المساهمة بالمحادثات إلى المشروع."
   },
   "invite_unregistered": {
-    "subject": "{0} invited you to join a project on {1}",
-    "body": "You have been invited to {0} by {1}. Help understand the content of the {2} conversations by listening and highlighting online. Register by clicking the button below and you will become a project member where you can begin listening to these conversations.",
-    "button_label": "Join Project",
-    "footer": "This project will become available on the {0} mobile application when you register where you can contribute conversations to the project."
+    "subject": "دعاك {0} للانضمام إلى مشروع في {1}",
+    "body": "لقد تمت دعوتك إلى {0} بحلول {1}. المساعدة في فهم محتوى محادثات {2} عن طريق الاستماع والتمييز عبر الإنترنت. سجل عن طريق النقر على الزر أدناه ، وسوف تصبح عضوا في المشروع حيث يمكنك البدء في الاستماع إلى هذه المحادثات.",
+    "button_label": "انضم إلى المشروع",
+    "footer": "سيصبح هذا المشروع متاحًا على تطبيق الهاتف المحمول {0} عند قيامك بالتسجيل حيث يمكنك المساهمة بمحادثات المشروع."
   }
 }
