@@ -1,5 +1,7 @@
 from ... import ma
-from ...models.projects import Project, ProjectPrompt, Membership, Codebook, Code as Tags, Organisation
+from ...models.projects import Project, ProjectLanguage, \
+    TopicLanguage, Membership, Codebook, Code as Tags, Organisation
+from ...models.language import SupportedLanguage
 from ...models.user import User
 from marshmallow import pre_load, ValidationError
 from slugify import slugify
@@ -93,30 +95,40 @@ class ProjectPostSchema(ma.Schema):
     def __validate(self, data):
         validator = HelperSchemaValidator('projects')
 
-        title_valid = validator.validate('title', 'str', data)
-        if title_valid and Project.query.with_deleted().filter_by(slug=slugify(data['title'])).first():
-            validator.errors.append("TITLE_EXISTS")
+        if not data.get('image', None):
+            data['image'] = 'default'
 
-        validator.validate('description', 'str', data)
         validator.validate('image', 'str', data)
-
-        validate_length(data.get('title'), 64, 'TITLE', validator)
-        validate_length(data.get('description'), 256, 'DESCRIPTION', validator)
 
         privacy_valid = validator.validate('privacy', 'str', data)
         if privacy_valid and data['privacy'] not in ['private', 'public']:
             validator.errors.append('PRIVACY_INVALID')
 
-        topics_valid = validator.validate('topics', 'list', data)
+        supported_langs = [i.code for i in SupportedLanguage.query.all()]
 
-        if topics_valid:
-            for topic in data['topics']:
-                if validator.is_not_str(topic):
-                    validator.errors.append('TOPIC_IS_NOT_STRING')
-                if not topic:
-                    validator.errors.append('TOPIC_IS_EMPTY')
-                if topic:
-                    validate_length(data.get('text'), 260, 'TOPIC', validator)
+        for language, content in data['content'].items():
+            if language not in supported_langs:
+                validator.errors.append("UNSUPPORTED_LANGUAGE")
+
+            title_valid = validator.validate('title', 'str', content)
+            if title_valid and ProjectLanguage.query.filter_by(slug=slugify(content['title'])).first():
+                validator.errors.append("TITLE_EXISTS")
+
+            validator.validate('description', 'str', content)
+
+            validate_length(content.get('title'), 64, 'TITLE', validator)
+            validate_length(content.get('description'), 768, 'DESCRIPTION', validator)
+
+            topics_valid = validator.validate('topics', 'list', content)
+
+            if topics_valid:
+                for topic in content['topics']:
+                    if validator.is_not_str(topic.get('text')):
+                        validator.errors.append('TOPIC_IS_NOT_STRING')
+                    if not topic:
+                        validator.errors.append('TOPIC_IS_EMPTY')
+                    if topic:
+                        validate_length(topic.get('text'), 260, 'TOPIC', validator)
 
         validator.raise_if_errors()
 
@@ -138,21 +150,24 @@ class ProjectMemberWithAccess(ProjectMember):
     email = ma.String(attribute='user.email')
 
 
-class ProjectTopicSchema(ma.ModelSchema):
-    """
-    Note: No validation is done here as it's all done in ProjectModelSchema before serialization
-    """
-    text = ma.String(attribute="text_prompt")
+class ProjectLanguageSchema(ma.ModelSchema):
 
     class Meta:
-        model = ProjectPrompt
+        model = ProjectLanguage
         include_fk = True
-        exclude = ['text_prompt', 'image_path', 'project', 'creator', 'created_on', 'updated_on']
+        exclude = ['content', 'project_id']
+
+
+class TopicLanguageSchema(ma.ModelSchema):
+
+    class Meta:
+        model = TopicLanguage
+        include_fk = True
 
 
 class ProjectModelSchema(ma.ModelSchema):
     image = ma.Method("_from_amazon")
-    topics = ma.Nested(ProjectTopicSchema, many=True, attribute="prompts")
+    content = ma.Method("_content_by_language")
     codebook = ma.Function(lambda o: CodebookSchema().dump(o.codebook.first()) if o.codebook.first() else None)
     members = ma.Method("_members")
     creator = ma.Method("_creator")
@@ -170,6 +185,33 @@ class ProjectModelSchema(ma.ModelSchema):
         self.user_id = kwargs.pop('user_id', None)
         # Need to initialise parent manually
         ma.ModelSchema.__init__(self,  **kwargs)
+
+    @staticmethod
+    def _content_by_language(data):
+        """
+        Groups content by language to simplify lookup by clients.
+
+        Returns dict:
+            {
+                "en": {
+                    title: "",
+                    topics: {}
+                },
+                "it": {
+                    ...
+                }
+            }
+        """
+        projects = ProjectLanguageSchema(many=True).dump(data.content)
+        topics = TopicLanguageSchema(many=True).dump(data.topics)
+
+        grouped_content = {}
+        for project in projects:
+            lang = SupportedLanguage.query.get(project['lang_id']).code
+            grouped_content[lang] = project
+            grouped_content[lang]['topics'] = [t for t in topics if t['lang_id'] == project['lang_id']]
+
+        return grouped_content
 
     @staticmethod
     def _from_amazon(data):
@@ -210,6 +252,7 @@ class ProjectModelSchema(ma.ModelSchema):
 
     @pre_load
     def __validate(self, data):
+        # Note: currently, all content comes up at once for all languages.
         validator = HelperSchemaValidator('projects')
 
         pid_valid = validator.validate('id', 'int', data)
@@ -220,69 +263,69 @@ class ProjectModelSchema(ma.ModelSchema):
 
         # This must be a known user, and must be a member of this project
         creator_valid = validator.validate('creator', 'int', data)
-        title_valid = validator.validate('title', 'str', data)
-        title_as_slug = slugify(data['title'])
-
-        if 'image' not in data and data.get('image', None):
-            validator.errors.append('image_KEY_REQUIRED')
-        if 'image' in data and len(data['image']) > 0 and not isinstance(data['image'], basestring):
-            validator.errors.append('image_IS_NOT_STRING')
-
-        validate_length(data.get('title'), 64, 'TITLE', validator)
-        validate_length(data.get('description'), 256, 'DESCRIPTION', validator)
-
-        if pid_valid and title_valid:
-            # The title is different from the previous one, hence it changed.
-            if Project.query.get(data['id']).slug != title_as_slug:
-                # The slug does not exist, so it is a unique new title
-                if Project.query.with_deleted().filter_by(slug=title_as_slug).first():
-                    validator.errors.append("TITLE_EXISTS")
-                else:
-                    # Note: this is not passed up and is always calculated in the backend
-                    data['slug'] = title_as_slug
-
-        validator.validate('description', 'str', data)
-
         privacy_valid = validator.validate('privacy', 'str', data)
+
         if privacy_valid and data['privacy'] not in ['private', 'public']:
             validator.errors.append('PRIVACY_INVALID')
         else:
             # TODO: because the name is different, it does not update the model.
-            data['is_public'] = 1 if data['privacy'] == 'public' else 0
+            data['is_public'] = data['privacy'] == 'public'
 
-        topics_valid = validator.validate('topics', 'list', data)
+        supported_langs = [i.code for i in SupportedLanguage.query.all()]
+        for language, content in data['content'].items():
+            if language not in supported_langs:
+                validator.errors.append("UNSUPPORTED_LANGUAGE")
 
-        if topics_valid:
-            for item in data['topics']:
-                if not isinstance(item, dict):
-                    validator.errors.append('TOPICS_IS_NOT_DICT')
-                else:
-                    if item.get('id'):
-                        if 'is_active' not in item:
-                            validator.errors.append('TOPICS_IS_ACTIVE_KEY_404')
-                        else:
-                            if not isinstance(item.get('is_active'), int):
-                                validator.errors.append('TOPICS_IS_ACTIVE_MUST_BE_INT')
-                            elif item['is_active'] not in [0, 1]:
-                                validator.errors.append('TOPICS_IS_ACTIVE_MUST_BE_0_OR_1')
-                        # Note: the ID will not appear as we implemented a primary join for only active sessions ...
-                        all_project_topics = [i.id for i in ProjectPrompt.query.filter_by(project_id=data['id']).all()]
-                        if item.get('id') and (item['id'] not in all_project_topics):
-                            validator.errors.append('TOPICS_ID_NOT_PROJECT')
+            title_valid = validator.validate('title', 'str', content)
+            title_as_slug = slugify(content['title'])
+            validator.validate('description', 'str', content)
 
-                    # We do not check for ID as if it does not exist then a topic will be created
-                    if not item.get('text'):
-                        validator.errors.append('TOPICS_TEXT_KEY_404')
+            if 'image' not in content and content.get('image', None):
+                validator.errors.append('image_KEY_REQUIRED')
+            if 'image' in content and len(content['image']) > 0 and not isinstance(content['image'], basestring):
+                validator.errors.append('image_IS_NOT_STRING')
+
+            validate_length(content.get('title'), 64, 'TITLE', validator)
+            validate_length(content.get('description'), 768, 'DESCRIPTION', validator)
+
+            if pid_valid and title_valid:
+                # The title is different from the previous one, hence it changed.
+                if ProjectLanguage.query.get(content['id']).slug != title_as_slug:
+                    # The slug does not exist, so it is a unique new title
+                    if ProjectLanguage.query.filter_by(slug=title_as_slug).first():
+                        validator.errors.append("TITLE_EXISTS")
                     else:
-                        if not isinstance(item['text'], basestring):
-                            validator.errors.append('TOPICS_TEXT_IS_NOT_STRING')
-                        else:
-                            validate_length(data.get('text'), 260, 'TOPIC', validator)
+                        # Note: this is not passed up and is always calculated in the backend
+                        content['slug'] = title_as_slug
 
-                # TODO: Rather than the user passing the creator to each topic, it is passed as a parent
-                # and we manually add it here as the relationship between these schemas is void.
-                if not validator.errors:
-                    item['creator'] = data['creator']
-                    item['project_id'] = data['id']
+            topics_valid = validator.validate('topics', 'list', content)
+
+            if topics_valid:
+                for item in content['topics']:
+                    if not isinstance(item, dict):
+                        validator.errors.append('TOPICS_IS_NOT_DICT')
+                    else:
+                        if item.get('id'):
+                            if 'is_active' not in item:
+                                validator.errors.append('TOPICS_IS_ACTIVE_KEY_404')
+                            else:
+                                if not isinstance(item.get('is_active'), int):
+                                    validator.errors.append('TOPICS_IS_ACTIVE_MUST_BE_INT')
+                                elif item['is_active'] not in [0, 1]:
+                                    validator.errors.append('TOPICS_IS_ACTIVE_MUST_BE_0_OR_1')
+
+                            # Note: the ID will not appear as we implemented a primary join for only active sessions ...
+                            all_project_topics = [i.id for i in TopicLanguage.query.filter_by(project_id=item['project_id']).all()]
+                            if item.get('id') and (item['id'] not in all_project_topics):
+                                validator.errors.append('TOPICS_ID_NOT_PROJECT')
+
+                        # We do not check for ID as if it does not exist then a topic will be created
+                        if not item.get('text'):
+                            validator.errors.append('TOPICS_TEXT_KEY_404')
+                        else:
+                            if not isinstance(item['text'], basestring):
+                                validator.errors.append('TOPICS_TEXT_IS_NOT_STRING')
+                            else:
+                                validate_length(content.get('text'), 260, 'TOPIC', validator)
 
         validator.raise_if_errors()

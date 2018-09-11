@@ -5,7 +5,7 @@ from gabber import ma
 
 class RecordingTopicSchema(ma.ModelSchema):
     topic_id = ma.Int(attribute="prompt_id")
-    text = ma.String(attribute='topic.text_prompt')
+    text = ma.String(attribute='topic.text')
 
     class Meta:
         model = InterviewPrompts

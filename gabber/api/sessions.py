@@ -6,8 +6,9 @@ from .. import db
 from ..api.schemas.create_session import ParticipantScheme, RecordingAnnotationSchema
 from ..api.schemas.session import RecordingSessionsSchema
 from ..api.schemas.helpers import is_not_empty
-from ..models.projects import InterviewSession, InterviewParticipants, InterviewPrompts, Project
+from ..models.projects import InterviewSession, InterviewParticipants, InterviewPrompts, Project, TopicLanguage
 from ..models.user import User, SessionConsent
+from ..models.language import SupportedLanguage
 from ..utils.general import custom_response
 from marshmallow import ValidationError
 from flask_restful import Resource, reqparse, abort
@@ -110,8 +111,14 @@ class ProjectSessions(Resource):
 
         send_mail = MailClient(interview_session.lang_id)
 
+        # The conversation language spoken may not be a project configuration, therefore
+        # We will use the language of the topic configuration. This could lead to:
+        # Conversation is in English, yet topics were viewed in Italian.
+        lang = TopicLanguage.query.get(prompts[0]['PromptID']).lang_id
+        title = project.content.filter_by(lang_id=lang).first().title
+
         for participant in participants:
-            send_mail.consent(participant, self.names(participants), project.title, interview_session.id, args['consent'])
+            send_mail.consent(participant, self.names(participants), title, interview_session.id, args['consent'])
         return {}, 201
 
     @staticmethod
