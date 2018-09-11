@@ -74,7 +74,7 @@ class Projects(Resource):
 
         content = json_data['content'].get('en', None)
         if not content:
-            return custom_response(400, errors=['UNSUPPORTED_LANGUAGE'])
+            return custom_response(400, errors=['projects.UNSUPPORTED_LANGUAGE'])
 
         project.content.extend([ProjectLanguage(
             pid=project.id, lid=english_lang.id, description=content['description'], title=content['title'])])
