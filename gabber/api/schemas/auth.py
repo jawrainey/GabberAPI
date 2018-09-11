@@ -78,7 +78,8 @@ class AuthLoginSchema(ma.Schema):
             user = User.query.filter_by(email=data['email'].lower()).first()
             if user and not user.is_correct_password(data['password']):
                 validator.errors.append("INVALID_PASSWORD")
-
+            if not user.verified:
+                validator.errors.append("UNVERIFIED_USER")
         validator.raise_if_errors()
 
 
