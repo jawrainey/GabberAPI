@@ -53,6 +53,7 @@ class MailClient:
         consent = self.content['misc']['consent'][consent_type]
         content['body'] = content['body'].format(self.brand, names, project_title, consent)
         content['button_url'] = SessionConsent.consent_url(session_id, user.id)
+        content['footer'] = content['footer'].format(self.brand, self.contact)
 
         self.send_email(user.email, content)
 
@@ -78,21 +79,35 @@ class MailClient:
 
         self.send_email(user.email, content)
 
-    def build_html(self, content):
-        content = self.__add_shared(content)
+    def build_html(self, _content):
+        content = self.__add_shared(_content)
         content['bottom'] = content['bottom'].replace('Android', '<a href="{0}/android/">Android</a>'.format(self.homepage))
         content['bottom'] = content['bottom'].replace('iOS', '<a href="{0}/ios/">iOS</a>'.format(self.homepage))
+
+        download = '<a href="{0}/download/">{1}</a>'.format(self.homepage, self.brand)
+        content['footer'] = content['footer'].replace(self.brand, download)
+
+        content['footer'] = content['footer'].replace("!", "!<br><hr>")
+        contact = '<a href="mailto:{0}">{1}</a>'.format(self.contact, self.contact)
+        content['footer'] = content['footer'].replace(self.contact, contact)
+
         return render_template('action.html', **content)
 
-    def build_plaintext(self, content):
-        content = self.__add_shared(content)
+    def build_plaintext(self, _content):
+        content = self.__add_shared(_content)
         content['bottom'] = content['bottom'].replace('Android', 'Android ({0}/android/)'.format(self.homepage))
         content['bottom'] = content['bottom'].replace('iOS', 'iOS ({0}/ios/)'.format(self.homepage))
+
+        download = '{0} ({1}/download/)'.format(self.brand, self.homepage)
+        content['footer'] = content['footer'].replace(self.brand, download)
+
         return u'Hi {name},\n\n{body}\n\n{button_label} ({button_url})' \
                u'\n\n{footer}\n{brand}\n\n{bottom}'.format(**self.__add_shared(content))
 
     def send_email(self, recipient, content):
         sender = '{0} <{1}>'.format(self.sender_name, self.sender_email)
+        html = self.build_html(content)
+        text = self.build_plaintext(content)
 
         requests.post(
             'https://api.eu.mailgun.net/v3/{0}/messages'.format(self.mailbox),
@@ -102,8 +117,8 @@ class MailClient:
                 'from': sender,
                 'to': recipient,
                 'subject': content['subject'],
-                'text': self.build_plaintext(content),
-                'html': self.build_html(content)
+                'text': text,
+                'html': html
             }
         )
 
