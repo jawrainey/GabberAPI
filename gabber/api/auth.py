@@ -212,13 +212,16 @@ class UserRegistration(Resource):
         Register a NEW user to Gabber and return JWT tokens
         """
         data = helpers.jsonify_request_or_abort()
-        helpers.abort_if_errors_in_validation(AuthRegisterSchema().validate(data))
+        errors = AuthRegisterSchema().validate(data)
+        helpers.abort_if_errors_in_validation(errors)
         email = data['email'].lower()
 
         if User.query.filter_by(email=email).first():
             return custom_response(200)
         else:
             user = User(fullname=data['fullname'], email=email, password=data['password'],
+                        age=data['age'], society=data['society'], role=data['role'],
+                        gender=data['gender'], custom=data['custom'],
                         preferred_lang=data['lang'], registered=True)
 
             db.session.add(user)

@@ -50,6 +50,12 @@ class User(db.Model):
     password = db.Column(db.String(192))
     fullname = db.Column(db.String(64))
     lang = db.Column(db.Integer, db.ForeignKey('supported_language.id'))
+    # IFRC TalkFutures specifics
+    age = db.Column(db.Integer)
+    society = db.Column(db.Integer)
+    role = db.Column(db.Integer)
+    gender = db.Column(db.Integer)
+    gender_custom = db.Column(db.String(256))
 
     # User accounts are created when participating in a session; once registered,
     # this is changed so that we can identify between registers/unregistered users.
@@ -64,16 +70,23 @@ class User(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
-    def __init__(self, fullname, email, password, preferred_lang, registered=False):
+    def __init__(self, fullname, email, password,
+                 age, society, role, gender, custom,
+                 preferred_lang, registered=False):
         self.fullname = fullname
         self.email = email
         self.set_password(password)
         self.lang = preferred_lang
+        self.age = age
+        self.society = society
+        self.role = role
+        self.gender = gender
+        self.gender_custom = custom
         self.registered = registered
 
     @staticmethod
-    def create_unregistered_user(fullname, email, lang):
-        user = User(fullname, email, uuid4().hex, lang)
+    def create_unregistered_user(fullname, email, lang, age, society, role, gender, custom):
+        user = User(fullname, email, uuid4().hex, age, society, role, gender, custom, lang)
         db.session.add(user)
         db.session.commit()
         return user

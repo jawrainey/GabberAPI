@@ -113,7 +113,8 @@ class ProjectInvites(Resource):
         # This is similar to how users are created after a Gabber session.
         if not user:
             # TODO: use the project default language?!
-            user = User.create_unregistered_user(data['fullname'], email, 1)
+            # TODO: hack for ifrc-talkfutures as we won't be using this endpoint
+            user = User.create_unregistered_user(data['fullname'], email, 1, 0, 0, 0, 0, 0)
         # The user cannot be added to the same project multiple times
         if not user.is_project_member(pid):
             membership = Membership(uid=user.id,  pid=pid, rid=role_id(data['role']), confirmed=user.registered)

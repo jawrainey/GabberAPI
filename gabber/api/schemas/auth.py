@@ -88,6 +88,11 @@ class AuthRegisterSchema(ma.Schema):
     email = ma.String()
     password = ma.String()
     lang = ma.Int()
+    age = ma.Int()
+    society = ma.Int()
+    role = ma.Int()
+    gender = ma.Int()
+    custom = ma.String()
 
     @pre_load()
     def __validate(self, data):
@@ -96,6 +101,11 @@ class AuthRegisterSchema(ma.Schema):
         fullname_valid = validator.validate('fullname', 'str', data)
         email_valid = validator.validate('email', 'str', data)
         lang_valid = validator.validate('lang', 'int', data)
+
+        age_valid = validator.validate('age', 'int', data)
+        society_valid = validator.validate('society', 'society', data)
+        gender_valid = validator.validate('gender', 'int', data)
+        custom_valid = validator.validate('custom', 'str', data)
 
         if lang_valid:
             is_lang = SupportedLanguage.query.get(data['lang'])
