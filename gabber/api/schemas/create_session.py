@@ -53,6 +53,26 @@ class ParticipantScheme(ma.Schema):
         required=True,
         error_messages={'required': required_message('Role of a participant', 'session')}
     )
+    Society = ma.Int(
+        required=True,
+        error_messages={'required': required_message('Society of a participant', 'session')}
+    )
+    Age = ma.Int(
+        required=True,
+        error_messages={'required': required_message('Age of a participant', 'session')}
+    )
+    IFRC_Role = ma.Int(
+        required=True,
+        error_messages={'required': required_message('The role of a participant in the IFRC', 'session')}
+    )
+    Gender = ma.Int(
+        required=True,
+        error_messages={'required': required_message('Gender of a participant', 'session')}
+    )
+    Gender_Term = ma.Str(
+        required=False,
+        allow_none=True
+    )
 
     class Meta:
         index_errors = False
