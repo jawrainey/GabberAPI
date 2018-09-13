@@ -4,7 +4,7 @@ then
     exit 1
 fi
 
-REGISTRY="gabber/api"
+REGISTRY="talkfutures/api"
 VERSION="$1"
 
 docker build -t "$REGISTRY:$VERSION" -t "$REGISTRY:latest" .
