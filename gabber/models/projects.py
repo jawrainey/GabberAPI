@@ -214,7 +214,7 @@ class InterviewSession(db.Model):
         one-to-many: an interview can have many connections
     """
     id = db.Column(db.String(260), primary_key=True)
-    lang_id = db.Column(db.Integer, db.ForeignKey('supported_language.id'))
+    lang_id = db.Column(db.Integer)
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     created_on = db.Column(db.DateTime)

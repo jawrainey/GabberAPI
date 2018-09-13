@@ -39,7 +39,7 @@ class HelperSchemaValidator:
     def validate(self, attribute, _type, data):
         if attribute not in data:
             self.errors.append('%s_KEY_REQUIRED' % attribute.upper())
-        elif not data[attribute]:
+        elif data[attribute] not in [0,1] and not data[attribute]:
             self.errors.append('%s_IS_EMPTY' % attribute.upper())
         elif _type == "str" and self.is_not_str(data[attribute]):
             self.errors.append('%s_IS_NOT_STRING' % attribute.upper())
@@ -52,7 +52,7 @@ class HelperSchemaValidator:
 
     @staticmethod
     def is_not_int(data):
-        return not isinstance(data, int)
+        return not type(data) == int
 
     @staticmethod
     def is_not_list(data):

@@ -92,7 +92,7 @@ class AuthRegisterSchema(ma.Schema):
     society = ma.Int()
     role = ma.Int()
     gender = ma.Int()
-    custom = ma.String()
+    custom = ma.String(allow_none=True)
 
     @pre_load()
     def __validate(self, data):
@@ -105,7 +105,7 @@ class AuthRegisterSchema(ma.Schema):
         age_valid = validator.validate('age', 'int', data)
         society_valid = validator.validate('society', 'society', data)
         gender_valid = validator.validate('gender', 'int', data)
-        custom_valid = validator.validate('custom', 'str', data)
+        role_valid = validator.validate('role', 'int', data)
 
         if lang_valid:
             is_lang = SupportedLanguage.query.get(data['lang'])
