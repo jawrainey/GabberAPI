@@ -16,7 +16,7 @@
   "verify": {
     "subject": "Vérifiez votre compte {0}",
     "body": "Bienvenue dans {0}! Veuillez vérifier votre adresse e-mail en cliquant sur le bouton ci-dessous.",
-    "button_label": "Vérifier les courriels",
+    "button_label": "Vérifier le compte",
     "footer": ""
   },
   "consent": {

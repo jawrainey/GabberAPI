@@ -16,7 +16,7 @@
   "verify": {
     "subject": "Verifica tu cuenta {0}",
     "body": "¡Bienvenido a {0}! Por favor, verifique su correo electrónico dando clic en el botón de abajo.",
-    "button_label": "Verifique su correo electrónico",
+    "button_label": "Verificar Cuenta",
     "footer": ""
   },
   "consent": {

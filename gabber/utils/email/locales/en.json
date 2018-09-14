@@ -16,7 +16,7 @@
   "verify": {
     "subject": "Verify your {0} account",
     "body": "Welcome to {0}! Please verify your email address by tapping on the button below.",
-    "button_label": "Verify Email",
+    "button_label": "Verify Account",
     "footer": ""
   },
   "consent": {
