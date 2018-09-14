@@ -16,6 +16,11 @@ class RecordingTopicSchema(ma.ModelSchema):
 class RecordingParticipantsSchema(ma.ModelSchema):
     user_id = ma.Int(attribute='user.id')
     role = ma.Function(lambda member: 'interviewer' if member.role else 'interviewee')
+    age = ma.Int(attribute='user.age')
+    society = ma.Int(attribute='user.society')
+    m_role = ma.Int(attribute='user.role')
+    gender = ma.Int(attribute='user.gender')
+    custom = ma.Int(attribute='user.custom')
 
     class Meta:
         model = InterviewParticipants
