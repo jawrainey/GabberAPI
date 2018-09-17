@@ -20,7 +20,7 @@ class RecordingParticipantsSchema(ma.ModelSchema):
     society = ma.Int(attribute='user.society')
     m_role = ma.Int(attribute='user.role')
     gender = ma.Int(attribute='user.gender')
-    custom = ma.Int(attribute='user.custom')
+    custom = ma.String(attribute='user.gender_custom')
 
     class Meta:
         model = InterviewParticipants
