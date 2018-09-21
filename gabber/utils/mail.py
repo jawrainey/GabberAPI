@@ -22,6 +22,8 @@ class MailClient:
         self.apikey = app.config['MAIL_API_KEY']
         self.sender_name = app.config['MAIL_SENDER_NAME']
         self.sender_email = app.config['MAIL_SENDER_EMAIL']
+        self.android_url = 'https://play.google.com/store/apps/details?id=uk.ac.ncl.openlab.talkfutures'
+        self.ios_url = 'https://itunes.apple.com/us/app/talkfutures/id1436172223'
 
     def forgot(self, user, url):
         content = self.content['forgot']
@@ -81,25 +83,15 @@ class MailClient:
 
     def build_html(self, _content):
         content = self.__add_shared(_content)
-        content['bottom'] = content['bottom'].replace('Android', '<a href="{0}/android/">Android</a>'.format(self.homepage))
-        content['bottom'] = content['bottom'].replace('iOS', '<a href="{0}/ios/">iOS</a>'.format(self.homepage))
-
-        download = '<a href="{0}/download/">{1}</a>'.format(self.homepage, self.brand)
-        content['footer'] = content['footer'].replace(self.brand, download)
-
-        content['footer'] = content['footer'].replace("!", "!<br><hr>")
-        contact = '<a href="mailto:{0}">{1}</a>'.format(self.contact, self.contact)
-        content['footer'] = content['footer'].replace(self.contact, contact)
+        content['bottom'] = content['bottom'].replace('Android', '<a href="{0}">Android</a>'.format(self.android_url))
+        content['bottom'] = content['bottom'].replace('iOS', '<a href="{0}">iOS</a>'.format(self.ios_url))
 
         return render_template('action.html', **content)
 
     def build_plaintext(self, _content):
         content = self.__add_shared(_content)
-        content['bottom'] = content['bottom'].replace('Android', 'Android ({0}/android/)'.format(self.homepage))
-        content['bottom'] = content['bottom'].replace('iOS', 'iOS ({0}/ios/)'.format(self.homepage))
-
-        download = '{0} ({1}/download/)'.format(self.brand, self.homepage)
-        content['footer'] = content['footer'].replace(self.brand, download)
+        content['bottom'] = content['bottom'].replace('Android', 'Android ({0})'.format(self.android_url))
+        content['bottom'] = content['bottom'].replace('iOS', 'iOS ({0})'.format(self.ios_url))
 
         return u'Hi {name},\n\n{body}\n\n{button_label} ({button_url})' \
                u'\n\n{footer}\n{brand}\n\n{bottom}'.format(**self.__add_shared(content))
