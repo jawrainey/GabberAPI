@@ -3,6 +3,7 @@ from flask_restful import Api
 restful_api = Api()
 
 from .help import SupportedLanguages
+from .fcm import TokenForUser
 from .projects import Projects
 from .project import Project
 from .membership import ProjectMembership, ProjectInvites, ProjectInviteVerification
@@ -15,6 +16,7 @@ from .auth import TokenRefresh, UserRegistration, UserLogin, ForgotPassword, Res
 from .auth import VerifyRegistration
 
 restful_api.add_resource(SupportedLanguages, '/api/help/languages/')
+restful_api.add_resource(TokenForUser, '/api/fcm/')
 restful_api.add_resource(Projects, '/api/projects/')
 restful_api.add_resource(Project, '/api/projects/<int:pid>/')
 restful_api.add_resource(ProjectMembership, '/api/projects/<int:pid>/membership/')

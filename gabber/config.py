@@ -26,6 +26,8 @@ class Config:
     S3_ROOT_FOLDER = os.getenv('S3_APP_NAME', 'main')
     S3_PROJECT_MODE = os.environ.get('S3_APP_MODE', 'dev')
 
+    FCM_API_KEY = os.environ.get('FCM_API_KEY', '')
+
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET', '')
     JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=60*24*499)
 
