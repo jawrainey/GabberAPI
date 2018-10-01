@@ -1,5 +1,6 @@
 {
   "misc": {
+    "brand": "فريق {0}",
     "footer": "سجل وشارك محادثتك الخاصة مع {0} على Android و iOS.",
     "consent": {
       "public": "أي واحد",

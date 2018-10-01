@@ -116,7 +116,7 @@ class MailClient:
 
     def __add_shared(self, content):
         content['footer'] = content['footer'].format(self.contact)
-        content['brand'] = self.brand
+        content['brand'] = self.content['misc']['brand'].format(self.brand)
         content['brand_url'] = self.homepage
         content['bottom'] = self.content['misc']['footer'].format(self.brand)
         return content
