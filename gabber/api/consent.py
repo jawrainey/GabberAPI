@@ -10,10 +10,10 @@ from ..api.schemas.session import RecordingSessionSchema
 from ..api.auth import AuthToken
 from ..models.projects import Project, InterviewSession
 from ..models.user import User, SessionConsent as SessionConsentModel
-from ..utils.general import custom_response
+from ..utils.general import CustomException, custom_response
 from flask import current_app as app
 from flask_restful import Resource
-from itsdangerous import URLSafeTimedSerializer
+from itsdangerous import URLSafeSerializer, SignatureExpired, BadSignature
 import gabber.utils.helpers as helpers
 
 
@@ -26,7 +26,7 @@ class SessionConsent(Resource):
         """
         Returns the project, session and user associated with the session that is being consented by the user.
         """
-        consent_id = AuthToken.validate_token(token)
+        consent_id = SessionConsent.validate_token(token)
         consent = SessionConsentModel.query.get(consent_id)
         _session = InterviewSession.query.get(consent.session_id)
         session = RecordingSessionSchema().dump(_session)
@@ -39,7 +39,7 @@ class SessionConsent(Resource):
         """
         Lets a user update their consent for a gabber session.
         """
-        consent_id = AuthToken.validate_token(token)
+        consent_id = SessionConsent.validate_token(token)
         data = helpers.jsonify_request_or_abort()
         helpers.abort_if_errors_in_validation(ConsentType().validate(data))
         consent = SessionConsentModel.query.get(consent_id)
@@ -52,7 +52,18 @@ class SessionConsent(Resource):
         """
         Generates an invite URL with embedded information
         """
-        return URLSafeTimedSerializer(app.config["SECRET_KEY"]).dumps(consent_id, app.config['SALT'])
+        return URLSafeSerializer(app.config["SECRET_KEY"]).dumps(consent_id, app.config['SALT'])
+
+    @staticmethod
+    def validate_token(token):
+        """
+        Validates that the token used exists
+        """
+        try:
+            serializer = URLSafeSerializer(app.config['SECRET_KEY'])
+            return serializer.loads(token, salt=app.config['SALT'])
+        except Exception:
+            raise CustomException(400, errors=['general.UNKNOWN_TOKEN'])
 
     @staticmethod
     def consent_url(session_id, user_id):
