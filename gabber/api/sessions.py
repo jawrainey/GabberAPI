@@ -4,11 +4,10 @@ Viewing all Gabber sessions and creating a new one
 """
 from .. import db
 from ..api.schemas.create_session import ParticipantScheme, RecordingAnnotationSchema
-from ..api.schemas.session import RecordingSessionsSchema
+from ..api.schemas.session import RecordingSessionsSchema, Recommendation
 from ..api.schemas.helpers import is_not_empty
 from ..models.projects import InterviewSession, InterviewParticipants, InterviewPrompts, Project, TopicLanguage
 from ..models.user import User, SessionConsent
-from ..models.language import SupportedLanguage
 from ..utils.general import custom_response
 from marshmallow import ValidationError
 from flask_restful import Resource, reqparse, abort
@@ -17,6 +16,22 @@ from uuid import uuid4
 from ..utils.mail import MailClient
 import gabber.utils.helpers as helpers
 import json
+
+
+class Recommendations(Resource):
+    @jwt_optional
+    def get(self):
+        """
+        View recommendations for users to view on the homepage
+        :return: A dictionary of recommendations
+        """
+        _sessions = [
+            '838d600a26fe4b94bfea13197584be81',
+            '0560bac7727a421a96f3b2d03f074a27',
+            'e9363612af0b4f43842e1983781d94f3'
+        ]
+        sessions = InterviewSession.query.filter(InterviewSession.id.in_(_sessions)).all()
+        return custom_response(200, data=Recommendation(many=True).dump(sessions))
 
 
 class ProjectSessions(Resource):

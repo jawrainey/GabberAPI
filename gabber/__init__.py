@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from .config import config
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy

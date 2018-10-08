@@ -7,7 +7,7 @@ from .fcm import TokenForUser
 from .projects import Projects
 from .project import Project
 from .membership import ProjectMembership, ProjectInvites, ProjectInviteVerification
-from .sessions import ProjectSessions
+from .sessions import ProjectSessions, Recommendations
 from .session import ProjectSession
 from .consent import SessionConsent
 from .annotations import UserAnnotations, UserAnnotation
@@ -24,6 +24,7 @@ restful_api.add_resource(ProjectInvites,
                          '/api/projects/<int:pid>/membership/invites/',
                          '/api/projects/<int:pid>/membership/invites/<int:mid>/')
 restful_api.add_resource(ProjectInviteVerification, '/api/projects/invites/<token>/')
+restful_api.add_resource(Recommendations, '/api/sessions/recommendations/')
 restful_api.add_resource(ProjectSessions, '/api/projects/<int:pid>/sessions/')
 restful_api.add_resource(ProjectSession, '/api/projects/<int:pid>/sessions/<string:sid>/')
 restful_api.add_resource(SessionConsent, '/api/consent/<string:token>/')

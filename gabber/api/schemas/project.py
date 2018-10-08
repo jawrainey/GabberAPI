@@ -175,6 +175,7 @@ class ProjectModelSchema(ma.ModelSchema):
     organisation_id = ma.Function(lambda d: d.organisation)
     creator_id = ma.Function(lambda d: d.creator)
     privacy = ma.Function(lambda obj: "public" if obj.is_public else "private")
+    sessions = ma.Function(lambda o: len(o.sessions))
 
     def __init__(self, **kwargs):
         """

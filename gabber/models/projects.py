@@ -196,6 +196,7 @@ class Project(db.Model):
     content = db.relationship('ProjectLanguage', backref='content', lazy='dynamic')
     topics = db.relationship('TopicLanguage', backref='topics', lazy='dynamic')
     codebook = db.relationship('Codebook', backref='project', lazy='dynamic')
+    sessions = db.relationship('InterviewSession', backref='sessions', uselist=True)
 
     members = db.relationship('Membership', back_populates='project',
                               primaryjoin='and_(Project.id==Membership.project_id, Membership.deactivated == False)')
