@@ -4,8 +4,9 @@ All annotations for a session
 """
 from .. import db
 from ..utils.general import custom_response
+from ..utils.fcm import fcm
 from ..api.schemas.annotations import UserAnnotationSchema
-from ..models.projects import Connection as UserAnnotationModel, Code as Tags, Project
+from ..models.projects import Connection as UserAnnotationModel, Code as Tags, Project, InterviewSession
 from ..models.user import User
 from flask import request
 from flask_restful import Resource
@@ -58,6 +59,8 @@ class UserAnnotations(Resource):
             user_annotation.tags.extend([Tags.query.filter_by(id=cid).first() for cid in json_data['tags']])
         db.session.add(user_annotation)
         db.session.commit()
+
+        fcm.notify_participants_user_commented(pid, sid)
 
         return custom_response(200, data=schema.dump(user_annotation))
 

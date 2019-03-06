@@ -56,6 +56,8 @@ class User(db.Model):
     registered = db.Column(db.Boolean, default=False)
     verified = db.Column(db.Boolean, default=False)
 
+    fcm_token = db.Column(db.String(256), default=None)
+
     participant_of = db.relationship("InterviewParticipants", lazy='joined')
     member_of = db.relationship("Membership", back_populates="user", lazy='dynamic')
     connections = db.relationship('Connection', backref='user', lazy='dynamic')

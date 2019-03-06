@@ -12,3 +12,4 @@ marshmallow==3.0.0b7
 flask-marshmallow==0.8.0
 marshmallow-sqlalchemy==0.13.2
 requests==2.19.1
+pyfcm==1.4.5

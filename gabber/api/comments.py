@@ -7,6 +7,7 @@ from ..api.schemas.annotations import UserAnnotationCommentSchema
 from ..models.projects import ConnectionComments as CommentsModel, Project
 from ..models.user import User
 from ..utils.general import custom_response
+from ..utils.fcm import fcm
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 import gabber.utils.helpers as helpers
@@ -30,6 +31,8 @@ def create_comment(project_id, session_id, annotation_id, comment_id=None):
     comment = CommentsModel(data['content'], comment_id, user.id, annotation_id)
     db.session.add(comment)
     db.session.commit()
+
+    fcm.notify_participants_user_commented(project_id, session_id)
     return custom_response(200, data=schema.dump(comment))
 
 
