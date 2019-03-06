@@ -1,5 +1,6 @@
 {
   "misc": {
+    "brand": "El equipo de {0}",
     "footer": "Graba y comparte tu conversación en {0}, disponible para Android e iOS.",
     "consent": {
       "public": "nadie",
