@@ -73,7 +73,8 @@ class User(db.Model):
 
     @staticmethod
     def create_unregistered_user(fullname, email, lang):
-        user = User(fullname, email, uuid4().hex, lang)
+        user = User(fullname=fullname, email=email,
+                    password=uuid4().hex, preferred_lang=lang)
         db.session.add(user)
         db.session.commit()
         return user
