@@ -55,7 +55,7 @@ class RecordingSessionSchema(RecordingSessionsSchema):
 
 class Recommendation(ma.ModelSchema):
     participants = ma.Function(lambda data: len(data.participants))
-    comments = ma.Function(lambda data: len([i.comments for i in data.connections]) + len(data.connections))
+    comments = ma.Function(lambda data: len(data.connections))
     pid = ma.String(attribute="project_id")
     image = ma.Method("_project_image_from_amazon")
     content = ma.Method("_project_title")
