@@ -47,7 +47,7 @@ def notify_user_commented(user, pid, sid):
     content = locales[SupportedLanguage.query.get(user.lang).code]['commented']
     push_service = FCMNotification(api_key=app.config['FCM_API_KEY'])
     # NOTE: this URL is currently different from the main Gabber website
-    session_url = '{0}/themes/{1}/conversations/{2}'.format(app.config['WEB_HOST'], pid, sid)
+    session_url = '{0}/projects/{1}/conversations/{2}'.format(app.config['WEB_HOST'], pid, sid)
 
     push_service.notify_single_device(
         registration_id=user.fcm_token,
