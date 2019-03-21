@@ -15,6 +15,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, jwt_optional
 from uuid import uuid4
 from ..utils.mail import MailClient
 import gabber.utils.helpers as helpers
+from itertools import chain
+from random import choice
 import json
 
 
@@ -25,13 +27,11 @@ class Recommendations(Resource):
         View recommendations for users to view on the homepage
         :return: A dictionary of recommendations
         """
-        _sessions = [
-            '838d600a26fe4b94bfea13197584be81',
-            '0560bac7727a421a96f3b2d03f074a27',
-            'e9363612af0b4f43842e1983781d94f3'
-        ]
-        sessions = InterviewSession.query.filter(InterviewSession.id.in_(_sessions)).all()
-        return custom_response(200, data=Recommendation(many=True).dump(sessions))
+        projects = Project.query.filter_by(is_public=True).all()
+        __sessions = [InterviewSession.all_consented_sessions_by_project(i) for i in projects]
+        __sessions = list(chain(*__sessions))
+        choices = [choice(__sessions), choice(__sessions), choice(__sessions)]
+        return custom_response(200, data=Recommendation(many=True).dump(choices))
 
 
 class ProjectSessions(Resource):
