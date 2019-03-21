@@ -34,6 +34,8 @@ class Config:
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', '')
+    PHOTOS_API_KEY = os.getenv('PHOTOS_API_KEY', '')
+
     JSONIFY_PRETTYPRINT_REGULAR = False
 
 

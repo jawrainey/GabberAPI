@@ -14,7 +14,9 @@ from .annotations import UserAnnotations, UserAnnotation
 from .comments import Comments, Comment, CommentsReplies
 from .auth import TokenRefresh, UserRegistration, UserLogin, ForgotPassword, ResetPassword, UserAsMe
 from .auth import VerifyRegistration
+from .misc import SearchImages
 
+restful_api.add_resource(SearchImages, '/api/misc/photos/')
 restful_api.add_resource(SupportedLanguages, '/api/help/languages/')
 restful_api.add_resource(TokenForUser, '/api/fcm/')
 restful_api.add_resource(Projects, '/api/projects/')
