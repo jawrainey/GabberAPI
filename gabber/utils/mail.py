@@ -60,26 +60,29 @@ class MailClient:
         self.send_email(user.email, content)
 
     def invite_registered(self, user, admin_name, project):
-        num_sessions = len(InterviewSession.query.filter_by(project_id=project.id).all())
         content = self.content['invite_registered']
-        content['subject'] = content['subject'].format(admin_name, self.brand)
-        content['name'] = user.fullname
-        content['body'] = content['body'].format(project.title, admin_name, num_sessions)
+        content = self.__make_invite_content(content, user, admin_name, project)
         content['button_url'] = '{0}/projects/{1}/sessions/'.format(self.homepage, project.id)
-
         self.send_email(user.email, content)
 
     def invite_unregistered(self, user, admin_name, project):
         from ..api.membership import ProjectInviteVerification
-
-        num_sessions = len(InterviewSession.query.filter_by(project_id=project.id).all())
         content = self.content['invite_unregistered']
+        content = self.__make_invite_content(content, user, admin_name, project)
+        content['button_url'] = ProjectInviteVerification.generate_invite_url(user.id, project.id)
+        self.send_email(user.email, content)
+
+    def __make_invite_content(self, content, user, admin_name, project):
+        from ..models.projects import ProjectLanguage
         content['subject'] = content['subject'].format(admin_name, self.brand)
         content['name'] = user.fullname
-        content['body'] = content['body'].format(project.title, admin_name, num_sessions)
-        content['button_url'] = ProjectInviteVerification.generate_invite_url(user.id, project.id)
 
-        self.send_email(user.email, content)
+        num_sessions = len(InterviewSession.query.filter_by(project_id=project.id).all())
+        pl = ProjectLanguage.query.filter_by(project_id=project.id, lang_id=project.default_lang).first()
+        content['body'] = content['body'].format(pl.title, admin_name, num_sessions)
+
+        content['footer'] = content['footer'].format(self.brand, self.contact)
+        return content
 
     def build_html(self, _content):
         content = self.__add_shared(_content)
