@@ -42,7 +42,7 @@ class UserAsMe(Resource):
         return self.__user(user)
 
     @jwt_required
-    def put(self):
+    def post(self):
         """
         Updates the language preference of the user.
 
