@@ -30,6 +30,18 @@ locales = {
             "title": "Nouveau commentaire sur votre conversation",
             "body": "Appuyez pour afficher sur gabber.audio"
         }
+    },
+    "it": {
+        "commented": {
+            "title": "Nuovo commento nella tua conversazione",
+            "body": "Tocca per visualizzare su gabber.audio"
+        }
+    },
+    "ru": {
+        "commented": {
+            "title": "Новый комментарий к вашему разговору",
+            "body": "Нажмите, чтобы посмотреть на gabber.audio"
+        }
     }
 }
 
