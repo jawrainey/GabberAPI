@@ -55,13 +55,13 @@ class ProjectInviteVerification(Resource):
         user.fullname = data['fullname']
         user.set_password(data['password'])
         user.registered = True
-        user.verified = True
 
         membership = Membership.query.filter_by(project_id=token_data['project_id'], user_id=user.id).first()
         # Makes sure that they can only be confirmed once
-        if membership.confirmed:
+        if membership.confirmed and user.verified:
             return custom_response(400, errors=['MEMBERSHIP_CONFIRMED'])
 
+        user.verified = True
         membership.confirmed = True
         db.session.commit()
         return custom_response(200, data=create_jwt_access(user.email))

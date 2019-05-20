@@ -211,6 +211,9 @@ class ProjectSessions(Resource):
             # e.g. someone interviewed a person who is not a Gabber user
             if not known_user:
                 known_user = User.create_unregistered_user(p['Name'], p['Email'], lang_id)
+                project = Project.query.get(project_id)
+                admin = User.query.get(project.creator)
+                MailClient(lang_id).invite_unregistered(known_user, admin.fullname, project)
             # By default, participants involved in a Gabber become members
             if not known_user.is_project_member(project_id):
                 Membership.join_project(known_user.id, project_id)
