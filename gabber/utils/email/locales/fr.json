@@ -14,6 +14,18 @@
     "button_label": "Réinitialisez votre mot de passe",
     "footer": "Si vous n'avez pas demandé de réinitialisation du mot de passe, veuillez ignorer cet e-mail ou contactez-nous et faites-le nous savoir. Cette réinitialisation de mot de passe est uniquement valide pour les 30 prochaines minutes."
   },
+  "comment_root_response": {
+    "subject": "Someone has responded to your comment on {0}",
+    "body": "A new response to your comment has been created. Login to {0} to respond and continue the conversation.",
+    "button_label": "View Conversation",
+    "footer": ""
+  },
+  "comment_nested_response": {
+    "subject": "There's a new comment on your {0} conversation",
+    "body": "Someone has listened and commented on your conversation. Login to {0} to respond and continue the conversation.",
+    "button_label": "View Conversation",
+    "footer": ""
+  },
   "verify": {
     "subject": "Vérifiez votre compte {0}",
     "body": "Bienvenue dans {0}! Veuillez vérifier votre adresse e-mail en cliquant sur le bouton ci-dessous.",

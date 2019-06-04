@@ -14,6 +14,18 @@
     "button_label": "اعد ضبط كلمه السر",
     "footer": "إذا لم تطلب إعادة تعيين كلمة المرور ، فيرجى تجاهل هذه الرسالة الإلكترونية أو الاتصال بنا وإخبارنا بذلك. إعادة تعيين كلمة المرور هذه صالحة لمدة 30 دقيقة فقط."
   },
+  "comment_root_response": {
+    "subject": "Someone has responded to your comment on {0}",
+    "body": "A new response to your comment has been created. Login to {0} to respond and continue the conversation.",
+    "button_label": "View Conversation",
+    "footer": ""
+  },
+  "comment_nested_response": {
+    "subject": "There's a new comment on your {0} conversation",
+    "body": "Someone has listened and commented on your conversation. Login to {0} to respond and continue the conversation.",
+    "button_label": "View Conversation",
+    "footer": ""
+  },
   "verify": {
     "subject": "تحقق من حسابك {0}",
     "body": "مرحبًا بك {0}! يرجى التحقق من عنوان البريد الإلكتروني الخاص بك عن طريق النقر على الزر أدناه.",

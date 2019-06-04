@@ -4,7 +4,7 @@ READ a list of the comments for an annotation or CREATE a new comment.
 """
 from .. import db
 from ..api.schemas.annotations import UserAnnotationCommentSchema
-from ..models.projects import ConnectionComments as CommentsModel, Project
+from ..models.projects import ConnectionComments as CommentsModel, Project, InterviewSession, Connection as RootComment
 from ..models.user import User
 from ..utils.general import custom_response
 from ..utils.fcm import fcm
@@ -31,6 +31,17 @@ def create_comment(project_id, session_id, annotation_id, comment_id=None):
     comment = CommentsModel(data['content'], comment_id, user.id, annotation_id)
     db.session.add(comment)
     db.session.commit()
+
+    # Determine which type of comment the response is to: nested or a root comment
+    if comment_id:
+        _comment = CommentsModel.query.filter_by(parent_id=comment_id).first()
+    else:
+        _comment = RootComment.query.get(annotation_id)
+    parent_user_id = _comment.user_id
+    usr = User.query.get(parent_user_id)
+
+    if user.id != usr.id:
+        InterviewSession.email_commentor(usr, project_id, session_id)
 
     fcm.notify_participants_user_commented(project_id, session_id)
     return custom_response(200, data=schema.dump(comment))

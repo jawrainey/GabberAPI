@@ -4,6 +4,7 @@ Handles sending notifications through Firebase Cloud Messaging
 """
 from pyfcm import FCMNotification
 from ...models.language import SupportedLanguage
+from ...models.projects import InterviewSession
 
 # Store these here while #Notifications is small
 locales = {
@@ -47,7 +48,6 @@ locales = {
 
 
 def notify_participants_user_commented(pid, sid):
-    from ...models.projects import InterviewSession
     for participant in InterviewSession.query.get(sid).participants:
         if participant.user.fcm_token:
             notify_user_commented(participant.user, pid, sid)
@@ -58,13 +58,11 @@ def notify_user_commented(user, pid, sid):
 
     content = locales[SupportedLanguage.query.get(user.lang).code]['commented']
     push_service = FCMNotification(api_key=app.config['FCM_API_KEY'])
-    # NOTE: this URL is currently different from the main Gabber website
-    session_url = '{0}/projects/{1}/conversations/{2}'.format(app.config['WEB_HOST'], pid, sid)
 
     push_service.notify_single_device(
         registration_id=user.fcm_token,
         message_title=content['title'],
         message_body=content['body'],
-        data_message={"url": session_url}
+        data_message={"url": InterviewSession.session_url(pid, sid)}
     )
 

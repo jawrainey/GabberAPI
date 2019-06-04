@@ -14,6 +14,18 @@
     "button_label": "Restablecer su contraseña",
     "footer": "Si no solicitó restablecer la contraseña, ignore este correo electrónico o infórmenos. Este restablecimiento de contraseña es válido solo por los próximos 30 minutos."
   },
+  "comment_root_response": {
+    "subject": "Someone has responded to your comment on {0}",
+    "body": "A new response to your comment has been created. Login to {0} to respond and continue the conversation.",
+    "button_label": "View Conversation",
+    "footer": ""
+  },
+  "comment_nested_response": {
+    "subject": "There's a new comment on your {0} conversation",
+    "body": "Someone has listened and commented on your conversation. Login to {0} to respond and continue the conversation.",
+    "button_label": "View Conversation",
+    "footer": ""
+  },
   "verify": {
     "subject": "Verifica tu cuenta {0}",
     "body": "¡Bienvenido a {0}! Por favor, verifique su correo electrónico dando clic en el botón de abajo.",

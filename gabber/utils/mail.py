@@ -43,6 +43,24 @@ class MailClient:
 
         self.send_email(user.email, content)
 
+    def comment_nested_response(self, creator, pid, sid):
+        content = self.content['comment_nested_response']
+        content['subject'] = content['subject'].format(self.brand)
+        content['name'] = creator.fullname
+        content['body'] = content['body'].format(self.brand)
+        content['button_url'] = InterviewSession.session_url(pid, sid)
+
+        self.send_email(creator.email, content)
+
+    def comment_root_response(self, participant, pid, sid):
+        content = self.content['comment_root_response']
+        content['subject'] = content['subject'].format(self.brand)
+        content['name'] = participant.fullname
+        content['body'] = content['body'].format(self.brand)
+        content['button_url'] = InterviewSession.session_url(pid, sid)
+
+        self.send_email(participant.email, content)
+
     def consent(self, participant, names, project_title, session_id, consent_type):
         from ..models.user import User
         from ..api.consent import SessionConsent

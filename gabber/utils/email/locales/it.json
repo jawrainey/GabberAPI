@@ -13,6 +13,18 @@
     "button_label": "Reset your password",
     "footer": "If you did not request a password reset, then please ignore this email or contact us and let us know. This password reset is only valid for the next 30 minutes."
   },
+  "comment_root_response": {
+    "subject": "Someone has responded to your comment on {0}",
+    "body": "A new response to your comment has been created. Login to {0} to respond and continue the conversation.",
+    "button_label": "View Conversation",
+    "footer": ""
+  },
+  "comment_nested_response": {
+    "subject": "There's a new comment on your {0} conversation",
+    "body": "Someone has listened and commented on your conversation. Login to {0} to respond and continue the conversation.",
+    "button_label": "View Conversation",
+    "footer": ""
+  },
   "verify": {
     "subject": "Verify your {0} account",
     "body": "Welcome to {0}! Please verify your email address by tapping on the button below.",

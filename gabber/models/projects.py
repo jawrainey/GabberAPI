@@ -285,6 +285,29 @@ class InterviewSession(db.Model):
         from ..utils import amazon
         return amazon.signed_url(self.project_id, self.id)
 
+    @staticmethod
+    def session_url(pid, sid):
+        from flask import current_app as app
+        return '{0}/projects/{1}/conversations/{2}'.format(app.config['WEB_HOST'], pid, sid)
+
+    @staticmethod
+    def email_commentor(comment_creator, pid, sid):
+        from ..utils.mail import MailClient
+        send_mail = MailClient(comment_creator.id)
+        send_mail.comment_root_response(comment_creator, pid, sid)
+
+    @staticmethod
+    def email_participants(creator, sid):
+        from ..utils.mail import MailClient
+        from ..models.user import User
+        session = InterviewSession.query.get(sid)
+
+        # notify all participants, except the one who created the comment if they did
+        for participant in [p for p in session.participants if p.user_id != creator.id]:
+            user = User.query.get(participant.user_id)
+            send_mail = MailClient(user.lang)
+            send_mail.comment_nested_response(user, session.project_id, sid)
+
 
 class InterviewPrompts(db.Model):
     """

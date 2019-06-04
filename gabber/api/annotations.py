@@ -47,11 +47,12 @@ class UserAnnotations(Resource):
         schema = UserAnnotationSchema()
         helpers.abort_if_errors_in_validation(errors=schema.validate(json_data))
 
+        user = User.query.filter_by(email=get_jwt_identity()).first()
         user_annotation = UserAnnotationModel(
             content=json_data['content'],
             start_interval=json_data['start_interval'],
             end_interval=json_data['end_interval'],
-            user_id=User.query.filter_by(email=get_jwt_identity()).first().id,
+            user_id=user.id,
             session_id=sid
         )
 
@@ -60,6 +61,7 @@ class UserAnnotations(Resource):
         db.session.add(user_annotation)
         db.session.commit()
 
+        InterviewSession.email_participants(user, sid)
         fcm.notify_participants_user_commented(pid, sid)
 
         return custom_response(200, data=schema.dump(user_annotation))
