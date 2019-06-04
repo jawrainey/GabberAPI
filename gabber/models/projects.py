@@ -188,8 +188,8 @@ class Project(db.Model):
     # Is the project public or private? True (1) is public.
     is_public = db.Column(db.Boolean, default=True)
 
-    # This can be null as the organisation may be an individual
-    organisation = db.Column(db.Integer, db.ForeignKey('organisation.id'), nullable=True)
+    # Defaults to individual unless told otherwise
+    organisation = db.Column(db.Integer, db.ForeignKey('organisation.id'), default=0)
     creator = db.Column(db.Integer, db.ForeignKey('user.id'))
     default_lang = db.Column(db.Integer, db.ForeignKey('supported_language.id'))
 

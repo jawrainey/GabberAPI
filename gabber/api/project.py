@@ -66,9 +66,7 @@ class Project(Resource):
 
         project = ProjectModel.query.get(pid)
         # TODO: it's unclear why schema.load does not load image correctly, hence needing to manually set it.
-        # TODO: ORG is hard-coded in the frontend and not validated in the schema above.
         project.image = json_data['image'] if json_data.get('image', None) else project.image
-        project.organisation = int(json_data.get('organisation', {id: 0})['id'])
         project.is_public = json_data['privacy'] == 'public'
 
         # Loads project data: relations are not loaded in their own schemas

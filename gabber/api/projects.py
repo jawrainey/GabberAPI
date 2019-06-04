@@ -66,8 +66,6 @@ class Projects(Resource):
 
         admin_role = Roles.query.filter_by(name='administrator').first().id
         membership = Membership(uid=user.id, pid=project.id, rid=admin_role, confirmed=True)
-        # TODO: temporary hard-coded value[s] in frontend ...
-        project.organisation = int(json_data.get('organisation', {id: 0})['id'])
         project.members.append(membership)
         db.session.add(project)
         db.session.flush()
