@@ -35,7 +35,7 @@ class SessionAnnotationSchema(ma.ModelSchema):
 class RecordingSessionsSchema(ma.ModelSchema):
     topics = ma.Nested(RecordingTopicSchema, many=True, attribute="prompts")
     participants = ma.Nested(RecordingParticipantsSchema, many=True, attribute="participants")
-    num_user_annotations = ma.Function(lambda data: len([i.comments for i in data.connections]) + len(data.connections))
+    num_user_annotations = ma.Function(lambda data: len(data.connections))
     creator = ma.Method("_creator")
 
     @staticmethod
