@@ -16,13 +16,13 @@ from uuid import uuid4
 from ..utils.mail import MailClient
 import gabber.utils.helpers as helpers
 from itertools import chain
-from random import choice
+from random import sample
 import json
 
 
 class Recommendations(Resource):
     @jwt_optional
-    def get(self):
+    def get(self, num=3):
         """
         View recommendations for users to view on the homepage
         :return: A dictionary of recommendations
@@ -30,8 +30,8 @@ class Recommendations(Resource):
         projects = Project.query.filter_by(is_public=True).all()
         __sessions = [InterviewSession.all_consented_sessions_by_project(i) for i in projects]
         __sessions = list(chain(*__sessions))
-        choices = [choice(__sessions), choice(__sessions), choice(__sessions)]
-        return custom_response(200, data=Recommendation(many=True).dump(choices))
+        # TODO: assumes at least num recommendations exist ...
+        return custom_response(200, data=Recommendation(many=True).dump(sample(__sessions, num)))
 
 
 class ProjectSessions(Resource):
