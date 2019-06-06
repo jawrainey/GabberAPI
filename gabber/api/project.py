@@ -4,9 +4,10 @@ Content for all projects that a user has access to
 """
 from .. import db
 from ..models.user import User
-from ..models.projects import Project as ProjectModel, TopicLanguage
+from ..models.projects import Project as ProjectModel, TopicLanguage, Code, Codebook
 from ..utils.general import custom_response
-from ..api.schemas.project import ProjectModelSchema, ProjectLanguageSchema, TopicLanguageSchema
+from ..api.schemas.project import ProjectModelSchema, ProjectLanguageSchema, \
+    TopicLanguageSchema, CodebookSchema, TagsSchema
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity, jwt_optional
 from gabber.utils import helpers
@@ -72,6 +73,8 @@ class Project(Resource):
         # Loads project data: relations are not loaded in their own schemas
         data = schema.load(json_data, instance=project)
 
+        self.add_codebook(project.id, json_data['codebook'])
+
         # Note: it may be better to move this to schema's pre-load
         for language, content in json_data['content'].items():
             # As the title may have changed, we must create a new slug
@@ -98,3 +101,22 @@ class Project(Resource):
         ProjectModel.query.filter_by(id=pid).update({'is_active': False})
         db.session.commit()
         return custom_response(200)
+
+    @staticmethod
+    def add_codebook(project_id, json_codebook):
+        codebook = CodebookSchema().dump(json_codebook)
+
+        if 'id' not in codebook or not codebook.get('id', None):
+            new_codebook = Codebook(project_id=project_id)
+            db.session.add(new_codebook)
+            db.session.commit()
+            # To access below if it exists
+            codebook['id'] = new_codebook.id
+
+        for tag in codebook['tags']:
+            if tag.get('id', None):
+                TagsSchema().load(tag)
+            else:
+                new_tag = Code(text=tag['text'], codebook_id=codebook['id'])
+                db.session.add(new_tag)
+        db.session.commit()

@@ -12,6 +12,7 @@ from flask_restful import Resource
 from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 from sqlalchemy import or_
 import gabber.utils.helpers as helpers
+from ..api.project import Project
 
 
 class Projects(Resource):
@@ -69,6 +70,8 @@ class Projects(Resource):
         project.members.append(membership)
         db.session.add(project)
         db.session.flush()
+
+        Project().add_codebook(project.id, json_data['codebook'])
 
         content = json_data['content'].get('en', None)
         if not content:

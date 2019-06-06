@@ -450,4 +450,5 @@ class Code(db.Model):
     """
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(64))
+    is_active = db.Column(db.SmallInteger, default=1)
     codebook_id = db.Column(db.Integer, db.ForeignKey('codebook.id'))
