@@ -3,7 +3,7 @@ from gabber import ma
 from gabber.models.projects import \
     Connection as UserAnnotations, \
     Code as Tags, \
-    ConnectionComments as Comments
+    ConnectionComments as Comments, InterviewSession
 from marshmallow import pre_load
 from gabber.api.schemas.project import HelperSchemaValidator, validate_length
 
@@ -57,10 +57,15 @@ class UserAnnotationSchema(ma.ModelSchema):
     labels = ma.Nested(UserAnnotationTagSchema, many=True, attribute="tags")
     comments = ma.Nested(UserAnnotationCommentSchema, many=True, attribute="comments")
     creator = ma.Method("_creator")
+    project_id = ma.Method("_project_id")
 
     @staticmethod
     def _creator(data):
         return {'user_id': data.user.id, 'fullname': data.user.fullname}
+
+    @staticmethod
+    def _project_id(data):
+        return InterviewSession.query.get(data.session_id).project_id
 
     class Meta:
         model = UserAnnotations
