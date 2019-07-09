@@ -4,6 +4,8 @@ restful_api = Api()
 
 from .help import SupportedLanguages
 from .fcm import TokenForUser
+from .playlist import Playlist
+from .playlists import Playlists
 from .projects import Projects
 from .project import Project
 from .membership import ProjectMembership, ProjectInvites, ProjectInviteVerification
@@ -21,6 +23,8 @@ restful_api.add_resource(SupportedLanguages, '/api/help/languages/')
 restful_api.add_resource(TokenForUser, '/api/fcm/')
 restful_api.add_resource(Projects, '/api/projects/')
 restful_api.add_resource(Project, '/api/projects/<int:pid>/')
+restful_api.add_resource(Playlists, '/api/playlists/')
+restful_api.add_resource(Playlist, '/api/playlists/<int:pid>/')
 restful_api.add_resource(ProjectMembership, '/api/projects/<int:pid>/membership/')
 restful_api.add_resource(ProjectInvites,
                          '/api/projects/<int:pid>/membership/invites/',

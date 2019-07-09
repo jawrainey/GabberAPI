@@ -1,4 +1,5 @@
 from ..models.projects import Project
+from ..models.playlist import Playlist
 from ..utils.general import CustomException
 from ..models.user import User
 from ..models.projects import InterviewSession, ConnectionComments
@@ -9,6 +10,11 @@ def abort_if_not_admin_or_staff(user, project_id, action="UPDATE"):
     role = user.role_for_project(project_id)
     if not role or role == 'participant':
         raise CustomException(403, errors=[('%s_UNAUTHORIZED' % action)])
+
+
+def abort_on_unknown_playlist_id(pid):
+    if pid not in [p.id for p in Playlist.query.all()]:
+        raise CustomException(400, errors=['general.PLAYLIST_404'])
 
 
 def abort_on_unknown_project_id(pid):
